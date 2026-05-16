@@ -1,0 +1,46 @@
+{
+  "name": "meal_ledger",
+  "version": "0.0.0",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git@github.work:vbee-holding-base/20252-meal-ledger.git"
+  },
+  "type": "module",
+  "main": "index.js",
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
+    "@eslint/css": "1.2.0",
+    "@eslint/js": "10.0.1",
+    "@eslint/json": "1.2.0",
+    "@types/node": "25.8.0",
+    "eslint": "10.4.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.6.0",
+    "husky": "9.1.7",
+    "lint-staged": "17.0.4",
+    "prettier": "3.8.3",
+    "ts-node": "10.9.2",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.59.3"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "lint": "eslint .",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write .",
+    "validate": "npm run lint && npm run format"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,jsx,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{html,css,json, md}": [
+      "prettier --write"
+    ]
+  },
+  "license": "ISC",
+  "author": ""
+}
