@@ -15,15 +15,14 @@ export interface IOwner {
 
 const ownerSchema = new mongoose.Schema<IOwner>(
   {
-    _id: { type: Schema.Types.ObjectId, required: true, unique: true },
     googleId: { type: String, required: true, unique: true },
     fullName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     avatar: { type: String, required: true },
     bankAccount: {
-      bankName: { type: String, required: true },
-      accountNumber: { type: String, required: true },
-      accountName: { type: String, required: true },
+      bankName: { type: String, required: false },
+      accountNumber: { type: String, required: false },
+      accountName: { type: String, required: false },
     },
   },
   {

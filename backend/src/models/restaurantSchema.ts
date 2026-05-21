@@ -9,10 +9,9 @@ export interface IRestaurant {
 
 const restaurantSchema = new mongoose.Schema<IRestaurant>(
   {
-    _id: { type: Schema.Types.ObjectId, required: true, unique: true },
-    ownerId: { type: Schema.Types.ObjectId, required: true },
+    ownerId: { type: Schema.Types.ObjectId, required: true, ref: "Owner" },
     name: { type: String, required: true },
-    address: { type: String, required: true },
+    address: { type: String, required: false, default: "" },
   },
   {
     timestamps: true,

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OAuth Test - Meal Ledger</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7f6;
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+      }
+      .section {
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        background-color: #fafafa;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #4285f4;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      .btn:hover {
+        background-color: #357ae8;
+      }
+      .btn-success {
+        background-color: #28a745;
+      }
+      .btn-success:hover {
+        background-color: #218838;
+      }
+      .btn-danger {
+        background-color: #dc3545;
+      }
+      .btn-danger:hover {
+        background-color: #c82333;
+      }
+
+      .input-group {
+        margin-top: 15px;
+        display: flex;
+        gap: 10px;
+      }
+      input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+      pre {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 15px;
+        border-radius: 5px;
+        overflow-x: auto;
+        font-size: 14px;
+        margin-top: 15px;
+      }
+      label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Google OAuth Tester</h1>
+
+      <!-- BƯỚC 1: LOGIN -->
+      <div class="section">
+        <h3>Bước 1: Đăng nhập Google</h3>
+        <p>
+          Click vào nút bên dưới. Trình duyệt sẽ chuyển hướng sang trang đăng
+          nhập Google. Sau khi đăng nhập thành công, server sẽ trả về một chuỗi
+          JSON.
+        </p>
+        <p>
+          <strong>Lưu ý:</strong> Hãy copy giá trị của trường
+          <code>access_token</code> trong chuỗi JSON đó để dùng cho các bước
+          tiếp theo.
+        </p>
+        <a
+          href="http://localhost:3001/api/v1/auth/google"
+          target="_blank"
+          class="btn"
+          >🚀 Login with Google</a
+        >
+      </div>
+
+      <!-- BƯỚC 2: TEST API CẦN TOKEN -->
+      <div class="section">
+        <h3>Bước 2: Test API với Token</h3>
+        <label for="token">Dán access_token vào đây:</label>
+        <div class="input-group">
+          <input
+            type="text"
+            id="token"
+            placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          />
+        </div>
+
+        <div style="margin-top: 20px; display: flex; gap: 10px">
+          <button class="btn btn-success" onclick="getMe()">
+            Lấy thông tin (GET /auth/me)
+          </button>
+          <button class="btn btn-danger" onclick="logout()">
+            Đăng xuất (POST /auth/logout)
+          </button>
+        </div>
+
+        <h4>Kết quả trả về:</h4>
+        <pre id="result">Chưa có dữ liệu...</pre>
+      </div>
+    </div>
+
+    <script>
+      const baseUrl = "http://localhost:3001/api/v1";
+
+      function displayResult(data) {
+        document.getElementById("result").textContent = JSON.stringify(
+          data,
+          null,
+          2,
+        );
+      }
+
+      async function getMe() {
+        const token = document.getElementById("token").value.trim();
+        if (!token) {
+          alert("Vui lòng nhập access_token trước!");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${baseUrl}/auth/me`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+          const data = await response.json();
+          displayResult(data);
+        } catch (error) {
+          displayResult({ error: error.message });
+        }
+      }
+
+      async function logout() {
+        const token = document.getElementById("token").value.trim();
+        if (!token) {
+          alert("Vui lòng nhập access_token trước!");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${baseUrl}/auth/logout`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          });
+          const data = await response.json();
+          displayResult(data);
+        } catch (error) {
+          displayResult({ error: error.message });
+        }
+      }
+    </script>
+  </body>
+</html>
