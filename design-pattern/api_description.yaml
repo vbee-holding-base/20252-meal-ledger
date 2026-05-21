@@ -1,0 +1,1408 @@
+openapi: 3.0.3
+info:
+  title: Debt Management API
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local
+  - url: https://lm123.com/v1
+    description: Production
+
+tags:
+  - name: Auth
+  - name: Participants
+  - name: Restaurants
+  - name: Debts
+  - name: Meals
+  - name: Payments
+  - name: Bank Account
+  - name: Public
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+
+    Owner:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "owner_abc123"
+        email:
+          type: string
+          example: "owner@gmail.com"
+        name:
+          type: string
+          example: "Nguyễn Văn A"
+        avatar_url:
+          type: string
+          example: "https://lh3.googleusercontent.com/abc"
+        created_at:
+          type: string
+          format: date-time
+
+    AuthTokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiJ9..."
+        token_type:
+          type: string
+          example: "Bearer"
+        expires_in:
+          type: integer
+          example: 86400
+        owner:
+          $ref: '#/components/schemas/Owner'
+
+    Participant:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "part_001"
+        name:
+          type: string
+          example: "Nam"
+        total_debt:
+          type: number
+          example: 250000
+        status:
+          type: string
+          example: "active"
+        created_at:
+          type: string
+          format: date-time
+
+    Restaurant:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "rest_001"
+        name:
+          type: string
+          example: "Phở Bát Đàn"
+        address:
+          type: string
+          nullable: true
+          example: "49 Bát Đàn, Hoàn Kiếm, Hà Nội"
+        created_at:
+          type: string
+          format: date-time
+
+    MealParticipantItem:
+      type: object
+      properties:
+        participant_id:
+          type: string
+          example: "part_001"
+        participant_name:
+          type: string
+          example: "Nam"
+        amount:
+          type: number
+          example: 60000
+
+    Meal:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "meal_001"
+        owner_id:
+          type: string
+          example: "owner_abc123"
+        restaurant_id:
+          type: string
+          nullable: true
+          example: "rest_001"
+        restaurant_name:
+          type: string
+          example: "Phở Bát Đàn"
+        meal_time:
+          type: string
+          format: date-time
+          example: "2025-07-14T12:00:00+07:00"
+        total_amount:
+          type: number
+          example: 160000
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealParticipantItem'
+        created_at:
+          type: string
+          format: date-time
+
+    # kết quả AI trả về trước khi owner xác nhận
+    MealDraft:
+      type: object
+      properties:
+        restaurant_name:
+          type: string
+          nullable: true
+          example: "Phở Bát Đàn"
+        restaurant_id:
+          type: string
+          nullable: true
+          example: "rest_001"
+        meal_time:
+          type: string
+          format: date-time
+          example: "2025-07-14T12:00:00+07:00"
+        total_amount:
+          type: number
+          example: 160000
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/MealParticipantItem'
+        unrecognized_names:
+          type: array
+          description: tên chưa có trong danh sách participant
+          items:
+            type: string
+          example: ["Tùng"]
+        warnings:
+          type: array
+          items:
+            type: string
+          example: ["Phát hiện tên người mới: Tùng"]
+
+    DebtSummary:
+      type: object
+      properties:
+        participant_id:
+          type: string
+          example: "part_001"
+        participant_name:
+          type: string
+          example: "Nam"
+        total_debt:
+          type: number
+          example: 250000
+
+    DebtHistoryItem:
+      type: object
+      properties:
+        meal_id:
+          type: string
+          example: "meal_001"
+        meal_time:
+          type: string
+          format: date-time
+        restaurant_name:
+          type: string
+          example: "Phở Bát Đàn"
+        amount:
+          type: number
+          example: 60000
+        status:
+          type: string
+          enum: [unpaid, paid]
+          example: "unpaid"
+        paid_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    QRCodeResponse:
+      type: object
+      properties:
+        qr_image_url:
+          type: string
+          example: "https://qr.sepay.vn/img?acc=SO_TAI_KHOAN&bank=NGAN_HANG&amount=SO_TIEN&des=NOI_DUNG&template=TEMPLATE&download=DOWNLOAD"
+        amount:
+          type: number
+          example: 250000
+        transfer_content:
+          type: string
+          example: "THANHTOAN NAM123"
+        bank_name:
+          type: string
+          example: "Vietcombank"
+        account_number:
+          type: string
+          example: "0123456789"
+        account_name:
+          type: string
+          example: "NGUYEN VAN A"
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "txn_001"
+        owner_id:
+          type: string
+          example: "owner_abc123"
+        participant_id:
+          type: string
+          example: "part_001"
+        participant_name:
+          type: string
+          example: "Nam"
+        amount:
+          type: number
+          example: 250000
+        transfer_content:
+          type: string
+          example: "THANHTOAN NAM123"
+        status:
+          type: string
+          enum: [success, partial, unresolved]
+        sepay_transaction_id:
+          type: string
+          example: "TXN20250714001"
+        created_at:
+          type: string
+          format: date-time
+
+    BankAccount:
+      type: object
+      properties:
+        bank_name:
+          type: string
+          example: "Vietcombank"
+        account_number:
+          type: string
+          example: "0123456789"
+        account_name:
+          type: string
+          example: "NGUYEN VAN A"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            error-code:
+              type: string
+              example: "VALIDATION_ERROR"
+            message:
+              type: string
+              example: "Không hợp lệ"
+              
+            
+
+    SuccessMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Thành công"
+
+paths:
+
+  # ───────────────────────────────────────────
+  # AUTH
+  # ───────────────────────────────────────────
+  /auth/google:
+    get:
+      tags: [Auth]
+      summary: Redirect sang Google OAuth
+      operationId: initiateGoogleLogin
+      security: []
+      responses:
+        '302':
+          description: Redirect
+
+  /auth/google/callback:
+    get:
+      tags: [Auth]
+      summary: Google callback, trả về JWT
+      operationId: googleCallback
+      security: []
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '400':
+          description: Từ chối cấp quyền hoặc code lỗi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "AUTH_DENIED"
+                message: "Đăng nhập thất bại"
+        '500':
+          description: Server lỗi
+          content:
+            application/json:
+              schema: 
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "SERVER_CRASH"
+                message: "Lỗi từ server"
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Đăng xuất
+      operationId: logout
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          description: Unauthorized
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Lấy thông tin owner đang đăng nhập
+      operationId: getMe
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Owner'
+        '401':
+          description: Unauthorized
+
+  # ───────────────────────────────────────────
+  # PARTICIPANTS
+  # ───────────────────────────────────────────
+  /participants:
+    get:
+      tags: [Participants]
+      summary: Lấy danh sách participant
+      operationId: listParticipants
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Participant'
+                  total:
+                    type: integer
+                    example: 5
+        '401':
+          description: Unauthorized
+
+    post:
+      tags: [Participants]
+      summary: Thêm participant mới
+      operationId: createParticipant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  example: "Nam"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participant'
+        '400':
+          description: Tên bị bỏ trống
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "VALIDATION_ERROR"
+                message: "Tên không được để trống"
+        '409':
+          description: Tên đã tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "DUPLICATE_NAME"
+                message: "Tên này đã tồn tại, vui lòng chọn biệt danh khác"
+        '401':
+          description: Unauthorized
+
+  /participants/{participantId}:
+    parameters:
+      - name: participantId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: "part_001"
+
+    put:
+      tags: [Participants]
+      summary: Sửa thông tin participant
+      operationId: updateParticipant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  example: "Nam Đẹp Trai"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Participant'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Không tìm thấy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Tên bị trùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+    delete:
+      tags: [Participants]
+      summary: Xóa participant
+      description: Không xóa được nếu còn nợ chưa thanh toán
+      operationId: deleteParticipant
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '409':
+          description: Vẫn còn nợ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "HAS_OUTSTANDING_DEBT"
+                message: "Không thể xóa người này vì vẫn còn công nợ chưa thanh toán"
+        '404':
+          description: Không tìm thấy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+  # ───────────────────────────────────────────
+  # RESTAURANTS
+  # ───────────────────────────────────────────
+  /restaurants:
+    get:
+      tags: [Restaurants]
+      summary: Lấy danh sách quán ăn
+      operationId: listRestaurants
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Restaurant'
+                  total:
+                    type: integer
+                    example: 10
+        '401':
+          description: Unauthorized
+
+    post:
+      tags: [Restaurants]
+      summary: Thêm quán ăn mới
+      operationId: createRestaurant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  example: "Phở Bát Đàn"
+                address:
+                  type: string
+                  nullable: true
+                  example: "49 Bát Đàn, Hoàn Kiếm, Hà Nội"
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '400':
+          description: Tên quán bị bỏ trống
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "VALIDATION_ERROR"
+                message: "Tên quán không được để trống"
+        '409':
+          description: Quán đã tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "DUPLICATE_RESTAURANT"
+                message: "Quán ăn này đã có trong danh sách"
+        '401':
+          description: Unauthorized
+
+  /restaurants/{restaurantId}:
+    parameters:
+      - name: restaurantId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: "rest_001"
+
+    put:
+      tags: [Restaurants]
+      summary: Sửa thông tin quán ăn
+      operationId: updateRestaurant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  example: "Phở Bát Đàn (Cơ sở 2)"
+                address:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Restaurant'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Không tìm thấy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Tên trùng
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+    delete:
+      tags: [Restaurants]
+      summary: Xóa quán ăn
+      operationId: deleteRestaurant
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '404':
+          description: Không tìm thấy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+  # ───────────────────────────────────────────
+  # DEBTS
+  # ───────────────────────────────────────────
+  /debts:
+    get:
+      tags: [Debts]
+      summary: Dashboard công nợ - tổng nợ của từng người
+      operationId: getDebtDashboard
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DebtSummary'
+                  total_outstanding:
+                    type: number
+                    example: 1250000
+        '401':
+          description: Unauthorized
+
+  /debts/{participantId}:
+    get:
+      tags: [Debts]
+      summary: Lịch sử nợ chi tiết của 1 người
+      operationId: getParticipantDebtHistory
+      parameters:
+        - name: participantId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "part_001"
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [all, unpaid, paid]
+            default: all
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  participant:
+                    $ref: '#/components/schemas/Participant'
+                  total_debt:
+                    type: number
+                    example: 250000
+                  history:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DebtHistoryItem'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                        example: 1
+                      limit:
+                        type: integer
+                        example: 20
+                      total:
+                        type: integer
+                        example: 15
+        '404':
+          description: Không tìm thấy participant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+  # ───────────────────────────────────────────
+  # MEALS
+  # ───────────────────────────────────────────
+  /meals/analyze:
+    post:
+      tags: [Meals]
+      summary: Gửi text cho AI phân tích, trả về draft để owner xác nhận
+      operationId: analyzeMealText
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [raw_text]
+              properties:
+                raw_text:
+                  type: string
+                  example: "Hôm nay ăn lẩu ếch tiệm Hương Lan, Nam 200k, Tú 150k, tổng 500k"
+      responses:
+        '200':
+          description: AI phân tích xong, trả về draft
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MealDraft'
+        '422':
+          description: AI không đọc được
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "AI_PARSE_FAILED"
+                message: "Không thể tự động phân tích câu này. Vui lòng nhập thông tin thủ công"
+        '503':
+          description: Gemini timeout hoặc lỗi kết nối
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "LLM_TIMEOUT"
+                message: "Dịch vụ phân tích AI đang bận. Vui lòng thử lại hoặc nhập thông tin thủ công"
+        '401':
+          description: Unauthorized
+
+  /meals:
+    get:
+      tags: [Meals]
+      summary: Lấy danh sách bữa ăn
+      operationId: listMeals
+      parameters:
+        - name: participant_id
+          in: query
+          schema:
+            type: string
+        - name: from_date
+          in: query
+          schema:
+            type: string
+            format: date
+          example: "2025-07-01"
+        - name: to_date
+          in: query
+          schema:
+            type: string
+            format: date
+          example: "2025-07-31"
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Meal'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      total:
+                        type: integer
+        '401':
+          description: Unauthorized
+
+    post:
+      tags: [Meals]
+      summary: Lưu bữa ăn sau khi owner xác nhận
+      description: Tổng tiền của các thành viên phải bằng total_amount, không thì bị chặn
+      operationId: saveMeal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [restaurant_name, meal_time, total_amount, participants]
+              properties:
+                restaurant_name:
+                  type: string
+                  example: "Phở Bát Đàn"
+                restaurant_id:
+                  type: string
+                  nullable: true
+                  example: "rest_001"
+                meal_time:
+                  type: string
+                  format: date-time
+                  example: "2025-07-14T12:00:00+07:00"
+                total_amount:
+                  type: number
+                  example: 160000
+                note:
+                  type: string
+                  nullable: true
+                participants:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [participant_id, amount]
+                    properties:
+                      participant_id:
+                        type: string
+                        example: "part_001"
+                      amount:
+                        type: number
+                        example: 60000
+      responses:
+        '201':
+          description: Lưu thành công
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meal'
+        '400':
+          description: Tổng tiền lệch hoặc thiếu trường bắt buộc
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                amount_mismatch:
+                  value:
+                    error: "AMOUNT_MISMATCH"
+                    message: "Tổng tiền các thành viên (110k) không khớp với tổng hóa đơn (160k)"
+                missing_restaurant:
+                  value:
+                    error: "MISSING_REQUIRED_FIELD"
+                    message: "Vui lòng bổ sung tên quán ăn"
+        '401':
+          description: Unauthorized
+
+  /meals/{mealId}:
+    get:
+      tags: [Meals]
+      summary: Chi tiết 1 bữa ăn
+      operationId: getMeal
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "meal_001"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meal'
+        '404':
+          description: Không tìm thấy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+  # ───────────────────────────────────────────
+  # PAYMENTS
+  # ───────────────────────────────────────────
+  /payments/qr:
+    post:
+      tags: [Payments]
+      summary: Sinh QR Code thanh toán cho participant
+      operationId: generateQR
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [participant_id]
+              properties:
+                participant_id:
+                  type: string
+                  example: "part_001"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QRCodeResponse'
+        '400':
+          description: Không có nợ hoặc thiếu thông tin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "NO_DEBT"
+                message: "Người này không có công nợ"
+        '404':
+          description: Participant không tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: SePay API lỗi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /payments/webhook/sepay:
+    post:
+      tags: [Payments]
+      summary: Webhook từ SePay khi có tiền vào tài khoản owner
+      description: >
+        SePay tự gọi endpoint này. Backend đọc description để tìm participant,
+        trừ nợ tương ứng. Không khớp thì đẩy vào bảng unresolved.
+      operationId: sepayWebhook
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [transaction_id, amount, description, transaction_date]
+              properties:
+                transaction_id:
+                  type: string
+                  example: "TXN20250714001"
+                amount:
+                  type: number
+                  example: 250000
+                description:
+                  type: string
+                  example: "THANHTOAN NAM123"
+                transaction_date:
+                  type: string
+                  format: date-time
+                bank_account:
+                  type: string
+                  example: "0123456789"
+      responses:
+        '200':
+          description: Nhận webhook thành công (phải trả 200 để SePay không retry)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /payments/transactions:
+    get:
+      tags: [Payments]
+      summary: Lịch sử giao dịch thanh toán
+      operationId: listTransactions
+      parameters:
+        - name: participant_id
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [success, partial, unresolved]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      total:
+                        type: integer
+        '401':
+          description: Unauthorized
+
+  /payments/unresolved:
+    get:
+      tags: [Payments]
+      summary: Giao dịch không nhận dạng được người gửi
+      operationId: listUnresolved
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "unresolved_001"
+                        amount:
+                          type: number
+                          example: 150000
+                        original_description:
+                          type: string
+                          example: "Chuyển tiền ăn trưa"
+                        sepay_transaction_id:
+                          type: string
+                          example: "TXN20250714002"
+                        created_at:
+                          type: string
+                          format: date-time
+        '401':
+          description: Unauthorized
+
+  /payments/manual-deduct:
+    post:
+      tags: [Payments]
+      summary: Gạch nợ thủ công cho participant
+      operationId: manualDeduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [participant_id, amount]
+              properties:
+                participant_id:
+                  type: string
+                  example: "part_001"
+                amount:
+                  type: number
+                  example: 250000
+                note:
+                  type: string
+                  nullable: true
+                  example: "Xác nhận biến động số dư thủ công"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Số tiền không hợp lệ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Participant không tồn tại
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+  # ───────────────────────────────────────────
+  # BANK ACCOUNT
+  # ───────────────────────────────────────────
+  /bank-account:
+    get:
+      tags: [Bank Account]
+      summary: Lấy thông tin tài khoản ngân hàng hiện tại
+      operationId: getBankAccount
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccount'
+        '404':
+          description: Chưa cấu hình tài khoản nào
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+    put:
+      tags: [Bank Account]
+      summary: Lưu / cập nhật tài khoản ngân hàng
+      operationId: saveBankAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bank_code, account_number]
+              properties:
+                bank_code:
+                  type: string
+                  example: "VCB"
+                account_number:
+                  type: string
+                  example: "0123456789"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BankAccount'
+        '400':
+          description: Thiếu thông tin hoặc số tài khoản không xác thực được
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missing:
+                  value:
+                    error: "VALIDATION_ERROR"
+                    message: "Vui lòng điền đầy đủ thông tin ngân hàng"
+                invalid:
+                  value:
+                    error: "INVALID_BANK_ACCOUNT"
+                    message: "Không thể xác thực số tài khoản này"
+        '401':
+          description: Unauthorized
+
+  /bank-account/verify:
+    post:
+      tags: [Bank Account]
+      summary: Tra cứu tên chủ tài khoản qua SePay
+      operationId: verifyBankAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bank_code, account_number]
+              properties:
+                bank_code:
+                  type: string
+                  example: "VCB"
+                account_number:
+                  type: string
+                  example: "0123456789"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  is_valid:
+                    type: boolean
+                    example: true
+                  account_name:
+                    type: string
+                    nullable: true
+                    example: "NGUYEN VAN A"
+                  message:
+                    type: string
+                    example: "Xác thực thành công"
+        '503':
+          description: SePay không phản hồi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthorized
+
+  # ───────────────────────────────────────────
+  # PUBLIC (không cần đăng nhập)
+  # ───────────────────────────────────────────
+  /public/participants/{alias}/debt:
+    get:
+      tags: [Public]
+      summary: Participant tra cứu tổng nợ bằng biệt danh
+      operationId: publicGetDebt
+      security: []
+      parameters:
+        - name: alias
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "Nam"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  participant_name:
+                    type: string
+                    example: "Nam"
+                  total_debt:
+                    type: number
+                    example: 250000
+        '404':
+          description: Không tìm thấy biệt danh
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "NOT_FOUND"
+                message: "Không tìm thấy người dùng với biệt danh này"
+
+  /public/participants/{alias}/history:
+    get:
+      tags: [Public]
+      summary: Participant xem lịch sử nợ bằng biệt danh
+      operationId: publicGetHistory
+      security: []
+      parameters:
+        - name: alias
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "Nam"
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  participant_name:
+                    type: string
+                    example: "Nam"
+                  total_debt:
+                    type: number
+                    example: 250000
+                  history:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DebtHistoryItem'
+                  pagination:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      total:
+                        type: integer
+        '404':
+          description: Không tìm thấy biệt danh
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+security:
+  - BearerAuth: []
