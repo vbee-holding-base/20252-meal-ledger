@@ -12,9 +12,12 @@ export interface ITransaction {
 
 const transactionSchema = new mongoose.Schema<ITransaction>(
   {
-    _id: { type: Schema.Types.ObjectId, required: true, unique: true },
-    ownerId: { type: Schema.Types.ObjectId, required: true },
-    participantId: { type: Schema.Types.ObjectId, required: true },
+    ownerId: { type: Schema.Types.ObjectId, required: true, ref: "Owner" },
+    participantId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Participant",
+    },
     amount: { type: Number, required: true },
     transferDescription: { type: String, required: true },
     status: { type: String, required: true },

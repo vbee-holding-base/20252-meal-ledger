@@ -7,25 +7,30 @@ export interface IMeal {
   restaurantName: string;
   date: Date;
   totalAmount: number;
-  participantsInfo: [
-    {
-      participantId: mongoose.Types.ObjectId;
-      amount: number;
-    },
-  ];
+  participantsInfo: {
+    participantId: mongoose.Types.ObjectId;
+    amount: number;
+  }[];
 }
 
 const mealSchema = new mongoose.Schema<IMeal>(
   {
-    _id: { type: Schema.Types.ObjectId, required: true, unique: true },
-    ownerId: { type: Schema.Types.ObjectId, required: true },
-    restaurantId: { type: Schema.Types.ObjectId, required: true },
+    ownerId: { type: Schema.Types.ObjectId, required: true, ref: "Owner" },
+    restaurantId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Restaurant",
+    },
     restaurantName: { type: String, required: true },
     date: { type: Date, required: true },
     totalAmount: { type: Number, required: true },
     participantsInfo: [
       {
-        participantId: { type: Schema.Types.ObjectId, required: true },
+        participantId: {
+          type: Schema.Types.ObjectId,
+          required: true,
+          ref: "Participant",
+        },
         amount: { type: Number, required: true },
       },
     ],

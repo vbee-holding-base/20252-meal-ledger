@@ -10,11 +10,10 @@ export interface IParticipant {
 
 const participantSchema = new mongoose.Schema<IParticipant>(
   {
-    _id: { type: Schema.Types.ObjectId, required: true, unique: true },
-    ownerId: { type: Schema.Types.ObjectId, required: true },
+    ownerId: { type: Schema.Types.ObjectId, required: true, ref: "Owner" },
     name: { type: String, required: true },
-    totalDebt: { type: Number, required: true },
-    status: { type: String, required: true },
+    totalDebt: { type: Number, required: true, default: 0 },
+    status: { type: String, required: true, default: "active" },
   },
   {
     timestamps: true,
