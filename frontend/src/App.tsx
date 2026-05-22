@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import AuthCallback from "./pages/AuthCallback";
 import ParticipantManagement from "./pages/ParticipantManagement";
 import RestaurantManagement from "./pages/RestaurantManagement";
 import AddMeal from "./pages/AddMeal";
@@ -19,6 +20,7 @@ function App() {
         <div className="w-full max-w-md bg-background min-h-screen relative shadow-2xl overflow-x-hidden">
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/" element={<Home />} />
             <Route path="/participants" element={<ParticipantManagement />} />
             <Route path="/restaurants" element={<RestaurantManagement />} />

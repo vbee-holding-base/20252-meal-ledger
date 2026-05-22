@@ -2,6 +2,9 @@ import React, { useState } from "react";
 
 import logo from "../assets/logo.png";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001/api/v1";
+
 const Login: React.FC = () => {
   const [searchName, setSearchName] = useState("");
   const [showToast, setShowToast] = useState(false);
@@ -66,7 +69,7 @@ const Login: React.FC = () => {
               <div className="border-2 border-outline-variant/30 rounded-xl p-md">
                 <a
                   className="w-full h-14 bg-surface-container-lowest border border-outline-variant rounded-full flex items-center justify-center gap-base font-label-md text-label-md text-on-surface-variant squishy-active hover:bg-surface-container-low transition-colors"
-                  href="http://localhost:3001/api/v1/auth/google"
+                  href={`${API_BASE_URL}/auth/google`}
                 >
                   <svg className="w-6 h-6" viewBox="0 0 24 24">
                     <path

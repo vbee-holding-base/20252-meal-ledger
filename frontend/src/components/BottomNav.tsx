@@ -12,8 +12,11 @@ const BottomNav: React.FC = () => {
     { path: "/more", icon: "more_horiz", label: "Khác" },
   ];
 
-  // Don't show bottom nav on login page
-  if (location.pathname === "/login") {
+  // Hide app navigation outside authenticated app screens.
+  if (
+    location.pathname === "/login" ||
+    location.pathname === "/auth/callback"
+  ) {
     return null;
   }
 

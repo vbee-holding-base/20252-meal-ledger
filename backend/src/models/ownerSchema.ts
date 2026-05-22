@@ -16,9 +16,9 @@ export interface IOwner {
 const ownerSchema = new mongoose.Schema<IOwner>(
   {
     googleId: { type: String, required: true, unique: true },
-    fullName: { type: String, required: true },
+    fullName: { type: String, default: "" },
     email: { type: String, required: true, unique: true },
-    avatar: { type: String, required: true },
+    avatar: { type: String, default: "" },
     bankAccount: {
       bankName: { type: String, required: false },
       accountNumber: { type: String, required: false },
