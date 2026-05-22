@@ -1,6 +1,3 @@
-import forms from "@tailwindcss/forms";
-import containerQueries from "@tailwindcss/container-queries";
-
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
@@ -106,5 +103,10 @@ export default {
       },
     },
   },
-  plugins: [forms, containerQueries],
+  plugins: [
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("@tailwindcss/forms"),
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("@tailwindcss/container-queries"),
+  ],
 };
