@@ -6,6 +6,8 @@
 
 # build
 /dist
+/frontend/dist
+*.log
 
 # environment
 .env*

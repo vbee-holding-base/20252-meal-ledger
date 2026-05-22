@@ -5,23 +5,42 @@ import mongoose from "mongoose";
 import Owner from "../models/ownerSchema";
 import { AuthRequest } from "../middlewares/auth";
 
-// Khởi tạo client lazy để đảm bảo process.env đã được load bởi dotenv trong server.ts
 let client: OAuth2Client;
+
+const getRequiredEnv = (name: string): string => {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`${name} is not defined in environment`);
+  }
+  return value;
+};
+
 const getClient = () => {
   if (!client) {
     client = new OAuth2Client(
-      process.env.GOOGLE_CLIENT_ID as string,
-      process.env.GOOGLE_CLIENT_SECRET as string,
-      process.env.GOOGLE_CALLBACK_URL as string,
+      getRequiredEnv("GOOGLE_CLIENT_ID"),
+      getRequiredEnv("GOOGLE_CLIENT_SECRET"),
+      getRequiredEnv("GOOGLE_CALLBACK_URL"),
     );
   }
   return client;
 };
 
+const getFrontendUrl = () =>
+  process.env.FRONTEND_URL ?? "http://localhost:5173";
+
 const generateToken = (id: string) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET as string, {
+  return jwt.sign({ id }, getRequiredEnv("JWT_SECRET"), {
     expiresIn: "7d",
   });
+};
+
+const redirectToFrontend = (
+  res: Response,
+  params: Record<string, string>,
+): void => {
+  const query = new URLSearchParams(params).toString();
+  res.redirect(302, `${getFrontendUrl()}/auth/callback#${query}`);
 };
 
 /**
@@ -36,14 +55,14 @@ export const initiateGoogleLogin = (req: Request, res: Response): void => {
       "https://www.googleapis.com/auth/userinfo.profile",
       "https://www.googleapis.com/auth/userinfo.email",
     ],
-    prompt: "consent", // Ép hiện màn hình chọn tài khoản
+    prompt: "consent",
   });
 
   res.redirect(302, authorizeUrl);
 };
 
 /**
- * @desc    Google callback, trả về JWT
+ * @desc    Google callback, tra ve JWT cho frontend
  * @route   GET /api/auth/google/callback
  * @operationId googleCallback
  */
@@ -54,71 +73,70 @@ export const googleCallback = async (
   const code = req.query.code as string;
 
   if (!code) {
-    res.status(400).json({
-      error: {
-        "error-code": "AUTH_DENIED",
-        message: "Đăng nhập thất bại (Không tìm thấy code)",
-      },
-    });
+    redirectToFrontend(res, { error: "AUTH_DENIED" });
     return;
   }
 
   try {
-    // 1. Đổi code lấy tokens từ Google
     const { tokens } = await getClient().getToken(code);
+    if (!tokens.id_token) {
+      throw new Error("Google did not return an id_token");
+    }
 
-    // 2. Lấy thông tin user từ id_token của Google
-    const ticket = (await getClient().verifyIdToken({
-      idToken: tokens.id_token as string,
-      audience: process.env.GOOGLE_CLIENT_ID as string,
-    })) as any;
+    const ticket = await getClient().verifyIdToken({
+      idToken: tokens.id_token,
+      audience: getRequiredEnv("GOOGLE_CLIENT_ID"),
+    });
 
-    const payload = ticket.getPayload() as any;
-    if (!payload || !payload.email) throw new Error("Token payload invalid");
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+      throw new Error("Token payload invalid");
+    }
 
-    // 3. Tìm hoặc tạo owner
+    const fullName = payload.name ?? payload.given_name ?? payload.email;
+    const avatar = payload.picture ?? "";
+
     let owner = await Owner.findOne({ email: payload.email });
-    if (!owner) {
+    if (owner) {
+      owner.googleId = payload.sub;
+      owner.fullName = owner.fullName || fullName;
+      owner.avatar = owner.avatar || avatar;
+      await owner.save();
+    } else {
       owner = await Owner.create({
         _id: new mongoose.Types.ObjectId(),
         googleId: payload.sub,
-        fullName: payload.name ?? payload.given_name ?? "",
+        fullName,
         email: payload.email,
-        avatar: payload.picture ?? "",
+        avatar,
         bankAccount: {
           bankName: "",
           accountNumber: "",
           accountName: "",
         },
-      } as any);
+      });
     }
 
-    // 4. Trả về JSON theo đúng spec
-    res.status(200).json({
+    redirectToFrontend(res, {
       access_token: generateToken(owner._id.toString()),
       token_type: "Bearer",
-      expires_in: 604800,
-      owner: {
+      expires_in: "604800",
+      owner: JSON.stringify({
         id: owner._id.toString(),
         email: owner.email,
         name: owner.fullName,
         avatar_url: owner.avatar,
         created_at: (owner as any).createdAt,
-      },
+      }),
     });
   } catch (error) {
     console.error("Google Callback Error:", error);
-    res.status(500).json({
-      error: {
-        "error-code": "SERVER_CRASH",
-        message: "Lỗi từ server khi xác thực với Google",
-      },
-    });
+    redirectToFrontend(res, { error: "SERVER_CRASH" });
   }
 };
 
 /**
- * @desc    Lấy thông tin owner đang đăng nhập
+ * @desc    Lay thong tin owner dang dang nhap
  * @route   GET /api/auth/me
  * @operationId getMe
  */
@@ -127,7 +145,7 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
     const owner = await Owner.findById(req.user?.id);
 
     if (!owner) {
-      res.status(401).json({ message: "Unauthorized - Owner không tồn tại" });
+      res.status(401).json({ message: "Unauthorized - Owner khong ton tai" });
       return;
     }
 
@@ -142,14 +160,14 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
     res.status(500).json({
       error: {
         "error-code": "SERVER_CRASH",
-        message: "Lỗi server",
+        message: "Loi server",
       },
     });
   }
 };
 
 /**
- * @desc    Đăng xuất
+ * @desc    Dang xuat
  * @route   POST /api/auth/logout
  * @operationId logout
  */
@@ -157,9 +175,7 @@ export const logout = async (
   req: AuthRequest,
   res: Response,
 ): Promise<void> => {
-  // Với JWT (stateless), việc logout thực chất là xóa token ở client (localStorage/cookie).
-  // Ở backend, ta chỉ cần trả về thông báo thành công.
   res.status(200).json({
-    message: "Thành công",
+    message: "Thanh cong",
   });
 };
