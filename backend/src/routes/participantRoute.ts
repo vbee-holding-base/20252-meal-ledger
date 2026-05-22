@@ -1,7 +1,15 @@
 import { Router } from "express";
-import { getParticipants } from "../controllers/participantController";
+import {
+  createParticipant,
+  deleteParticipant,
+  readParticipants,
+  updateParticipant,
+} from "../controllers/participantController";
 
 const router = Router();
-router.get("/", getParticipants);
+router.get("/", readParticipants);
+router.post("/", createParticipant);
+router.put("/:participantId", updateParticipant);
+router.delete("/:participantId", deleteParticipant);
 
 export default router;
