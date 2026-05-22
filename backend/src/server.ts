@@ -9,8 +9,8 @@ import dotenv from "dotenv";
 import path from "path";
 import authRoute from "./routes/authRoute";
 import participantRoute from "./routes/participantRoute";
-
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+import restaurantRoute from "./routes/restaurantRoute";
+dotenv.config();
 
 connectDB();
 
@@ -20,6 +20,7 @@ app.use(express.json());
 
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/participants", participantRoute);
+app.use("/api/v1/restaurants", restaurantRoute);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("API Running");
