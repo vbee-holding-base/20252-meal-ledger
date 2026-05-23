@@ -306,17 +306,23 @@ paths:
   /auth/google:
     get:
       tags: [Auth]
-      summary: Redirect sang Google OAuth
+      summary: Khởi tạo luồng đăng nhập Google OAuth
       operationId: initiateGoogleLogin
       security: []
       responses:
         "302":
-          description: Redirect
+          description: Redirect sang trang xác thực Google
 
   /auth/google/callback:
     get:
       tags: [Auth]
-      summary: Google callback, trả về JWT
+      summary: Google OAuth callback — set cookie và redirect về frontend
+      description: >
+        Google gọi endpoint này sau khi người dùng xác thực.
+        Backend xác minh `id_token`, tạo hoặc cập nhật Owner trong DB,
+        phát sinh `accessToken` (15 phút) và `refreshToken` (7 ngày).
+        `refreshToken` được set vào HttpOnly cookie `refreshToken`.
+        Sau đó redirect 302 về `{FRONTEND_URL}/auth/callback#{params}`.
       operationId: googleCallback
       security: []
       parameters:
@@ -325,52 +331,32 @@ paths:
           required: true
           schema:
             type: string
+          description: Authorization code do Google cấp
       responses:
-        "200":
-          description: OK
-          content:
-            application/json:
+        "302":
+          description: >
+            Redirect về frontend với fragment chứa các tham số.
+            Thành công: `#access_token=...&token_type=Bearer&expires_in=900&owner={json}`
+            Thất bại (user từ chối): `#error=AUTH_DENIED`
+            Thất bại (server): `#error=SERVER_CRASH`
+          headers:
+            Location:
               schema:
-                $ref: "#/components/schemas/AuthTokenResponse"
-        "400":
-          description: Từ chối cấp quyền hoặc code lỗi
-          content:
-            application/json:
+                type: string
+              example: "http://localhost:5173/auth/callback#access_token=eyJ...&token_type=Bearer&expires_in=900&owner=%7B...%7D"
+            Set-Cookie:
               schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              example:
-                error: "AUTH_DENIED"
-                message: "Đăng nhập thất bại"
-        "500":
-          description: Server lỗi
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-              example:
-                error: "SERVER_CRASH"
-                message: "Lỗi từ server"
-
-  /auth/logout:
-    post:
-      tags: [Auth]
-      summary: Đăng xuất
-      operationId: logout
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/SuccessMessage"
-        "401":
-          description: Unauthorized
+                type: string
+              description: HttpOnly Secure SameSite=None cookie chứa refresh token (7 ngày)
+              example: "refreshToken=eyJ...; Max-Age=604800; HttpOnly; Secure; SameSite=None"
 
   /auth/me:
     get:
       tags: [Auth]
       summary: Lấy thông tin owner đang đăng nhập
       operationId: getMe
+      security:
+        - BearerAuth: []
       responses:
         "200":
           description: OK
@@ -378,8 +364,108 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Owner"
+              example:
+                id: "68312a4f1e2b3c4d5e6f7a8b"
+                email: "owner@gmail.com"
+                name: "Nguyễn Văn A"
+                avatar_url: "https://lh3.googleusercontent.com/abc"
+                created_at: "2025-07-14T05:00:00.000Z"
         "401":
-          description: Unauthorized
+          description: Token không hợp lệ hoặc owner không tồn tại
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                unauthorized:
+                  value:
+                    message: "Unauthorized - Owner khong ton tai"
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Làm mới access token bằng refresh token trong cookie
+      description: >
+        Đọc HttpOnly cookie `refreshToken`, xác minh chữ ký JWT,
+        và phát hành access token mới (15 phút).
+        Không cần Authorization header.
+      operationId: refreshToken
+      security: []
+      parameters:
+        - name: Cookie
+          in: header
+          required: true
+          schema:
+            type: string
+          description: HttpOnly cookie `refreshToken` được set tự động bởi browser
+          example: "refreshToken=eyJ..."
+      responses:
+        "200":
+          description: Cấp access token mới thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiJ9..."
+        "401":
+          description: Không có hoặc refresh token không hợp lệ / hết hạn
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                no_token:
+                  value:
+                    message: "No refresh token found"
+                invalid_token:
+                  value:
+                    message: "Invalid refresh token"
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Đăng xuất — xóa refresh token cookie
+      description: >
+        Clear HttpOnly cookie `refreshToken`.
+        Access token phía client cần được xóa thủ công (in-memory).
+      operationId: logout
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Đăng xuất thành công
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessMessage"
+              example:
+                message: "Thanh cong"
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+              description: Xóa cookie refreshToken
+              example: "refreshToken=; Max-Age=0; HttpOnly; Secure; SameSite=None"
+        "401":
+          description: Không có hoặc access token không hợp lệ
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Not authorized, no token"
 
   # ───────────────────────────────────────────
   # PARTICIPANTS
