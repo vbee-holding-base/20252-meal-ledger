@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
 import Participant from "../models/participantSchema";
-import mongoose from "mongoose";
-
-const MOCK_OWNER_ID = new mongoose.Types.ObjectId("6a0f57cfa963de1d3ceb80a6");
 
 const sanitiseString = (name: unknown) => {
   if (!name || typeof name !== "string") return null;
@@ -13,7 +10,14 @@ const sanitiseString = (name: unknown) => {
 
 export const readParticipants = async (req: Request, res: Response) => {
   try {
-    const participants = await Participant.find({ ownerId: MOCK_OWNER_ID });
+    const { ownerId } = req.body;
+    if (!ownerId) {
+      res
+        .status(400)
+        .json({ error: "VALIDATION_ERROR", message: "Không hợp lệ" });
+      return;
+    }
+    const participants = await Participant.find({ ownerId: ownerId });
     res.status(200).json({ data: participants, total: participants.length });
   } catch (err) {
     console.error("Error reading participant:", err);
@@ -25,9 +29,9 @@ export const readParticipants = async (req: Request, res: Response) => {
 
 export const createParticipant = async (req: Request, res: Response) => {
   try {
-    const { name } = req.body;
+    const { name, ownerId } = req.body;
     const formattedName = sanitiseString(name);
-    if (formattedName === null) {
+    if (formattedName === null || !ownerId) {
       res.status(400).json({
         error: "VALIDATION_ERROR",
         message: "Tên không hợp lệ",
@@ -36,7 +40,7 @@ export const createParticipant = async (req: Request, res: Response) => {
     }
 
     const existingParticipant = await Participant.findOne({
-      ownerId: MOCK_OWNER_ID,
+      ownerId: ownerId,
       name: formattedName,
     });
     if (existingParticipant) {
@@ -48,7 +52,7 @@ export const createParticipant = async (req: Request, res: Response) => {
     }
 
     const newParticipant = new Participant({
-      ownerId: MOCK_OWNER_ID,
+      ownerId: ownerId,
       name: formattedName,
       totalDebt: 0,
       status: "active",
@@ -66,9 +70,9 @@ export const createParticipant = async (req: Request, res: Response) => {
 export const updateParticipant = async (req: Request, res: Response) => {
   try {
     const { participantId } = req.params;
-    const { name } = req.body;
+    const { name, ownerId } = req.body;
     const formattedName = sanitiseString(name);
-    if (formattedName === null || !participantId) {
+    if (formattedName === null || !participantId || !ownerId) {
       console.log(name);
       res
         .status(400)
@@ -77,7 +81,7 @@ export const updateParticipant = async (req: Request, res: Response) => {
     }
 
     const existedName = await Participant.findOne({
-      ownerId: MOCK_OWNER_ID,
+      ownerId: ownerId,
       _id: { $ne: participantId },
       name: formattedName,
     });
@@ -89,7 +93,7 @@ export const updateParticipant = async (req: Request, res: Response) => {
     }
 
     const updatedParticipant = await Participant.findOneAndUpdate(
-      { ownerId: MOCK_OWNER_ID, _id: participantId },
+      { ownerId: ownerId, _id: participantId },
       { name: formattedName },
       { returnDocument: "after" },
     );
@@ -110,15 +114,15 @@ export const updateParticipant = async (req: Request, res: Response) => {
 export const deleteParticipant = async (req: Request, res: Response) => {
   try {
     const { participantId } = req.params;
-
-    if (!participantId) {
+    const { ownerId } = req.body;
+    if (!participantId || !ownerId) {
       res
         .status(400)
         .json({ error: "VALIDATION_ERROR", message: "Không hợp lệ" });
       return;
     }
     const existingParticipant = await Participant.findOne({
-      ownerId: MOCK_OWNER_ID,
+      ownerId: ownerId,
       _id: participantId,
     });
     if (!existingParticipant) {
@@ -134,7 +138,7 @@ export const deleteParticipant = async (req: Request, res: Response) => {
       return;
     }
 
-    await Participant.deleteOne({ _id: participantId, ownerId: MOCK_OWNER_ID });
+    await Participant.deleteOne({ _id: participantId, ownerId: ownerId });
     res.status(200).json({ message: "Thành công" });
   } catch (err) {
     console.error("Error deleting participant:", err);

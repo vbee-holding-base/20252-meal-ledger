@@ -5,11 +5,12 @@ import {
   readParticipants,
   updateParticipant,
 } from "../controllers/participantController";
+import { protect } from "../middlewares/auth";
 
 const router = Router();
-router.get("/", readParticipants);
-router.post("/", createParticipant);
-router.put("/:participantId", updateParticipant);
-router.delete("/:participantId", deleteParticipant);
+router.get("/", protect, readParticipants);
+router.post("/", protect, createParticipant);
+router.put("/:participantId", protect, updateParticipant);
+router.delete("/:participantId", protect, deleteParticipant);
 
 export default router;
