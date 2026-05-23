@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const AuthCallback = () => {
   const navigate = useNavigate();
   const handledRef = useRef(false);
   const [message, setMessage] = useState("Đang hoàn tất đăng nhập...");
+
+  const { login } = useAuth();
 
   useEffect(() => {
     if (handledRef.current) {
@@ -25,13 +28,13 @@ const AuthCallback = () => {
       return;
     }
 
-    localStorage.setItem("access_token", token);
+    login(token);
     if (owner) {
       localStorage.setItem("owner", owner);
     }
 
     navigate("/", { replace: true });
-  }, [navigate]);
+  }, [navigate, login]);
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex items-center justify-center px-margin-mobile font-body-md">
