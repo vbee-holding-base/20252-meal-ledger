@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 import logo from "../assets/logo.png";
 
@@ -8,6 +10,14 @@ const API_BASE_URL =
 const Login: React.FC = () => {
   const [searchName, setSearchName] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSearch = () => {
     if (searchName.trim() !== "") {

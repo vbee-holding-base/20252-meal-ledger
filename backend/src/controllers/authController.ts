@@ -29,8 +29,14 @@ const getClient = () => {
 const getFrontendUrl = () =>
   process.env.FRONTEND_URL ?? "http://localhost:5173";
 
-const generateToken = (id: string) => {
+const generateAccessToken = (id: string) => {
   return jwt.sign({ id }, getRequiredEnv("JWT_SECRET"), {
+    expiresIn: "15m",
+  });
+};
+
+const generateRefreshToken = (id: string) => {
+  return jwt.sign({ id }, getRequiredEnv("JWT_REFRESH_SECRET"), {
     expiresIn: "7d",
   });
 };
@@ -117,10 +123,20 @@ export const googleCallback = async (
       });
     }
 
+    const accessToken = generateAccessToken(owner._id.toString());
+    const refreshToken = generateRefreshToken(owner._id.toString());
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     redirectToFrontend(res, {
-      access_token: generateToken(owner._id.toString()),
+      access_token: accessToken,
       token_type: "Bearer",
-      expires_in: "604800",
+      expires_in: "900",
       owner: JSON.stringify({
         id: owner._id.toString(),
         email: owner.email,
@@ -175,7 +191,40 @@ export const logout = async (
   req: AuthRequest,
   res: Response,
 ): Promise<void> => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
   res.status(200).json({
     message: "Thanh cong",
   });
+};
+
+/**
+ * @desc    Refresh access token
+ * @route   POST /api/auth/refresh
+ * @operationId refreshToken
+ */
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const token = req.cookies?.refreshToken;
+  if (!token) {
+    res.status(401).json({ message: "No refresh token found" });
+    return;
+  }
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      getRequiredEnv("JWT_REFRESH_SECRET"),
+    ) as any;
+    const accessToken = generateAccessToken(decoded.id);
+
+    res.status(200).json({ access_token: accessToken });
+  } catch (error) {
+    res.status(401).json({ message: "Invalid refresh token" });
+  }
 };

@@ -1,8 +1,15 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,7 +39,17 @@ const Home: React.FC = () => {
         <h1 className="font-headline-md text-headline-md text-primary font-bold tracking-tight">
           LunchSplit
         </h1>
-        <div className="flex gap-2"></div>
+        <div className="flex gap-2">
+          <button
+            onClick={handleLogout}
+            className="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center hover:bg-error hover:text-on-error transition-colors duration-300"
+            title="Đăng xuất"
+          >
+            <span className="material-symbols-outlined text-[20px]">
+              logout
+            </span>
+          </button>
+        </div>
       </header>
 
       {/* Main Content Canvas */}
