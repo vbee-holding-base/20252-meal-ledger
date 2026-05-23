@@ -49,11 +49,8 @@ const redirectToFrontend = (
   res.redirect(302, `${getFrontendUrl()}/auth/callback#${query}`);
 };
 
-/**
- * @desc    Redirect sang Google OAuth
- * @route   GET /api/auth/google
- * @operationId initiateGoogleLogin
- */
+// GET /api/auth/google
+
 export const initiateGoogleLogin = (req: Request, res: Response): void => {
   const authorizeUrl = getClient().generateAuthUrl({
     access_type: "offline",
@@ -67,11 +64,8 @@ export const initiateGoogleLogin = (req: Request, res: Response): void => {
   res.redirect(302, authorizeUrl);
 };
 
-/**
- * @desc    Google callback, tra ve JWT cho frontend
- * @route   GET /api/auth/google/callback
- * @operationId googleCallback
- */
+// GET /api/auth/google/callback
+
 export const googleCallback = async (
   req: Request,
   res: Response,
@@ -151,11 +145,7 @@ export const googleCallback = async (
   }
 };
 
-/**
- * @desc    Lay thong tin owner dang dang nhap
- * @route   GET /api/auth/me
- * @operationId getMe
- */
+// GET /api/auth/me
 export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const owner = await Owner.findById(req.user?.id);
@@ -182,11 +172,7 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
   }
 };
 
-/**
- * @desc    Dang xuat
- * @route   POST /api/auth/logout
- * @operationId logout
- */
+// POST /api/auth/logout
 export const logout = async (
   req: AuthRequest,
   res: Response,
@@ -201,11 +187,7 @@ export const logout = async (
   });
 };
 
-/**
- * @desc    Refresh access token
- * @route   POST /api/auth/refresh
- * @operationId refreshToken
- */
+// POST /api/auth/refresh
 export const refreshToken = async (
   req: Request,
   res: Response,
