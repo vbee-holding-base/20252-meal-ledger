@@ -22,7 +22,17 @@ export default defineConfig([
   })),
   {
     files: ["**/*.{js,mjs,cjs,ts,tsx}"],
-    rules: js.configs.recommended.rules,
+    rules: {
+      ...js.configs.recommended.rules,
+      "no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+    },
     languageOptions: {
       globals: {
         ...globals.browser,

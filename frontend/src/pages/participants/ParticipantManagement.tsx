@@ -1,0 +1,166 @@
+import React, { useState } from "react";
+import TopAppBar from "../../components/layout/TopAppBar";
+import SearchBar from "../../components/common/SearchBar";
+import ConfirmDeleteModal from "../../components/common/ConfirmDeleteModal";
+import { MOCK_PARTICIPANTS } from "../../constants/participants";
+import type { Participant } from "../../types";
+import { useNavigate } from "react-router-dom";
+
+const ParticipantManagement: React.FC = () => {
+  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Participant | null>(null);
+
+  const filtered = MOCK_PARTICIPANTS.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  return (
+    <div className="bg-background text-on-surface min-h-screen pb-24">
+      <TopAppBar title="Người tham gia" />
+
+      <main className="flex-1 mt-16 pb-32">
+        <section className="px-margin-mobile sticky bg-surface z-40 pt-1 pb-2 top-12">
+          <SearchBar
+            value={search}
+            onChange={setSearch}
+            placeholder="Tìm kiếm tên người tham gia..."
+          />
+        </section>
+
+        <section className="px-margin-mobile pb-4">
+          <div className="flex gap-2 items-center">
+            <input
+              className="flex-1 h-12 px-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
+              placeholder="Tên người dùng"
+              type="text"
+            />
+            <button
+              className="w-12 h-12 bg-primary-container text-on-primary rounded-xl flex items-center justify-center active:scale-95 transition-transform"
+              onClick={() => setIsAddModalOpen(true)}
+            >
+              <span className="material-symbols-outlined">add</span>
+            </button>
+          </div>
+        </section>
+
+        <section className="px-margin-mobile flex flex-col gap-3">
+          <div className="flex items-center justify-between py-2">
+            <h2 className="text-label-md font-label-md text-on-surface-variant">
+              Tất cả người tham gia ({filtered.length})
+            </h2>
+            <button className="text-primary font-label-sm text-label-sm flex items-center gap-1">
+              Sắp xếp
+              <span className="material-symbols-outlined text-base leading-none ml-1">
+                unfold_more
+              </span>
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-4">
+            {filtered.map((p) => (
+              <div
+                key={p.id}
+                className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(153,71,0,0.06)] active:scale-[0.98] transition-all"
+              >
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`w-12 h-12 rounded-full ${p.bg} flex items-center justify-center ${p.text} font-bold text-headline-md`}
+                  >
+                    {p.initial}
+                  </div>
+                  <div>
+                    <p className="font-body-md text-body-md font-bold text-on-surface">
+                      {p.name}
+                    </p>
+                    {p.debt > 0 ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-error-container text-error text-label-sm">
+                        {p.debt.toLocaleString("vi-VN")}đ
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container text-tertiary text-label-sm">
+                        0đ
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    className="p-2 text-on-surface-variant hover:text-primary transition-colors"
+                    onClick={() => navigate(`/participants/${p.id}/edit`)}
+                  >
+                    <span className="material-symbols-outlined">edit</span>
+                  </button>
+                  <button
+                    className="p-2 text-on-surface-variant hover:text-error transition-colors"
+                    onClick={() => setDeleteTarget(p)}
+                  >
+                    <span className="material-symbols-outlined">delete</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      {/* Add Modal */}
+      <div
+        className={`${isAddModalOpen ? "flex" : "hidden"} fixed inset-0 z-[60] items-end`}
+      >
+        <div
+          className="modal-overlay absolute inset-0"
+          onClick={() => setIsAddModalOpen(false)}
+        />
+        <div className="bg-surface-container-lowest w-full rounded-t-[32px] p-xl relative shadow-2xl animate-slide-up">
+          <div className="w-12 h-1.5 bg-outline-variant rounded-full mx-auto mb-8" />
+          <h3 className="font-headline-md text-headline-md text-on-surface mb-6">
+            Thêm người tham gia
+          </h3>
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-label-md font-label-md text-on-surface-variant">
+                Tên hoặc Biệt danh
+              </label>
+              <input
+                className="w-full h-14 px-4 rounded-2xl border-2 border-surface-container-high focus:border-primary focus:ring-0 text-body-md transition-all"
+                placeholder="Nhập tên..."
+                type="text"
+              />
+            </div>
+            <div className="flex gap-4">
+              <button
+                className="flex-1 h-14 rounded-full border-2 border-primary text-primary font-bold active:scale-95 transition-transform"
+                onClick={() => setIsAddModalOpen(false)}
+              >
+                Hủy
+              </button>
+              <button
+                className="flex-1 h-14 rounded-full bg-primary-container text-on-primary font-bold shadow-md active:scale-95 transition-transform"
+                onClick={() => setIsAddModalOpen(false)}
+              >
+                Lưu
+              </button>
+            </div>
+          </div>
+          <div className="safe-area-bottom h-8" />
+        </div>
+      </div>
+
+      <ConfirmDeleteModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => setDeleteTarget(null)}
+        name={deleteTarget?.name ?? ""}
+        warningMessage={
+          deleteTarget && deleteTarget.debt > 0
+            ? `Người này vẫn còn nợ ${deleteTarget.debt / 1000}k. Xóa sẽ làm mất dữ liệu khoản nợ này.`
+            : undefined
+        }
+      />
+    </div>
+  );
+};
+
+export default ParticipantManagement;
