@@ -1,183 +1,85 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const AddMeal: React.FC = () => {
+const AddMealQuick: React.FC = () => {
   const navigate = useNavigate();
-  const [participants, setParticipants] = useState([
-    { id: "1", name: "", item: "", price: "" },
-    { id: "2", name: "", item: "", price: "" },
-  ]);
+  const [rawText, setRawText] = useState<string>("");
+  const [isFocused, setIsFocused] = useState<boolean>(false);
 
-  const addParticipant = () => {
-    setParticipants([
-      ...participants,
-      { id: Date.now().toString(), name: "", item: "", price: "" },
-    ]);
-  };
-
-  const removeParticipant = (idToRemove: string) => {
-    setParticipants(participants.filter((p) => p.id !== idToRemove));
+  const handleParse = () => {
+    if (!rawText.trim()) return;
+    console.log("Dữ liệu thô gửi đi phân tích:", rawText);
   };
 
   return (
-    <div className="bg-background text-on-surface min-h-screen pb-32">
-      {/* TopAppBar */}
-      <header className="fixed top-0 w-full max-w-md flex items-center px-gutter h-16 bg-background z-50">
-        <button
-          className="absolute left-gutter p-2 transition-all duration-200 active:scale-95 hover:bg-primary-container/20 rounded-full"
-          onClick={() => navigate(-1)}
-        >
-          <span className="material-symbols-outlined text-primary">
-            arrow_back
-          </span>
-        </button>
-        <div className="flex-1 text-center">
-          <h1 className="font-headline-md font-bold text-headline-md text-[#ff7a00]">
+    <div className="bg-background text-on-surface min-h-screen selection:bg-primary-container/30 font-headline-xl flex justify-center">
+      <div className="w-full max-w-md bg-background min-h-screen relative overflow-x-hidden">
+        <header className="fixed top-0 left-0 right-0 h-16 bg-background flex items-center justify-between px-gutter z-50 w-full max-w-md mx-auto">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center justify-center w-10 h-10 transition-all duration-200 active:scale-90 hover:bg-primary-container/20 rounded-full text-primary"
+          >
+            <span className="material-symbols-outlined">arrow_back</span>
+          </button>
+
+          <h1 className="text-headline-md flex-1 text-center text-primary-container">
             Thêm bữa ăn
           </h1>
-        </div>
-      </header>
 
-      <main className="pt-20 px-margin-mobile max-w-md mx-auto space-y-6">
-        {/* Quick Input Section */}
-        <section>
-          <div className="bg-surface-container-lowest rounded-xl p-md shadow-[0_4px_20px_rgba(153,71,0,0.1)]">
-            <label className="block font-label-md text-on-surface-variant mb-2 font-bold">
-              Nhập nhanh thông tin
-            </label>
-            <textarea
-              className="w-full min-h-[120px] p-md rounded-xl border-2 border-outline-variant focus:border-primary-container focus:ring-0 text-body-md transition-colors placeholder:text-outline"
-              placeholder="Nhập mô tả nhanh (Thời gian, ai ăn món gì, giá bao nhiêu, tổng tiền...)"
-            ></textarea>
-          </div>
-        </section>
-
-        {/* Common Time Section */}
-        <section>
-          <div className="bg-surface-container-lowest rounded-xl p-md shadow-[0_4px_20px_rgba(153,71,0,0.1)] flex items-center gap-4">
-            <div className="bg-primary-container/10 p-3 rounded-full text-primary">
-              <span className="material-symbols-outlined">schedule</span>
+          <button className="flex items-center justify-center w-10 h-10 transition-all duration-200 active:scale-90 hover:bg-primary-container/20 rounded-full text-on-surface-variant">
+            <span className="material-symbols-outlined">more_vert</span>
+          </button>
+        </header>
+        <main className="pt-20 pb-md px-margin-mobile min-h-screen flex flex-col gap-md">
+          <section
+            className={`bg-surface-container-lowest rounded-xl p-md border border-outline-variant/30 transition-all duration-300 shadow-[0_4px_20px_rgba(153,71,0,0.1)] ${
+              isFocused ? "ring-2 ring-primary-container/20" : ""
+            }`}
+          >
+            <div className="flex items-center gap-sm mb-base">
+              <span className="material-symbols-outlined text-primary">
+                edit_note
+              </span>
+              <h2 className="text-headline-md text-on-surface">
+                Nhập nhanh thông tin
+              </h2>
             </div>
-            <div className="flex-1">
-              <label className="block font-label-md text-on-surface-variant">
-                Thời gian
-              </label>
-              <input
-                className="w-full bg-transparent border-none focus:ring-0 p-0 text-body-lg font-semibold text-on-surface"
-                type="date"
-                defaultValue={new Date().toISOString().split("T")[0]}
+
+            <p className="text-body-md text-on-surface-variant mb-md">
+              Nhập danh sách món ăn và giá (ví dụ: Phở bò 50k, Coca 15k...)
+            </p>
+
+            <div className="relative group">
+              <textarea
+                className="w-full bg-surface-container-low border-2 border-transparent focus:border-primary-container focus:ring-0 rounded-xl p-md text-body-md placeholder:text-on-surface-variant/40 transition-all duration-300 outline-none resize-none"
+                placeholder={"Ví dụ:\nBún chả 45k\nTrà đá 5k\nNem chua 20k"}
+                rows={8}
+                value={rawText}
+                onChange={(e) => setRawText(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
               />
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Detailed List Section */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-headline-md text-headline-md text-on-surface font-bold">
-              Chi tiết bữa ăn
-            </h2>
-            <span className="text-label-md font-bold text-primary-container">
-              {participants.length} người
-            </span>
-          </div>
-
-          <div className="space-y-4">
-            {participants.map((p, index) => (
-              <div
-                key={p.id}
-                className="bg-surface-container-lowest rounded-xl p-md shadow-[0_4px_20px_rgba(153,71,0,0.1)] relative animate-in slide-in-from-bottom-2 duration-300"
-              >
-                {index > 0 && (
-                  <button
-                    onClick={() => removeParticipant(p.id)}
-                    className="absolute -top-2 -right-2 bg-error-container text-on-error-container w-6 h-6 rounded-full flex items-center justify-center shadow-sm"
-                  >
-                    <span className="material-symbols-outlined text-[14px]">
-                      close
-                    </span>
-                  </button>
-                )}
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="space-y-1">
-                    <label className="font-label-sm text-on-surface-variant ml-1">
-                      Người tham gia
-                    </label>
-                    <div className="flex items-center gap-2 border-2 border-outline-variant rounded-xl px-4 py-2 focus-within:border-primary-container transition-colors">
-                      <span className="material-symbols-outlined text-primary-container/60">
-                        person
-                      </span>
-                      <input
-                        className="w-full border-none focus:ring-0 p-0 text-body-md bg-transparent"
-                        placeholder="Tên người tham gia"
-                        type="text"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="font-label-sm text-on-surface-variant ml-1">
-                        Món ăn
-                      </label>
-                      <div className="flex items-center gap-2 border-2 border-outline-variant rounded-xl px-4 py-2 focus-within:border-primary-container transition-colors">
-                        <span className="material-symbols-outlined text-primary-container/60">
-                          restaurant
-                        </span>
-                        <input
-                          className="w-full border-none focus:ring-0 p-0 text-body-md bg-transparent"
-                          placeholder="Món ăn..."
-                          type="text"
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-1">
-                      <label className="font-label-sm text-on-surface-variant ml-1">
-                        Giá tiền
-                      </label>
-                      <div className="flex items-center gap-2 border-2 border-outline-variant rounded-xl px-4 py-2 focus-within:border-primary-container transition-colors">
-                        <span className="material-symbols-outlined text-primary-container/60">
-                          payments
-                        </span>
-                        <input
-                          className="w-full border-none focus:ring-0 p-0 text-body-md bg-transparent text-right"
-                          placeholder="0"
-                          type="number"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Add More Button */}
-          <button
-            onClick={addParticipant}
-            className="w-full py-4 border-2 border-dashed border-primary-container/40 rounded-xl flex items-center justify-center gap-2 text-primary-container font-label-md hover:bg-primary-container/10 transition-colors active:scale-[0.98]"
-          >
-            <span className="material-symbols-outlined">add_circle</span>
-            Thêm người tham gia
-          </button>
-        </section>
-      </main>
-
-      {/* Floating Save Button */}
-      <div className="fixed bottom-0 left-0 right-0 w-full max-w-md mx-auto z-40 bg-gradient-to-t from-background to-transparent pt-12 pb-24 px-margin-mobile">
-        <div className="max-w-md mx-auto">
-          <button className="w-full py-4 bg-primary-container text-white rounded-full font-headline-md text-headline-md shadow-lg shadow-primary-container/30 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2">
-            <span
-              className="material-symbols-outlined"
-              style={{ fontVariationSettings: "'FILL' 1" }}
+          <div className="w-full">
+            <button
+              onClick={handleParse}
+              disabled={!rawText.trim()}
+              className={`w-full h-14 rounded-full text-headline-md flex items-center justify-center gap-base shadow-lg transition-all duration-150 active:scale-95 ${
+                rawText.trim()
+                  ? "bg-primary-container hover:brightness-110 text-on-primary cursor-pointer shadow-primary-container/20"
+                  : "bg-outline-variant/40 text-on-surface-variant/30 cursor-not-allowed shadow-none"
+              }`}
             >
-              save
-            </span>
-            Lưu bữa ăn
-          </button>
-        </div>
+              <span>Phân tích</span>
+              <span className="material-symbols-outlined">check_circle</span>
+            </button>
+          </div>
+        </main>
       </div>
     </div>
   );
 };
 
-export default AddMeal;
+export default AddMealQuick;
