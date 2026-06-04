@@ -7,11 +7,13 @@ import {
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import AuthCallback from "./pages/AuthCallback";
-import ParticipantManagement from "./pages/ParticipantManagement";
-import RestaurantManagement from "./pages/RestaurantManagement";
+import ParticipantManagement from "./pages/participants/ParticipantManagement";
+import EditParticipant from "./pages/participants/EditParticipant";
+import RestaurantManagement from "./pages/restaurants/RestaurantManagement";
+import EditRestaurant from "./pages/restaurants/EditRestaurant";
 import AddMeal from "./pages/AddMeal";
 import DebtDetails from "./pages/DebtDetails";
-import BottomNav from "./components/BottomNav";
+import BottomNav from "./components/layout/BottomNav";
 
 function App() {
   return (
@@ -23,7 +25,12 @@ function App() {
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/" element={<Home />} />
             <Route path="/participants" element={<ParticipantManagement />} />
+            <Route
+              path="/participants/:id/edit"
+              element={<EditParticipant />}
+            />
             <Route path="/restaurants" element={<RestaurantManagement />} />
+            <Route path="/restaurants/:id/edit" element={<EditRestaurant />} />
             <Route path="/add-meal" element={<AddMeal />} />
             <Route path="/debts/:name" element={<DebtDetails />} />
             <Route path="*" element={<Navigate to="/" replace />} />
