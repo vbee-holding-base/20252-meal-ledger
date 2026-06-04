@@ -1,190 +1,112 @@
 import { Response } from "express";
-import Restaurant from "../models/restaurantSchema";
 import { AuthRequest } from "../middlewares/auth";
+import {
+  createRestaurantForOwner,
+  deleteRestaurantForOwner,
+  getRestaurantsByOwner,
+  RestaurantServiceError,
+  updateRestaurantForOwner,
+} from "../services/restaurantService";
+
+const getRestaurantIdParam = (idParam: unknown) =>
+  Array.isArray(idParam) ? idParam[0] : idParam;
+
+const handleRestaurantError = (error: unknown, res: Response) => {
+  if (error instanceof RestaurantServiceError) {
+    return res.status(error.statusCode).json({
+      error: {
+        "error-code": error.code,
+        message: error.message,
+      },
+    });
+  }
+
+  console.error("Restaurant controller error:", error);
+
+  return res.status(500).json({
+    message: "Restaurant operation failed",
+  });
+};
 
 export const getRestaurant = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user?.id) {
-      return res.status(401).json({ message: "Not authorized" });
+      return res.status(401).json({
+        message: "Not authorized",
+      });
     }
 
-    const restaurants = await Restaurant.find({
-      ownerId: req.user.id,
-    }).sort({ createdAt: -1 });
+    const restaurants = await getRestaurantsByOwner(req.user.id);
 
-    res.status(200).json({
+    return res.status(200).json({
       data: restaurants,
       total: restaurants.length,
     });
-  } catch (err) {
-    console.error("Error fetching restaurants:", err);
-    res.status(500).json({
-      message: "Error fetching restaurants",
-    });
+  } catch (error) {
+    return handleRestaurantError(error, res);
   }
 };
 
 export const addRestaurant = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user?.id) {
-      return res.status(401).json({ message: "Not authorized" });
-    }
-
-    const { name, address } = req.body;
-
-    if (!name || !name.trim()) {
-      return res.status(400).json({
-        error: {
-          "error-code": "VALIDATION_ERROR",
-          message: "Tên quán không được để trống",
-        },
+      return res.status(401).json({
+        message: "Not authorized",
       });
     }
 
-    const existingRestaurant = await Restaurant.findOne({
-      ownerId: req.user.id,
-      name: name.trim(),
+    const restaurant = await createRestaurantForOwner(req.user.id, {
+      name: req.body.name,
+      address: req.body.address,
     });
 
-    if (existingRestaurant) {
-      return res.status(409).json({
-        error: {
-          "error-code": "DUPLICATE_RESTAURANT",
-          message: "Quán ăn này đã có trong danh sách",
-        },
-      });
-    }
-
-    const restaurant = await Restaurant.create({
-      ownerId: req.user.id,
-      name: name.trim(),
-      address: address?.trim() ?? "",
-    });
-
-    res.status(201).json(restaurant);
-  } catch (err) {
-    console.error("Error creating restaurant:", err);
-    res.status(500).json({
-      message: "Error creating restaurant",
-    });
+    return res.status(201).json(restaurant);
+  } catch (error) {
+    return handleRestaurantError(error, res);
   }
 };
 
 export const updateRestaurant = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user?.id) {
-      return res.status(401).json({ message: "Not authorized" });
-    }
-
-    const idParam = req.params.id;
-    const id = Array.isArray(idParam) ? idParam[0] : idParam;
-    const { name, address } = req.body;
-
-    if (!id) {
-      return res.status(400).json({
-        error: {
-          "error-code": "VALIDATION_ERROR",
-          message: "Missing restaurant id",
-        },
+      return res.status(401).json({
+        message: "Not authorized",
       });
     }
 
-    if (!name || !name.trim()) {
-      return res.status(400).json({
-        error: {
-          "error-code": "VALIDATION_ERROR",
-          message: "Tên quán không được để trống",
-        },
-      });
-    }
+    const restaurantId = getRestaurantIdParam(req.params.id);
 
-    const existingRestaurant = await Restaurant.findOne({
-      ownerId: req.user.id,
-      name: name.trim(),
-      _id: { $ne: id },
-    });
-
-    if (existingRestaurant) {
-      return res.status(409).json({
-        error: {
-          "error-code": "DUPLICATE_RESTAURANT",
-          message: "Quán ăn này đã có trong danh sách",
-        },
-      });
-    }
-
-    const restaurant = await Restaurant.findOneAndUpdate(
+    const restaurant = await updateRestaurantForOwner(
+      req.user.id,
+      restaurantId,
       {
-        _id: id,
-        ownerId: req.user.id,
-      },
-      {
-        name: name.trim(),
-        address: address?.trim() ?? "",
-      },
-      {
-        new: true,
-        runValidators: true,
+        name: req.body.name,
+        address: req.body.address,
       },
     );
 
-    if (!restaurant) {
-      return res.status(404).json({
-        error: {
-          "error-code": "NOT_FOUND",
-          message: "Không tìm thấy quán ăn",
-        },
-      });
-    }
-
-    res.status(200).json(restaurant);
-  } catch (err) {
-    console.error("Error updating restaurant:", err);
-    res.status(500).json({
-      message: "Error updating restaurant",
-    });
+    return res.status(200).json(restaurant);
+  } catch (error) {
+    return handleRestaurantError(error, res);
   }
 };
 
 export const deleteRestaurant = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user?.id) {
-      return res.status(401).json({ message: "Not authorized" });
-    }
-
-    const idParam = req.params.id;
-    const id = Array.isArray(idParam) ? idParam[0] : idParam;
-
-    if (!id) {
-      return res.status(400).json({
-        error: {
-          "error-code": "VALIDATION_ERROR",
-          message: "Missing restaurant id",
-        },
+      return res.status(401).json({
+        message: "Not authorized",
       });
     }
 
-    const restaurant = await Restaurant.findOneAndDelete({
-      _id: id,
-      ownerId: req.user.id,
-    });
+    const restaurantId = getRestaurantIdParam(req.params.id);
 
-    if (!restaurant) {
-      return res.status(404).json({
-        error: {
-          "error-code": "NOT_FOUND",
-          message: "Không tìm thấy quán ăn",
-        },
-      });
-    }
+    await deleteRestaurantForOwner(req.user.id, restaurantId);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Thành công",
     });
-  } catch (err) {
-    console.error("Error deleting restaurant:", err);
-    res.status(500).json({
-      message: "Error deleting restaurant",
-    });
+  } catch (error) {
+    return handleRestaurantError(error, res);
   }
 };
