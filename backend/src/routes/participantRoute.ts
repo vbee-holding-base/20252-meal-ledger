@@ -1,7 +1,16 @@
 import { Router } from "express";
-//import { getParticipants } from "../controllers/participantController";
+import {
+  createParticipant,
+  deleteParticipant,
+  readParticipants,
+  updateParticipant,
+} from "../controllers/participantController";
+import { protect } from "../middlewares/auth";
 
 const router = Router();
-//router.get("/", getParticipants);
+router.get("/", protect, readParticipants);
+router.post("/", protect, createParticipant);
+router.put("/:participantId", protect, updateParticipant);
+router.delete("/:participantId", protect, deleteParticipant);
 
 export default router;

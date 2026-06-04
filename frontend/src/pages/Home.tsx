@@ -1,8 +1,15 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,19 +34,25 @@ const Home: React.FC = () => {
 
   return (
     <div className="bg-surface text-on-surface min-h-screen pb-24 font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
-      {/* TopAppBar */}
       <header className="fixed top-0 w-full max-w-md z-50 flex items-center justify-between px-margin-mobile h-16 bg-surface/80 backdrop-blur-md transition-all duration-300">
         <h1 className="font-headline-md text-headline-md text-primary font-bold tracking-tight">
           LunchSplit
         </h1>
-        <div className="flex gap-2"></div>
+        <div className="flex gap-2">
+          <button
+            onClick={handleLogout}
+            className="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center hover:bg-error hover:text-on-error transition-colors duration-300"
+            title="Đăng xuất"
+          >
+            <span className="material-symbols-outlined text-[20px]">
+              logout
+            </span>
+          </button>
+        </div>
       </header>
 
-      {/* Main Content Canvas */}
       <main className="pt-20 px-margin-mobile min-h-screen space-y-6 max-w-md mx-auto">
-        {/* Action Cards Grid */}
         <div className="space-y-4">
-          {/* Card 1: Add Meal */}
           <button
             className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant/30 squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
             onClick={() => navigate("/add-meal")}
@@ -62,7 +75,6 @@ const Home: React.FC = () => {
             </span>
           </button>
 
-          {/* Card 2: Participants */}
           <button
             className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant/30 squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
             onClick={() => navigate("/participants")}
@@ -85,7 +97,6 @@ const Home: React.FC = () => {
             </span>
           </button>
 
-          {/* Card 3: Restaurants */}
           <button
             className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant/30 squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
             onClick={() => navigate("/restaurants")}
@@ -109,7 +120,6 @@ const Home: React.FC = () => {
           </button>
         </div>
 
-        {/* Recent Activity Mini Section */}
         <section className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-headline-md text-[18px] text-on-background">

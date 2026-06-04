@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 import logo from "../assets/logo.png";
 
@@ -8,6 +10,14 @@ const API_BASE_URL =
 const Login: React.FC = () => {
   const [searchName, setSearchName] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSearch = () => {
     if (searchName.trim() !== "") {
@@ -16,7 +26,6 @@ const Login: React.FC = () => {
         setShowToast(false);
       }, 2000);
     } else {
-      // Small visual feedback for error could be added here
       const inputField = document.getElementById("name-search-input");
       if (inputField) {
         inputField.focus();
@@ -28,10 +37,8 @@ const Login: React.FC = () => {
 
   return (
     <div className="bg-surface text-on-surface min-h-screen flex flex-col font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
-      {/* Main Content Canvas */}
       <main className="flex-grow flex items-center justify-center px-margin-mobile py-lg">
         <div className="w-full max-w-[440px] flex flex-col items-center text-center">
-          {/* Branding Header */}
           <header className="mb-xl animate-in fade-in slide-in-from-bottom-4 duration-700">
             <div className="relative mb-md flex justify-center">
               <div className="w-24 h-24 rounded-full bg-primary-container/10 flex items-center justify-center overflow-hidden">
@@ -41,7 +48,6 @@ const Login: React.FC = () => {
                   src={logo}
                 />
               </div>
-              {/* Decorative element */}
               <div className="absolute -top-2 -right-2 bg-secondary-container p-2 rounded-full shadow-lg">
                 <span
                   className="material-symbols-outlined text-on-secondary-container"
@@ -59,9 +65,7 @@ const Login: React.FC = () => {
             </p>
           </header>
 
-          {/* Interaction Card */}
           <section className="w-full bg-surface-container-lowest rounded-xl p-md login-card-shadow animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-200">
-            {/* Owner Login (Google) */}
             <div className="relative pt-4 pb-2 mb-4">
               <label className="absolute -top-3 left-4 px-base bg-surface-container-lowest text-label-sm text-primary font-bold uppercase tracking-wider">
                 Chủ nhóm
@@ -94,7 +98,6 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            {/* Participant Search Section */}
             <div className="relative pt-4">
               <label className="absolute -top-3 left-4 px-base bg-surface-container-lowest text-label-sm text-primary font-bold uppercase tracking-wider">
                 Thành viên
@@ -132,7 +135,6 @@ const Login: React.FC = () => {
             </div>
           </section>
 
-          {/* Visual Decoration / Footer */}
           <footer className="mt-xl text-center">
             <p className="font-label-sm text-label-sm text-outline">
               © 2026 LunchSplit Team
@@ -141,7 +143,6 @@ const Login: React.FC = () => {
         </div>
       </main>
 
-      {/* Success Feedback (Hidden by default) */}
       <div
         className={`fixed bottom-margin-mobile left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-md py-base rounded-full font-label-md text-label-md shadow-xl transition-all duration-300 z-[100] pointer-events-none ${
           showToast ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"

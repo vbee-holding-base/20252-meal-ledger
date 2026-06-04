@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { getRestaurant, addRestaurant, updateRestaurant, deleteRestaurant } from "../controllers/restaurantController";
+import {
+  getRestaurant,
+  addRestaurant,
+  updateRestaurant,
+  deleteRestaurant,
+} from "../controllers/restaurantController";
 import { protect } from "../middlewares/auth";
 
 const router = Router();
