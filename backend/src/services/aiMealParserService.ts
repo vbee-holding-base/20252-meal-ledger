@@ -9,17 +9,18 @@ export interface MealParserRestaurantContext {
   address: string;
 }
 
-export interface ParsedMealParticipant {
-  name: string;
-  amount: number;
+export interface ParsedMealRawEntry {
+  personName: string;
+  amount: number | null;
   rawText?: string;
 }
 
-export interface ParsedMealDraft {
+export interface ParsedMealRaw {
   restaurantName: string | null;
-  date: string;
+  date: string | null;
+  payerName: string | null;
   totalAmount: number | null;
-  participants: ParsedMealParticipant[];
+  entries: ParsedMealRawEntry[];
   notes: string[];
 }
 
@@ -32,7 +33,7 @@ interface ParseMealTextInput {
 
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta";
 
-const mealDraftSchema = {
+const rawMealParseSchema = {
   type: "object",
   properties: {
     restaurantName: {
@@ -41,27 +42,33 @@ const mealDraftSchema = {
     },
     date: {
       type: "string",
+      nullable: true,
+    },
+    payerName: {
+      type: "string",
+      nullable: true,
     },
     totalAmount: {
       type: "number",
       nullable: true,
     },
-    participants: {
+    entries: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          name: {
+          personName: {
             type: "string",
           },
           amount: {
             type: "number",
+            nullable: true,
           },
           rawText: {
             type: "string",
           },
         },
-        required: ["name", "amount"],
+        required: ["personName", "amount"],
       },
     },
     notes: {
@@ -71,7 +78,14 @@ const mealDraftSchema = {
       },
     },
   },
-  required: ["restaurantName", "date", "totalAmount", "participants", "notes"],
+  required: [
+    "restaurantName",
+    "date",
+    "payerName",
+    "totalAmount",
+    "entries",
+    "notes",
+  ],
 };
 
 const buildPrompt = ({
@@ -80,37 +94,51 @@ const buildPrompt = ({
   participants,
   restaurants,
 }: ParseMealTextInput) => `
-Bạn là service bóc tách dữ liệu bữa ăn trưa từ text tiếng Việt.
+Bạn là bộ bóc tách dữ liệu từ text tiếng Việt.
 
-Hãy trả về JSON đúng schema đã yêu cầu.
-Không trả về markdown.
+Nhiệm vụ duy nhất của bạn là parse text thành JSON raw.
+Không validate nghiệp vụ.
+Không đánh giá đúng/sai.
+Không loại bỏ dữ liệu bất thường.
+Không tự sửa dữ liệu bất thường.
+Không trả markdown.
 Không giải thích ngoài JSON.
 
-Quy tắc:
-- Nếu text không nói thời gian, dùng thời điểm hiện tại: ${now.toISOString()}.
-- Chuẩn hóa tiền Việt Nam sang VND:
-  - "55k", "55 K", "55 ngàn", "55 nghìn" = 55000
-  - "1tr2", "1 triệu 2", "1.2tr" = 1200000
-- Chỉ bóc tách những người thực sự ăn/uống/có món trong text.
-- Các từ "tôi", "mình", "owner", "người trả tiền" chỉ là người thanh toán, không tự động tính là participant nếu text không nói rõ có ăn.
-- Nếu tên người gần đúng với danh sách participants, hãy dùng tên chuẩn trong danh sách.
-- Nếu quán ăn gần đúng với danh sách restaurants, hãy dùng tên chuẩn trong danh sách.
-- Nếu không chắc chắn thông tin nào, vẫn bóc tách phần chắc chắn và thêm lý do vào notes.
-- Không được tự bịa số tiền, người, quán ăn.
+Cần trích xuất:
+- restaurantName: tên quán nếu có, không có thì null.
+- date: ngày giờ bữa ăn nếu có. Nếu không có thời gian, dùng thời điểm hiện tại: ${now.toISOString()}.
+- payerName: người trả tiền nếu text có nói. Nếu không nói ai trả tiền thì null.
+- totalAmount: tổng tiền nếu có, không có thì null.
+- entries: danh sách người được nhắc tới cùng số tiền tương ứng.
+- notes: ghi chú parse nếu text mơ hồ.
 
-Danh sách participants đã cấu hình:
+Quy tắc parse tiền:
+- "55k", "55 K", "55 ngàn", "55 nghìn" = 55000.
+- "1tr2", "1 triệu 2", "1.2tr" = 1200000.
+- Nếu text ghi số tiền âm như "-90k", giữ nguyên là -90000.
+- Nếu không xác định được số tiền của một người, amount = null.
+
+Danh sách participants dưới đây chỉ dùng để hỗ trợ chuẩn hóa tên nếu khớp rõ ràng.
+Không dùng danh sách này để đánh giá hợp lệ hay không hợp lệ.
+Nếu tên không có trong danh sách, vẫn giữ nguyên tên đã parse.
+
+Participants context:
 ${JSON.stringify(participants)}
 
-Danh sách restaurants đã cấu hình:
+Danh sách restaurants dưới đây chỉ dùng để hỗ trợ chuẩn hóa tên quán nếu khớp rõ ràng.
+Không dùng danh sách này để đánh giá hợp lệ hay không hợp lệ.
+Nếu quán không có trong danh sách, vẫn giữ nguyên tên đã parse.
+
+Restaurants context:
 ${JSON.stringify(restaurants)}
 
-Text cần bóc tách:
+Text cần parse:
 "${text}"
 `;
 
 export const parseMealTextWithGemini = async (
   input: ParseMealTextInput,
-): Promise<ParsedMealDraft> => {
+): Promise<ParsedMealRaw> => {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
@@ -140,7 +168,7 @@ export const parseMealTextWithGemini = async (
         generationConfig: {
           temperature: 0.1,
           responseMimeType: "application/json",
-          responseSchema: mealDraftSchema,
+          responseSchema: rawMealParseSchema,
         },
       }),
     },
@@ -158,5 +186,5 @@ export const parseMealTextWithGemini = async (
     throw new Error("Gemini response did not contain parseable text");
   }
 
-  return JSON.parse(responseText) as ParsedMealDraft;
+  return JSON.parse(responseText) as ParsedMealRaw;
 };

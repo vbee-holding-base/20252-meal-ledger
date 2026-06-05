@@ -3,7 +3,6 @@ import Participant from "../models/participantSchema";
 import Restaurant from "../models/restaurantSchema";
 import { AuthRequest } from "../middlewares/auth";
 import { parseMealTextWithGemini } from "../services/aiMealParserService";
-import { validateParsedMealDraft } from "../validators/mealParserValidator";
 
 export const parseMealText = async (req: AuthRequest, res: Response) => {
   try {
@@ -44,23 +43,19 @@ export const parseMealText = async (req: AuthRequest, res: Response) => {
       address: restaurant.address,
     }));
 
-    const draft = await parseMealTextWithGemini({
+    const parsed = await parseMealTextWithGemini({
       text: text.trim(),
       now: new Date(),
       participants: participantContext,
       restaurants: restaurantContext,
     });
 
-    const validatedResult = validateParsedMealDraft({
-      draft,
-      participants: participantContext,
-      restaurants: restaurantContext,
-    });
-
     return res.status(200).json({
-      data: validatedResult.draft,
-      warnings: validatedResult.warnings,
-      isValid: validatedResult.isValid,
+      data: parsed,
+      context: {
+        participants: participantContext,
+        restaurants: restaurantContext,
+      },
     });
   } catch (error) {
     console.error("Error parsing meal text:", error);
