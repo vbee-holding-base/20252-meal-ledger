@@ -1,4 +1,5 @@
 import { Response } from "express";
+import Owner from "../models/ownerSchema";
 import Participant from "../models/participantSchema";
 import Restaurant from "../models/restaurantSchema";
 import { AuthRequest } from "../middlewares/auth";
@@ -21,16 +22,38 @@ export const parseMealText = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const [participants, restaurants] = await Promise.all([
+    const [owner, participants, restaurants] = await Promise.all([
+      Owner.findById(req.user.id).select("_id fullName email bankAccount"),
       Participant.find({
         ownerId: req.user.id,
         status: "active",
       }).select("_id name"),
-
       Restaurant.find({
         ownerId: req.user.id,
       }).select("_id name address"),
     ]);
+
+    if (!owner) {
+      return res.status(404).json({
+        error: "OWNER_NOT_FOUND",
+        message: "Owner not found.",
+      });
+    }
+
+    const ownerContext = {
+      id: owner._id.toString(),
+      name: owner.fullName,
+      aliases: [
+        owner.fullName,
+        owner.email,
+        owner.bankAccount?.accountName,
+        "tôi",
+        "toi",
+        "mình",
+        "minh",
+        "owner",
+      ].filter((value): value is string => Boolean(value)),
+    };
 
     const participantContext = participants.map((participant) => ({
       id: participant._id.toString(),
@@ -46,6 +69,7 @@ export const parseMealText = async (req: AuthRequest, res: Response) => {
     const parsed = await parseMealTextWithGemini({
       text: text.trim(),
       now: new Date(),
+      owner: ownerContext,
       participants: participantContext,
       restaurants: restaurantContext,
     });

@@ -1,3 +1,9 @@
+export interface MealParserOwnerContext {
+  id: string;
+  name: string;
+  aliases: string[];
+}
+
 export interface MealParserParticipantContext {
   id: string;
   name: string;
@@ -27,6 +33,7 @@ export interface ParsedMealRaw {
 interface ParseMealTextInput {
   text: string;
   now: Date;
+  owner: MealParserOwnerContext;
   participants: MealParserParticipantContext[];
   restaurants: MealParserRestaurantContext[];
 }
@@ -47,6 +54,13 @@ const rawMealParseSchema = {
     payerName: {
       type: "string",
       nullable: true,
+    },
+    payerName: {
+      type: "string",
+      nullable: true,
+    },
+    payerIsOwner: {
+      type: "boolean",
     },
     totalAmount: {
       type: "number",
@@ -91,6 +105,7 @@ const rawMealParseSchema = {
 const buildPrompt = ({
   text,
   now,
+  owner,
   participants,
   restaurants,
 }: ParseMealTextInput) => `

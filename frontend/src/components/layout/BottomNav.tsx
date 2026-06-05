@@ -3,12 +3,18 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 const navItems = [
   { path: "/", icon: "home", label: "Trang chủ" },
+  { path: "/add-meal", icon: "add", label: "Thêm bữa ăn" },
   { path: "/participants", icon: "groups", label: "Thành viên" },
   { path: "/restaurants", icon: "restaurant", label: "Quán ăn" },
   { path: "/more", icon: "more_horiz", label: "Khác" },
 ];
 
-const HIDDEN_PATHS = ["/login", "/auth/callback"];
+const HIDDEN_PATHS = [
+  "/login",
+  "/auth/callback",
+  "/add-meal",
+  "/add-meal-detail",
+];
 
 const BottomNav: React.FC = () => {
   const navigate = useNavigate();
