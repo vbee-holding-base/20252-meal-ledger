@@ -3,7 +3,6 @@ import React, { useState } from "react";
 interface SimpleInputCardProps {
   value: string;
   onChange: (_value: string) => void;
-  onSubmit?: () => void;
   title?: string;
   placeholder?: string;
   rows?: number;
@@ -12,7 +11,6 @@ interface SimpleInputCardProps {
 const InputCard: React.FC<SimpleInputCardProps> = ({
   value,
   onChange,
-  onSubmit,
   title = "Nhập thông tin",
   placeholder = "",
   rows = 6,
@@ -41,20 +39,6 @@ const InputCard: React.FC<SimpleInputCardProps> = ({
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />
-      </div>
-
-      <div className="w-full">
-        <button
-          type="button"
-          onClick={onSubmit}
-          disabled={!value.trim()}
-          className="w-full h-14 flex items-center justify-center gap-sm bg-[#ff7a00] text-white font-semibold text-lg rounded-full shadow-[0_4px_12px_rgba(255,122,0,0.2)] hover:bg-[#e06c00] active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none transition-all duration-200"
-        >
-          <span>Phân tích</span>
-          <span className="material-symbols-outlined text-[22px] font-bold">
-            check_circle
-          </span>
-        </button>
       </div>
     </section>
   );
