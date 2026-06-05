@@ -33,8 +33,5 @@
       "prettier --write"
     ]
   },
-  "license": "ISC",
-  "dependencies": {
-    "@rolldown/binding-linux-x64-gnu": "^1.1.0"
-  }
+  "license": "ISC"
 }
