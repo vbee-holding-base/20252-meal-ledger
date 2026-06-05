@@ -16,6 +16,7 @@ import EditRestaurant from "./pages/restaurants/EditRestaurant";
 import AddMeal from "./pages/AddMeal";
 import DebtDetails from "./pages/DebtDetails";
 import BottomNav from "./components/layout/BottomNav";
+import AddMealDetail from "./pages/AddMealDetail";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -88,6 +89,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <AddMeal />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/add-meal-detail"
+                element={
+                  <ProtectedRoute>
+                    <AddMealDetail />
                   </ProtectedRoute>
                 }
               />
