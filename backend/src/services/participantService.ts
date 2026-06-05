@@ -23,7 +23,7 @@ export const createParticipantForOwner = async (
 
 export const updateParticipantForOwner = async (
   ownerId: string,
-  participantId: string | string[],
+  participantId: string,
   newName: string,
 ) => {
   const existingName = await Participant.findOne({
@@ -41,7 +41,7 @@ export const updateParticipantForOwner = async (
 
 export const deleteParticipantForOwner = async (
   ownerId: string,
-  participantId: string | string[],
+  participantId: string,
 ) => {
   const participant = await Participant.findOne({
     ownerId,
