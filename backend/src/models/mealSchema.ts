@@ -10,6 +10,7 @@ export interface IMeal {
   participantsInfo: {
     participantId: mongoose.Types.ObjectId;
     amount: number;
+    status: "unpaid" | "paid";
   }[];
 }
 
@@ -32,6 +33,7 @@ const mealSchema = new mongoose.Schema<IMeal>(
           ref: "Participant",
         },
         amount: { type: Number, required: true },
+        status: { type: String, enum: ["unpaid", "paid"], default: "unpaid" },
       },
     ],
   },
