@@ -9,11 +9,13 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import AuthCallback from "./pages/AuthCallback";
-import ParticipantManagement from "./pages/ParticipantManagement";
-import RestaurantManagement from "./pages/RestaurantManagement";
+import ParticipantManagement from "./pages/participants/ParticipantManagement";
+import EditParticipant from "./pages/participants/EditParticipant";
+import RestaurantManagement from "./pages/restaurants/RestaurantManagement";
+import EditRestaurant from "./pages/restaurants/EditRestaurant";
 import AddMeal from "./pages/AddMeal";
 import DebtDetails from "./pages/DebtDetails";
-import BottomNav from "./components/BottomNav";
+import BottomNav from "./components/layout/BottomNav";
 import AddMealDetail from "./pages/AddMealDetail";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -59,10 +61,26 @@ function App() {
                 }
               />
               <Route
+                path="/participants/:id/edit"
+                element={
+                  <ProtectedRoute>
+                    <EditParticipant />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/restaurants"
                 element={
                   <ProtectedRoute>
                     <RestaurantManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/restaurants/:id/edit"
+                element={
+                  <ProtectedRoute>
+                    <EditRestaurant />
                   </ProtectedRoute>
                 }
               />
