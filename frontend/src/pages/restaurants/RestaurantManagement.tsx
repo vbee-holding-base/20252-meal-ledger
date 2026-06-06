@@ -18,8 +18,9 @@ const RestaurantManagement: React.FC = () => {
 
   type RestaurantApiResponse = {
     _id: string;
+    ownerId: string;
     name: string;
-    address?: string;
+    address: string;
   };
 
   const fetchRestaurants = async () => {

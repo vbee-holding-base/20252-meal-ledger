@@ -1,31 +1,100 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TopAppBar from "../../components/layout/TopAppBar";
-import { MOCK_PARTICIPANTS } from "../../constants/participants";
+import axiosClient from "../../api/axiosClient";
+import type { Participant } from "../../types";
 
 const EditParticipant: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const participant = MOCK_PARTICIPANTS.find((p) => p.id === id);
-
-  const [name, setName] = useState(participant?.name ?? "");
+  const [participant, setParticipant] = useState<Participant | null>(null);
+  const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
-    if (!name.trim()) {
+  type ParticipantApiResponse = {
+    _id: string;
+    ownerId: string;
+    name: string;
+    totalDebt: number;
+    status: string;
+  };
+
+  const fetchParticipant = async () => {
+    if (!id) return;
+
+    try {
+      setIsLoading(true);
+      setError("");
+
+      const response = await axiosClient.get("/participants");
+      const participantsData = (response.data?.data ??
+        []) as ParticipantApiResponse[];
+      const found = participantsData.find((item) => item._id === id);
+
+      if (!found) {
+        setError("Không tìm thấy thành viên.");
+        setParticipant(null);
+        return;
+      }
+
+      const mapped: Participant = {
+        id: found._id,
+        name: found.name,
+        debt: found.totalDebt ?? 0,
+        bg: "bg-primary-container",
+        text: "text-on-primary",
+        initial: found.name ? found.name.charAt(0).toUpperCase() : "?",
+      };
+
+      setParticipant(mapped);
+      setName(mapped.name);
+    } catch (err) {
+      console.error(err);
+      setError("Không tải được thông tin thành viên.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void fetchParticipant();
+  }, [id]);
+
+  const handleSave = async () => {
+    if (!name.trim() || !id) {
       setError("Tên không được để trống");
       return;
     }
-    // TODO: gọi API update
-    navigate(-1);
+
+    try {
+      setIsSaving(true);
+      setError("");
+      await axiosClient.put(`/participants/${id}`, { name: name.trim() });
+      navigate(-1);
+    } catch (err) {
+      console.error(err);
+      setError("Không thể cập nhật thành viên. Vui lòng thử lại.");
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-background min-h-screen flex items-center justify-center">
+        <p className="text-on-surface-variant font-body-md">Đang tải...</p>
+      </div>
+    );
+  }
 
   if (!participant) {
     return (
       <div className="bg-background min-h-screen flex items-center justify-center">
         <p className="text-on-surface-variant font-body-md">
-          Không tìm thấy thành viên.
+          {error || "Không tìm thấy thành viên."}
         </p>
       </div>
     );
@@ -103,10 +172,11 @@ const EditParticipant: React.FC = () => {
             Hủy
           </button>
           <button
-            className="flex-1 h-14 rounded-full bg-primary-container text-on-primary font-bold shadow-md active:scale-95 transition-transform"
+            className="flex-1 h-14 rounded-full bg-primary-container text-on-primary font-bold shadow-md active:scale-95 transition-transform disabled:opacity-50"
             onClick={handleSave}
+            disabled={isSaving}
           >
-            Lưu thay đổi
+            {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
           </button>
         </div>
       </main>

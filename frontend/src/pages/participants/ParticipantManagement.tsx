@@ -1,18 +1,103 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TopAppBar from "../../components/layout/TopAppBar";
 import SearchBar from "../../components/common/SearchBar";
 import ConfirmDeleteModal from "../../components/common/ConfirmDeleteModal";
-import { MOCK_PARTICIPANTS } from "../../constants/participants";
 import type { Participant } from "../../types";
 import { useNavigate } from "react-router-dom";
+import axiosClient from "../../api/axiosClient";
 
 const ParticipantManagement: React.FC = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Participant | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [newName, setNewName] = useState("");
+  const isBusy = isLoading || isAdding;
 
-  const filtered = MOCK_PARTICIPANTS.filter((p) =>
+  type ParticipantApiResponse = {
+    _id: string;
+    ownerId: string;
+    name: string;
+    totalDebt: number;
+    status: string;
+  };
+
+  const fetchParticipants = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await axiosClient.get("/participants");
+      const participantsData = (response.data?.data ??
+        []) as ParticipantApiResponse[];
+
+      const mappedParticipants: Participant[] = participantsData.map(
+        (item) => ({
+          id: item._id,
+          name: item.name,
+          debt: item.totalDebt ?? 0,
+          icon: "person",
+          bg: "bg-primary-container",
+          text: "text-on-primary",
+          initial: item.name ? item.name.charAt(0).toUpperCase() : "?",
+        }),
+      );
+
+      setParticipants(mappedParticipants);
+    } catch (err) {
+      console.error(err);
+      setError("Không tải được danh sách người tham gia.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void fetchParticipants();
+  }, []);
+
+  const handleAdd = async () => {
+    if (!newName.trim()) {
+      setError("Vui lòng nhập tên người tham gia.");
+      return;
+    }
+
+    try {
+      setIsAdding(true);
+      setError(null);
+      await axiosClient.post("/participants", { name: newName.trim() });
+      setNewName("");
+      await fetchParticipants();
+    } catch (err) {
+      console.error(err);
+      setError("Không thể thêm người tham gia. Vui lòng thử lại.");
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const handleDeleteParticipant = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      await axiosClient.delete(`/participants/${deleteTarget.id}`);
+      setDeleteTarget(null);
+      await fetchParticipants();
+    } catch (err) {
+      console.error(err);
+      setError("Không thể xóa người tham gia. Vui lòng thử lại.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filtered = participants.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -29,20 +114,30 @@ const ParticipantManagement: React.FC = () => {
           />
         </section>
 
+        {isLoading && (
+          <div className="px-margin-mobile py-3">
+            <p className="text-on-surface-variant text-center">Đang tải...</p>
+          </div>
+        )}
+
         <section className="px-margin-mobile pb-4">
           <div className="flex gap-2 items-center">
             <input
               className="flex-1 h-12 px-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
               placeholder="Tên người dùng"
               type="text"
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
             />
             <button
-              className="w-12 h-12 bg-primary-container text-on-primary rounded-xl flex items-center justify-center active:scale-95 transition-transform"
-              onClick={() => setIsAddModalOpen(true)}
+              className="w-12 h-12 bg-primary-container text-on-primary rounded-xl flex items-center justify-center active:scale-95 transition-transform disabled:opacity-50"
+              onClick={handleAdd}
+              disabled={isBusy}
             >
               <span className="material-symbols-outlined">add</span>
             </button>
           </div>
+          {error && <p className="mt-3 text-error font-body-sm">{error}</p>}
         </section>
 
         <section className="px-margin-mobile flex flex-col gap-3">
@@ -68,13 +163,13 @@ const ParticipantManagement: React.FC = () => {
                   <div
                     className={`w-12 h-12 rounded-full ${p.bg} flex items-center justify-center ${p.text} font-bold text-headline-md`}
                   >
-                    {p.initial}
+                    {p.initial ?? p.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
                     <p className="font-body-md text-body-md font-bold text-on-surface">
                       {p.name}
                     </p>
-                    {p.debt > 0 ? (
+                    {p.debt && p.debt > 0 ? (
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-error-container text-error text-label-sm">
                         {p.debt.toLocaleString("vi-VN")}đ
                       </span>
@@ -151,7 +246,7 @@ const ParticipantManagement: React.FC = () => {
       <ConfirmDeleteModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        onConfirm={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteParticipant}
         name={deleteTarget?.name ?? ""}
         warningMessage={
           deleteTarget && deleteTarget.debt > 0
