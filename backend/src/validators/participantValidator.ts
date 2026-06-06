@@ -1,8 +1,9 @@
 import { AuthRequest } from "../middlewares/auth";
 
 export const getOwnerId = (req: AuthRequest) => {
-  const ownerId = req.user?.id;
-  if (!ownerId) return req.body.ownerId;
+  let ownerId = req.user?.id;
+  if (!ownerId) ownerId = req.body.ownerId;
+  return ownerId;
 };
 
 export const participantIdFromParams = (req: AuthRequest) => {
