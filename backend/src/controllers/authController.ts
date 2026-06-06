@@ -1,8 +1,4 @@
 import { Request, Response } from "express";
-import { OAuth2Client } from "google-auth-library";
-import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
-import Owner from "../models/ownerSchema";
 import { AuthRequest } from "../middlewares/auth";
 import {
   generateAuthorizeUrl,
@@ -14,6 +10,7 @@ import {
   getMyInfo,
   regenerateAccessToken,
 } from "../services/authService";
+import { UnauthorisedError } from "../config/errors";
 
 // GET /api/auth/google
 
@@ -68,13 +65,8 @@ export const googleCallback = async (
 
 // GET /api/auth/me
 export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const owner = await getMyInfo(req.user?.id || "");
-
-    res.status(200).json(owner);
-  } catch (error) {
-    res.status(500).json(error);
-  }
+  const owner = await getMyInfo(req.user?.id || "");
+  res.status(200).json(owner);
 };
 
 // POST /api/auth/logout
@@ -98,18 +90,7 @@ export const refreshToken = async (
   res: Response,
 ): Promise<void> => {
   const token = req.cookies?.refreshToken;
-  if (!token) {
-    res.status(401).json({ message: "No refresh token found" });
-    return;
-  }
-
-  try {
-    regenerateAccessToken(token).then((accessToken) => {
-      res.status(200).json({
-        access_token: accessToken,
-      });
-    });
-  } catch (error) {
-    res.status(401).json({ message: "Invalid refresh token" });
-  }
+  if (!token) throw new UnauthorisedError("no refresh token found");
+  const accessToken = await regenerateAccessToken(token);
+  res.status(200).json({ access_token: accessToken });
 };
