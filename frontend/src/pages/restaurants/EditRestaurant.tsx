@@ -1,20 +1,61 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import TopAppBar from "../../components/layout/TopAppBar";
-import { MOCK_RESTAURANTS } from "../../constants/restaurants";
+import axiosClient from "../../api/axiosClient";
+import type { Restaurant } from "../../types";
 
 const EditRestaurant: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const restaurant = MOCK_RESTAURANTS.find((r) => r.id === id);
-
-  const [name, setName] = useState(restaurant?.name ?? "");
-  const [address, setAddress] = useState(restaurant?.address ?? "");
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
   const [errors, setErrors] = useState<{
     name?: string | undefined;
     address?: string | undefined;
   }>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch restaurant data
+  useEffect(() => {
+    const fetchRestaurant = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await axiosClient.get("/restaurants");
+        const restaurantsData = response.data?.data ?? [];
+        const foundRestaurant = restaurantsData.find(
+          (r: { _id: string }) => r._id === id,
+        );
+
+        if (foundRestaurant) {
+          const mappedRestaurant: Restaurant = {
+            id: foundRestaurant._id,
+            name: foundRestaurant.name,
+            address: foundRestaurant.address ?? "",
+            icon: "restaurant",
+            bg: "bg-primary-container",
+            text: "text-on-primary",
+          };
+
+          setRestaurant(mappedRestaurant);
+          setName(mappedRestaurant.name);
+          setAddress(mappedRestaurant.address);
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Không tải được thông tin quán ăn.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRestaurant();
+  }, [id]);
 
   const validate = () => {
     const next: typeof errors = {};
@@ -24,17 +65,40 @@ const EditRestaurant: React.FC = () => {
     return Object.keys(next).length === 0;
   };
 
-  const handleSave = () => {
-    if (!validate()) return;
-    // TODO: gọi API update
-    navigate(-1);
+  const handleSave = async () => {
+    if (!validate() || !id) return;
+
+    try {
+      setIsSaving(true);
+      setError(null);
+
+      await axiosClient.put(`/restaurants/${id}`, {
+        name: name.trim(),
+        address: address.trim(),
+      });
+
+      navigate(-1);
+    } catch (err) {
+      console.error(err);
+      setError("Không thể cập nhật quán ăn. Vui lòng thử lại.");
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="bg-background min-h-screen flex items-center justify-center">
+        <p className="text-on-surface-variant font-body-md">Đang tải...</p>
+      </div>
+    );
+  }
 
   if (!restaurant) {
     return (
       <div className="bg-background min-h-screen flex items-center justify-center">
         <p className="text-on-surface-variant font-body-md">
-          Không tìm thấy quán ăn.
+          {error || "Không tìm thấy quán ăn."}
         </p>
       </div>
     );
@@ -136,18 +200,25 @@ const EditRestaurant: React.FC = () => {
         </div>
 
         {/* Actions */}
+        {error && (
+          <p className="text-error text-body-sm font-body-sm text-center">
+            {error}
+          </p>
+        )}
         <div className="flex gap-4 pt-2">
           <button
-            className="flex-1 h-14 rounded-full border-2 border-primary text-primary font-bold active:scale-95 transition-transform"
+            className="flex-1 h-14 rounded-full border-2 border-primary text-primary font-bold active:scale-95 transition-transform disabled:opacity-50"
             onClick={() => navigate(-1)}
+            disabled={isSaving}
           >
             Hủy
           </button>
           <button
-            className="flex-1 h-14 rounded-full bg-primary-container text-on-primary font-bold shadow-md active:scale-95 transition-transform"
+            className="flex-1 h-14 rounded-full bg-primary-container text-on-primary font-bold shadow-md active:scale-95 transition-transform disabled:opacity-50"
             onClick={handleSave}
+            disabled={isSaving}
           >
-            Lưu thay đổi
+            {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
           </button>
         </div>
       </main>
