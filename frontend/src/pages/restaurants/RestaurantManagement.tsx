@@ -1,17 +1,102 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TopAppBar from "../../components/layout/TopAppBar";
 import SearchBar from "../../components/common/SearchBar";
 import ConfirmDeleteModal from "../../components/common/ConfirmDeleteModal";
-import { MOCK_RESTAURANTS } from "../../constants/restaurants";
 import type { Restaurant } from "../../types";
+import axiosClient from "../../api/axiosClient";
 
 const RestaurantManagement: React.FC = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [newName, setNewName] = useState("");
+  const [newAddress, setNewAddress] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Restaurant | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const filtered = MOCK_RESTAURANTS.filter((r) =>
+  type RestaurantApiResponse = {
+    _id: string;
+    name: string;
+    address?: string;
+  };
+
+  const fetchRestaurants = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const response = await axiosClient.get("/restaurants");
+      const restaurantsData = (response.data?.data ??
+        []) as RestaurantApiResponse[];
+
+      const mappedRestaurants: Restaurant[] = restaurantsData.map((item) => ({
+        id: item._id,
+        name: item.name,
+        address: item.address ?? "",
+        icon: "restaurant",
+        bg: "bg-primary-container",
+        text: "text-on-primary",
+      }));
+
+      setRestaurants(mappedRestaurants);
+    } catch (err) {
+      console.error(err);
+      setError("Không tải được danh sách quán ăn.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddRestaurant = async () => {
+    if (!newName.trim()) {
+      setError("Vui lòng nhập tên quán ăn.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      await axiosClient.post("/restaurants", {
+        name: newName,
+        address: newAddress,
+      });
+
+      setNewName("");
+      setNewAddress("");
+      await fetchRestaurants();
+    } catch (err) {
+      console.error(err);
+      setError("Không thể thêm quán ăn. Vui lòng thử lại.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleDeleteRestaurant = async () => {
+    if (!deleteTarget) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      await axiosClient.delete(`/restaurants/${deleteTarget.id}`);
+      setDeleteTarget(null);
+      await fetchRestaurants();
+    } catch (err) {
+      console.error(err);
+      setError("Không thể xóa quán ăn. Vui lòng thử lại.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRestaurants();
+  }, []);
+
+  const filtered = restaurants.filter((r) =>
     r.name.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -35,17 +120,26 @@ const RestaurantManagement: React.FC = () => {
                 className="w-full h-12 px-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
                 placeholder="Tên quán"
                 type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
               />
               <input
                 className="w-full h-12 px-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
                 placeholder="Địa chỉ"
                 type="text"
+                value={newAddress}
+                onChange={(e) => setNewAddress(e.target.value)}
               />
             </div>
-            <button className="w-12 h-[104px] bg-primary-container text-on-primary rounded-xl flex items-center justify-center active:scale-95 transition-transform">
+            <button
+              className="w-12 h-[104px] bg-primary-container text-on-primary rounded-xl flex items-center justify-center active:scale-95 transition-transform disabled:opacity-50"
+              onClick={handleAddRestaurant}
+              disabled={isLoading || !newName.trim()}
+            >
               <span className="material-symbols-outlined text-2xl">add</span>
             </button>
           </div>
+          {error && <p className="mt-3 text-error font-body-sm">{error}</p>}
         </section>
 
         <section className="flex justify-between items-end mb-4">
@@ -123,7 +217,7 @@ const RestaurantManagement: React.FC = () => {
       <ConfirmDeleteModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
-        onConfirm={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteRestaurant}
         name={deleteTarget?.name ?? ""}
       />
     </div>
