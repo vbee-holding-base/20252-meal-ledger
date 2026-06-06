@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { ServerError, UnauthorisedError } from "../config/errors";
 
 export interface AuthRequest extends Request {
   user?: { id: string };
@@ -11,15 +12,14 @@ export const protect = (
   next: NextFunction,
 ) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Not authorized, no token" });
-  }
+  if (!authHeader || !authHeader.startsWith("Bearer "))
+    return next(new UnauthorisedError("not authorised, no token"));
 
   const token = authHeader.split(" ")[1];
   const secret = process.env.JWT_SECRET;
   if (!secret) {
     console.error("JWT_SECRET is not defined in environment");
-    return res.status(500).json({ message: "Server configuration error" });
+    return next(new ServerError("server configuration error"));
   }
 
   try {
@@ -28,9 +28,8 @@ export const protect = (
       req.user = { id: (decoded as { id: string }).id };
       return next();
     }
-
-    return res.status(401).json({ message: "Not authorized, token invalid" });
+    return next(new UnauthorisedError("not authorised, invalid token"));
   } catch (error) {
-    return res.status(401).json({ message: "Not authorized, token failed" });
+    return next(new UnauthorisedError("not authorised, failed token"));
   }
 };

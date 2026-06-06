@@ -1,4 +1,9 @@
 import Participant from "../models/participantSchema";
+import {
+  DuplicateError,
+  NotFoundError,
+  ValidationError,
+} from "../config/errors";
 
 export const readParticipantsByOwner = async (ownerId: string) => {
   return await Participant.find({ ownerId });
@@ -12,7 +17,8 @@ export const createParticipantForOwner = async (
     ownerId,
     name: participantName,
   });
-  if (existingParticipant) return;
+  if (existingParticipant)
+    throw new DuplicateError("existing participant name");
   return await Participant.create({
     ownerId,
     name: participantName,
@@ -31,12 +37,15 @@ export const updateParticipantForOwner = async (
     _id: { $ne: participantId },
     name: newName,
   });
-  if (existingName) return;
-  return await Participant.findOneAndUpdate(
+  if (existingName)
+    throw new DuplicateError("existing name for another participant");
+  const updatedParticipant = await Participant.findOneAndUpdate(
     { ownerId, _id: participantId },
     { name: newName },
     { returnDocument: "after" },
   );
+  if (!updatedParticipant) throw new NotFoundError("unexisting participant");
+  return updatedParticipant;
 };
 
 export const deleteParticipantForOwner = async (
@@ -47,7 +56,8 @@ export const deleteParticipantForOwner = async (
     ownerId,
     _id: participantId,
   });
-  if (!participant) return;
-  if (participant.totalDebt > 0) return;
+  if (!participant) throw new NotFoundError("unexisting participant");
+  if (participant.totalDebt > 0)
+    throw new ValidationError("participant with unpaid debt");
   return await Participant.deleteOne({ ownerId, _id: participantId });
 };
