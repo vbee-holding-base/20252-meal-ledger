@@ -5,6 +5,6 @@ import { protect } from "../middlewares/auth";
 
 const router = Router();
 
-router.get("/debts/:id", protect, getDetailDebts);
-router.get("/debts", protect, readParticipants);
+router.get("/:id", protect, getDetailDebts);
+router.get("/", protect, readParticipants);
 export default router;

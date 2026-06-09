@@ -208,7 +208,7 @@ const EditRestaurant: React.FC = () => {
         <div className="flex gap-4 pt-2">
           <button
             className="flex-1 h-14 rounded-full border-2 border-primary text-primary font-bold active:scale-95 transition-transform disabled:opacity-50"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/restaurants")}
             disabled={isSaving}
           >
             Hủy

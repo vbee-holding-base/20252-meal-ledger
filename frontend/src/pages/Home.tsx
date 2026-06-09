@@ -124,6 +124,29 @@ const Home: React.FC = () => {
               chevron_right
             </span>
           </button>
+
+          {/* Card 4: Debts */}
+          <button
+            className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant/30 squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
+            onClick={() => navigate("/debts")}
+          >
+            <div className="w-14 h-14 bg-error-container rounded-full flex items-center justify-center group-hover:bg-error transition-colors duration-300">
+              <span className="material-symbols-outlined text-error group-hover:text-on-error text-[32px]">
+                credit_card
+              </span>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-headline-md text-on-surface text-[20px]">
+                Quản lý nợ
+              </h3>
+              <p className="text-on-surface-variant font-label-sm">
+                Theo dõi và quản lý các khoản nợ
+              </p>
+            </div>
+            <span className="material-symbols-outlined text-outline">
+              chevron_right
+            </span>
+          </button>
         </div>
 
         {/* Recent Activity Mini Section */}

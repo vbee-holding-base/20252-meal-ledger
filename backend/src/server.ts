@@ -11,6 +11,7 @@ import authRoute from "./routes/authRoute";
 import participantRoute from "./routes/participantRoute";
 import restaurantRoute from "./routes/restaurantRoute";
 import mealParserRoute from "./routes/mealParserRoute";
+import debtRoute from "./routes/debtRoute";
 import errorHandler from "./middlewares/errorHandler";
 
 dotenv.config();
@@ -31,6 +32,7 @@ app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/participants", participantRoute);
 app.use("/api/v1/restaurants", restaurantRoute);
 app.use("/api/v1/meals", mealParserRoute);
+app.use("/api/v1/debts", debtRoute);
 
 app.use(errorHandler);
 

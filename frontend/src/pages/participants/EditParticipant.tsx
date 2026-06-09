@@ -167,7 +167,7 @@ const EditParticipant: React.FC = () => {
         <div className="flex gap-4 pt-2">
           <button
             className="flex-1 h-14 rounded-full border-2 border-primary text-primary font-bold active:scale-95 transition-transform"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/participants")}
           >
             Hủy
           </button>
