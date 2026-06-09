@@ -1,31 +1,28 @@
-import Restaurant from "../models/restaurantSchema";
+import {
+  getRestaurantsByOwnerId,
+  findRestaurantByNameAndOwner,
+  createRestaurant,
+  findOtherRestaurantByName,
+  updateRestaurant,
+  deleteRestaurant,
+} from "../repo/restaurantRepo";
 
 interface RestaurantInput {
   name: string;
   address?: string;
 }
 
-export class RestaurantServiceError extends Error {
-  statusCode: number;
-  code: string;
-
-  constructor(statusCode: number, code: string, message: string) {
-    super(message);
-    this.statusCode = statusCode;
-    this.code = code;
-  }
-}
-
+import {
+  ValidationError,
+  NotFoundError,
+  DuplicateError,
+} from "../config/errors";
 const formatRestaurantInput = ({ name, address }: RestaurantInput) => {
   const formattedName = name?.trim();
   const formattedAddress = address?.trim() ?? "";
 
   if (!formattedName) {
-    throw new RestaurantServiceError(
-      400,
-      "VALIDATION_ERROR",
-      "Tên quán không được để trống",
-    );
+    throw new ValidationError("Tên quán không được để trống");
   }
 
   return {
@@ -35,9 +32,7 @@ const formatRestaurantInput = ({ name, address }: RestaurantInput) => {
 };
 
 export const getRestaurantsByOwner = async (ownerId: string) => {
-  return Restaurant.find({
-    ownerId,
-  }).sort({ createdAt: -1 });
+  return await getRestaurantsByOwnerId(ownerId);
 };
 
 export const createRestaurantForOwner = async (
@@ -45,25 +40,11 @@ export const createRestaurantForOwner = async (
   input: RestaurantInput,
 ) => {
   const formattedInput = formatRestaurantInput(input);
-
-  const existingRestaurant = await Restaurant.findOne({
+  return await createRestaurant(
     ownerId,
-    name: formattedInput.name,
-  });
-
-  if (existingRestaurant) {
-    throw new RestaurantServiceError(
-      409,
-      "DUPLICATE_RESTAURANT",
-      "Quán ăn này đã có trong danh sách",
-    );
-  }
-
-  return Restaurant.create({
-    ownerId,
-    name: formattedInput.name,
-    address: formattedInput.address,
-  });
+    formattedInput.name,
+    formattedInput.address,
+  );
 };
 
 export const updateRestaurantForOwner = async (
@@ -72,52 +53,15 @@ export const updateRestaurantForOwner = async (
   input: RestaurantInput,
 ) => {
   if (!restaurantId) {
-    throw new RestaurantServiceError(
-      400,
-      "VALIDATION_ERROR",
-      "Missing restaurant id",
-    );
+    throw new ValidationError("Missing restaurant id");
   }
 
   const formattedInput = formatRestaurantInput(input);
 
-  const existingRestaurant = await Restaurant.findOne({
-    ownerId,
+  const restaurant = await updateRestaurant(ownerId, restaurantId, {
     name: formattedInput.name,
-    _id: { $ne: restaurantId },
+    address: formattedInput.address,
   });
-
-  if (existingRestaurant) {
-    throw new RestaurantServiceError(
-      409,
-      "DUPLICATE_RESTAURANT",
-      "Quán ăn này đã có trong danh sách",
-    );
-  }
-
-  const restaurant = await Restaurant.findOneAndUpdate(
-    {
-      _id: restaurantId,
-      ownerId,
-    },
-    {
-      name: formattedInput.name,
-      address: formattedInput.address,
-    },
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
-
-  if (!restaurant) {
-    throw new RestaurantServiceError(
-      404,
-      "NOT_FOUND",
-      "Không tìm thấy quán ăn",
-    );
-  }
-
   return restaurant;
 };
 
@@ -126,25 +70,9 @@ export const deleteRestaurantForOwner = async (
   restaurantId: string,
 ) => {
   if (!restaurantId) {
-    throw new RestaurantServiceError(
-      400,
-      "VALIDATION_ERROR",
-      "Missing restaurant id",
-    );
+    throw new ValidationError("Missing restaurant id");
   }
 
-  const restaurant = await Restaurant.findOneAndDelete({
-    _id: restaurantId,
-    ownerId,
-  });
-
-  if (!restaurant) {
-    throw new RestaurantServiceError(
-      404,
-      "NOT_FOUND",
-      "Không tìm thấy quán ăn",
-    );
-  }
-
+  const restaurant = await deleteRestaurant(ownerId, restaurantId);
   return restaurant;
 };
