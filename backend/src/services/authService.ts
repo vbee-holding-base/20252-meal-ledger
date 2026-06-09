@@ -1,7 +1,6 @@
 import { LoginTicket, OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
-import Owner from "../models/ownerSchema";
+import { findOwnerByEmail, findOwnerById, createOwner } from "../repo/authRepo";
 import { Response } from "express";
 import {
   ExternalError,
@@ -94,25 +93,15 @@ export const findOrCreateOwner = async (ticket: LoginTicket) => {
   const name = payload.name ?? "";
   const avatar = payload.picture ?? "";
 
-  let owner = await Owner.findOne({ email });
-  if (!owner)
-    owner = await Owner.create({
-      _id: new mongoose.Types.ObjectId(),
-      googleId: googleID,
-      fullName: name,
-      email: email,
-      avatar: avatar,
-      bankAccount: {
-        bankName: "",
-        accountNumber: "",
-        accountName: "",
-      },
-    });
+  let owner = await findOwnerByEmail(email);
+  if (!owner) {
+    owner = await createOwner(googleID, name, email, avatar);
+  }
   return owner;
 };
 
 export const getMyInfo = async (_id: string) => {
-  const owner = await Owner.findById(_id);
+  const owner = await findOwnerById(_id);
   if (!owner) throw new NotFoundError("owner not found");
   return {
     _id: owner._id.toString(),

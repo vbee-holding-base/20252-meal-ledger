@@ -8,14 +8,10 @@ export const getDetailDebts = async (
   res: Response,
 ): Promise<void> => {
   const participantId = req.params.id;
-  try {
-    const participant = await checkParticipant(participantId as string);
-    const historyDebts = await getDetailDebt(participantId as string);
-    res.status(200).json({
-      participant: participant,
-      history: historyDebts,
-    });
-  } catch (error) {
-    res.status(500).json({ message: error });
-  }
+  const participant = await checkParticipant(participantId as string);
+  const historyDebts = await getDetailDebt(participantId as string);
+  res.status(200).json({
+    participant: participant,
+    history: historyDebts,
+  });
 };

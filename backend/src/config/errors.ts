@@ -7,7 +7,7 @@ export enum ErrorCode {
   EXTERNAL_ERROR = "EXTERNAL_ERROR",
 }
 
-class ApiError extends Error {
+export class ApiError extends Error {
   public readonly statusCode: number;
   public readonly code: ErrorCode;
 

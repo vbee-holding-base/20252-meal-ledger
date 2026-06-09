@@ -1,23 +1,9 @@
-import mongoose from "mongoose";
-import Participant from "../models/participantSchema";
-import Meal from "../models/mealSchema";
+import { findParticipantById } from "../repo/participantRepo";
+import { findUnpaidMealsByParticipant } from "../repo/debtRepo";
 
 export const getDetailDebt = async (participantId: string) => {
-  const participant = await Participant.findById(participantId);
-  if (!participant) {
-    throw new Error("Participant not found");
-  }
-  const participantMeal = await Meal.find({
-    participantsInfo: {
-      $elemMatch: {
-        participantId: new mongoose.Types.ObjectId(participantId),
-        status: "unpaid",
-      },
-    },
-  });
-  if (!participantMeal) {
-    throw new Error("No meals found for this participant");
-  }
+  const participant = await findParticipantById(participantId);
+  const participantMeal = await findUnpaidMealsByParticipant(participantId);
   const historyDebts = participantMeal
     .map((meal) => {
       const participantInfo = meal.participantsInfo.find(
@@ -39,9 +25,6 @@ export const getDetailDebt = async (participantId: string) => {
   return historyDebts;
 };
 export const checkParticipant = async (participantId: string) => {
-  const participant = await Participant.findById(participantId);
-  if (!participant) {
-    throw new Error("Participant not found");
-  }
+  const participant = await findParticipantById(participantId);
   return participant;
 };
