@@ -14,9 +14,10 @@ import EditParticipant from "./pages/participants/EditParticipant";
 import RestaurantManagement from "./pages/restaurants/RestaurantManagement";
 import EditRestaurant from "./pages/restaurants/EditRestaurant";
 import AddMeal from "./pages/AddMeal";
-import DebtDetails from "./pages/DebtDetails";
+import DebtDetailsPage from "./pages/debt/DebtDetails";
 import BottomNav from "./components/layout/BottomNav";
 import AddMealDetail from "./pages/AddMealDetail";
+import DebtManagement from "./pages/debt/DebtManagement";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -101,10 +102,18 @@ function App() {
                 }
               />
               <Route
-                path="/debts/:name"
+                path="/debts"
                 element={
                   <ProtectedRoute>
-                    <DebtDetails />
+                    <DebtManagement />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/debts/:id"
+                element={
+                  <ProtectedRoute>
+                    <DebtDetailsPage />
                   </ProtectedRoute>
                 }
               />

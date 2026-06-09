@@ -23,3 +23,17 @@ export interface Transaction {
   amount: number;
   icon: string;
 }
+
+export interface DebtDetails {
+  participant: {
+    ownerId: string;
+    name: string;
+    totalDebt: number;
+    status: string;
+  };
+  history: {
+    restaurantName: string;
+    date: string;
+    amount: number;
+  }[];
+}
