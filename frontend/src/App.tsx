@@ -18,6 +18,10 @@ import DebtDetailsPage from "./pages/debt/DebtDetails";
 import BottomNav from "./components/layout/BottomNav";
 import AddMealDetail from "./pages/AddMealDetail";
 import DebtManagement from "./pages/debt/DebtManagement";
+import More from "./pages/more/More";
+import BankAccountSettings from "./pages/more/BankAccountSettings";
+import GeneralSettings from "./pages/more/GeneralSettings";
+import HelpSupport from "./pages/more/HelpSupport";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -114,6 +118,38 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <DebtDetailsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/more"
+                element={
+                  <ProtectedRoute>
+                    <More />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/more/bank-account"
+                element={
+                  <ProtectedRoute>
+                    <BankAccountSettings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/more/general-settings"
+                element={
+                  <ProtectedRoute>
+                    <GeneralSettings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/more/help"
+                element={
+                  <ProtectedRoute>
+                    <HelpSupport />
                   </ProtectedRoute>
                 }
               />
