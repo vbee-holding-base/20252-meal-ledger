@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import LoginSearchBar, {
+  LoginSearchResult,
+} from "../components/common/LoginSearchBar";
 
 import logo from "../assets/logo.png";
 
@@ -8,8 +11,6 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001/api/v1";
 
 const Login: React.FC = () => {
-  const [searchName, setSearchName] = useState("");
-  const [showToast, setShowToast] = useState(false);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -19,21 +20,8 @@ const Login: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleSearch = () => {
-    if (searchName.trim() !== "") {
-      setShowToast(true);
-      setTimeout(() => {
-        setShowToast(false);
-      }, 2000);
-    } else {
-      // Small visual feedback for error could be added here
-      const inputField = document.getElementById("name-search-input");
-      if (inputField) {
-        inputField.focus();
-        inputField.classList.add("border-error");
-        setTimeout(() => inputField.classList.remove("border-error"), 500);
-      }
-    }
+  const handleParticipantSelect = (item: LoginSearchResult) => {
+    navigate(`/debts/${item._id}`);
   };
 
   return (
@@ -109,35 +97,8 @@ const Login: React.FC = () => {
               <label className="absolute -top-3 left-4 px-base bg-surface-container-lowest text-label-sm text-primary font-bold uppercase tracking-wider">
                 Thành viên
               </label>
-              <div className="border-2 border-outline-variant/30 rounded-xl p-md space-y-gutter">
-                <div className="relative group">
-                  <label className="absolute -top-2.5 left-4 px-base bg-surface-container-lowest text-label-sm text-primary font-semibold transition-all group-focus-within:text-primary-container">
-                    Tên của bạn
-                  </label>
-                  <input
-                    id="name-search-input"
-                    className="w-full h-14 bg-transparent border-2 border-outline-variant rounded-xl px-md font-body-md text-on-surface placeholder:text-outline/50 focus:border-primary-container focus:ring-0 transition-all outline-none"
-                    placeholder="VD: Nguyễn Văn A"
-                    type="text"
-                    value={searchName}
-                    onChange={(e) => setSearchName(e.target.value)}
-                  />
-                  <span className="material-symbols-outlined absolute right-4 top-4 text-outline group-focus-within:text-primary-container transition-colors">
-                    person_search
-                  </span>
-                </div>
-                <button
-                  className="w-full h-14 bg-primary-container text-on-primary font-label-md text-label-md rounded-full shadow-lg hover:bg-primary transition-all flex items-center justify-center gap-base squishy-active"
-                  onClick={handleSearch}
-                >
-                  <span
-                    className="material-symbols-outlined"
-                    style={{ fontVariationSettings: "'FILL' 1" }}
-                  >
-                    account_balance_wallet
-                  </span>
-                  <span>Tra cứu công nợ</span>
-                </button>
+              <div className="border-2 border-outline-variant/30 rounded-xl p-md">
+                <LoginSearchBar onItemSelect={handleParticipantSelect} />
               </div>
             </div>
           </section>
@@ -150,16 +111,6 @@ const Login: React.FC = () => {
           </footer>
         </div>
       </main>
-
-      {/* Success Feedback (Hidden by default) */}
-      <div
-        className={`fixed bottom-margin-mobile left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface px-md py-base rounded-full font-label-md text-label-md shadow-xl transition-all duration-300 z-[100] pointer-events-none ${
-          showToast ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-        }`}
-        id="toast"
-      >
-        Đang tìm kiếm thông tin của bạn...
-      </div>
     </div>
   );
 };

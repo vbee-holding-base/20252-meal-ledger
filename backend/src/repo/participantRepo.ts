@@ -25,6 +25,15 @@ export const createParticipant = async (
   });
 };
 
+export const getAllParticipantByName = async (name: string) => {
+  return await Participant.find({
+    name: {
+      $regex: name,
+      $options: "i",
+    },
+  }).limit(10);
+};
+
 export const findParticipant = async (
   ownerId: string,
   participantName: string,

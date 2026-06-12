@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TopAppBar from "../../components/layout/TopAppBar";
-import axiosClient from "../../api/axiosClient";
+import axiosClient, { axiosPublic } from "../../api/axiosClient";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import type { DebtDetails } from "../../types";
 
@@ -26,6 +27,8 @@ const DebtDetailsPage: React.FC = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const { isAuthenticated } = useAuth();
+
   const fetchDebtDetails = async () => {
     if (!id) {
       setError("ID không hợp lệ.");
@@ -36,8 +39,10 @@ const DebtDetailsPage: React.FC = () => {
       setIsLoading(true);
       setError("");
 
-      const response = await axiosClient.get(`/debts/${id}`);
-      const data = response.data as DebtDetailApiResponse;
+      const response = isAuthenticated
+        ? await axiosClient.get<DebtDetailApiResponse>(`/debts/${id}`)
+        : await axiosPublic.get<DebtDetailApiResponse>(`/debts/public/${id}`);
+      const data = response.data;
       setDebtDetails({ participant: data.participant, history: data.history });
     } catch (err) {
       console.error(err);
