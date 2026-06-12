@@ -12,10 +12,19 @@ export const setAccessToken = (token: string | null) => {
   inMemoryToken = token;
 };
 
-// Create axios instance
+// Create axios instance for authenticated requests
 const axiosClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true, // This is crucial for sending cookies (refresh token)
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Create axios instance for public requests
+export const axiosPublic = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: false,
   headers: {
     "Content-Type": "application/json",
   },

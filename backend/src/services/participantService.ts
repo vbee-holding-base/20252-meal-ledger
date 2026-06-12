@@ -1,14 +1,21 @@
 import {
   getAllParticipantByOwnerId,
+  getAllParticipantByName,
   createParticipant,
   findParticipantByIdAndOwner,
   updateParticipant,
   deleteParticipant,
 } from "../repo/participantRepo";
 import { ValidationError } from "../config/errors";
+import { escapeRegex } from "../validators/participantValidator";
 
 export const readParticipantsByOwner = async (ownerId: string) => {
   return await getAllParticipantByOwnerId(ownerId);
+};
+
+export const readAllParticipants = async (participantName: string) => {
+  const participantValidName = escapeRegex(participantName);
+  return await getAllParticipantByName(participantValidName);
 };
 
 export const createParticipantForOwner = async (

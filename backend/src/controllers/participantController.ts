@@ -9,6 +9,7 @@ import {
   deleteParticipantForOwner,
   readParticipantsByOwner,
   updateParticipantForOwner,
+  readAllParticipants,
 } from "../services/participantService";
 import { AuthRequest } from "../middlewares/auth";
 import { ValidationError } from "../config/errors";
@@ -55,4 +56,14 @@ export const deleteParticipant = async (req: AuthRequest, res: Response) => {
     throw new ValidationError("invalid ownerId or participantId");
   await deleteParticipantForOwner(ownerId, participantId);
   res.status(200).json({ message: "successfully deleted participant" });
+};
+
+export const readParticipantsPublic = async (req: Request, res: Response) => {
+  const participantName = req.query.q as string;
+  if (!participantName || participantName.trim() === "") {
+    res.status(200).json([]);
+    return;
+  }
+  const participants = await readAllParticipants(participantName);
+  res.status(200).json({ data: participants, total: participants.length });
 };

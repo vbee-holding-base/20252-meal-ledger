@@ -17,3 +17,6 @@ export const normaliseName = (name: unknown) => {
   if (norm === "") return null;
   return norm;
 };
+export const escapeRegex = (text: string): string => {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};

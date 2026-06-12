@@ -14,7 +14,7 @@ const TopAppBar: React.FC<TopAppBarProps> = ({ title, showBack = true }) => {
       {showBack ? (
         <button
           className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-container/10 transition-colors active:scale-95 duration-200"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
         >
           <span className="material-symbols-outlined text-primary">
             arrow_back
