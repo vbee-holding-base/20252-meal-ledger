@@ -1,6 +1,5 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth";
-import { parseMealTextWithGemini } from "../services/aiMealParserService";
 import { getAllParticipantByOwnerId } from "../repo/participantRepo";
 import { getRestaurantsByOwnerId } from "../repo/restaurantRepo";
 import {
@@ -8,6 +7,8 @@ import {
   ServerError,
   UnauthorisedError,
 } from "../config/errors";
+import { createMealParserProvider } from "../ai/factories/mealParserProviderFactory";
+import { MealParserService } from "../services/aiMealParserService";
 
 export const parseMealText = async (req: AuthRequest, res: Response) => {
   if (!req.user?.id) {
@@ -38,8 +39,11 @@ export const parseMealText = async (req: AuthRequest, res: Response) => {
     address: restaurant.address,
   }));
 
+  const provider = createMealParserProvider();
+  const mealParserService = new MealParserService(provider);
+
   try {
-    const parsed = await parseMealTextWithGemini({
+    const parsed = await mealParserService.parse({
       text: text.trim(),
       now: new Date(),
       participants: participantContext,
