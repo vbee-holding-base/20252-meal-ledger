@@ -19,7 +19,7 @@ import BottomNav from "./components/layout/BottomNav";
 import AddMealDetail from "./pages/AddMealDetail";
 import DebtManagement from "./pages/debt/DebtManagement";
 import More from "./pages/more/More";
-//import BankAccountSettings from "./pages/more/BankAccountSettings";
+import BankAccountSettings from "./pages/more/BankAccountSetting";
 //import GeneralSettings from "./pages/more/GeneralSettings";
 //import HelpSupport from "./pages/more/HelpSupport";
 
@@ -119,6 +119,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <More />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/more/bank-account"
+                element={
+                  <ProtectedRoute>
+                    <BankAccountSettings />
                   </ProtectedRoute>
                 }
               />
