@@ -59,7 +59,9 @@ const AddMealDetail: React.FC = () => {
   return (
     <div className="bg-background min-h-screen flex justify-center">
       <div className="w-full max-w-md bg-background px-4 pb-24 relative flex flex-col">
-        <TopAppBar title="Chi tiết bữa ăn" />
+        <div className="flex justify-center">
+          <TopAppBar title="Chi tiết bữa ăn" />
+        </div>
 
         <main className="flex-1 pt-20 pb-4 overflow-y-auto space-y-4">
           {participants.map((person) => (

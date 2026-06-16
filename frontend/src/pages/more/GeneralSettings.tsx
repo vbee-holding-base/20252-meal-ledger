@@ -21,7 +21,7 @@ const GeneralSettings: React.FC = () => {
       <main className="flex-1 mt-16 px-margin-mobile pt-4 space-y-4 max-w-md mx-auto w-full">
         <SettingRow
           icon={isDark ? "dark_mode" : "light_mode"}
-          title="Giao diện tối"
+          title={isDark ? "Giao diện tối" : "Giao diện sáng"}
           color="blue"
           type="toggle"
           toggled={isDark}
