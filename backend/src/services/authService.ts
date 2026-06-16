@@ -1,10 +1,14 @@
 import { LoginTicket, OAuth2Client } from "google-auth-library";
 import jwt from "jsonwebtoken";
-import { findOwnerByEmail, findOwnerById, createOwner } from "../repo/authRepo";
+import {
+  findOwnerByEmail,
+  findOwnerById,
+  createOwner,
+  setOwnerXid,
+} from "../repo/authRepo";
 import { Response } from "express";
 import {
   ExternalError,
-  NotFoundError,
   ServerError,
   UnauthorisedError,
   ValidationError,
@@ -102,7 +106,6 @@ export const findOrCreateOwner = async (ticket: LoginTicket) => {
 
 export const getMyInfo = async (_id: string) => {
   const owner = await findOwnerById(_id);
-  if (!owner) throw new NotFoundError("owner not found");
   return {
     _id: owner._id.toString(),
     email: owner.email,
@@ -124,4 +127,8 @@ export const regenerateAccessToken = async (token: string) => {
   } catch (error) {
     throw new UnauthorisedError("invalid refresh token");
   }
+};
+
+export const updateOwnerXid = async (_id: string, xid: string) => {
+  return await setOwnerXid(_id, xid);
 };

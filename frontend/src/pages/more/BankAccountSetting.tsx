@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import TopAppBar from "../../components/layout/TopAppBar";
-import { BANKS, getBankByCode, getBankByName } from "../../constants/banks";
 import axiosClient from "../../api/axiosClient";
+import BankHubIframe from "../../components/common/BankHubIframe";
+
+interface BankAccountInfo {
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+}
 
 const BankAccountSettings: React.FC = () => {
-  const [bankCode, setBankCode] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [accountName, setAccountName] = useState("");
-  const [message, setMessage] = useState<{
-    type: "error" | "success";
-    text: string;
-  } | null>(null);
+  const [bankAccounts, setBankAccounts] = useState<BankAccountInfo[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showIframe, setShowIframe] = useState(false);
 
   useEffect(() => {
     loadBankAccount();
@@ -18,87 +20,43 @@ const BankAccountSettings: React.FC = () => {
 
   const loadBankAccount = async () => {
     try {
-      const res = await axiosClient.get("/bank-account");
-      const data = res.data as {
-        bankName: string;
-        accountNumber: string;
-        accountName: string;
-      };
-      if (data.bankName && data.accountNumber && data.accountName) {
-        const bank = getBankByName(data.bankName);
-        if (bank) setBankCode(bank.code);
-        setAccountNumber(data.accountNumber);
-        setAccountName(data.accountName);
-      }
+      setLoading(true);
+      const res = await axiosClient.get("/bankhub/bank-account");
+      const data = res.data as BankAccountInfo[];
+      setBankAccounts(Array.isArray(data) ? data : []);
     } catch {
-      //
+      setBankAccounts([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleVerify = async () => {
-    if (!bankCode || !accountNumber) {
-      setMessage({
-        type: "error",
-        text: "Please select a bank and enter an account number",
-      });
-      return;
-    }
-    setMessage(null);
-    try {
-      const res = await axiosClient.post("/bank-account/verify", {
-        bankCode,
-        accountNumber,
-      });
-      const { is_valid, account_name } = res.data as {
-        is_valid: boolean;
-        account_name: string | null;
-      };
-      if (is_valid && account_name) {
-        setAccountName(account_name);
-        setMessage(null);
-      } else {
-        setMessage({
-          type: "error",
-          text: "Account name not found, please check your information",
-        });
-      }
-    } catch {
-      setMessage({
-        type: "error",
-        text: "Unable to verify account, please try again",
-      });
-    }
-  };
-
-  const handleSave = async () => {
-    if (!accountName) return;
-    const bank = getBankByCode(bankCode);
-    if (!bank) return;
-
-    setMessage(null);
-    try {
-      await axiosClient.put("/bank-account", {
-        bankName: bank.shortName,
-        accountNumber,
-        accountName,
-      });
-      setMessage({ type: "success", text: "Bank account saved" });
-    } catch {
-      setMessage({ type: "error", text: "Failed to save bank account" });
-    }
-  };
-
-  const handleBankChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setBankCode(e.target.value);
-    setAccountName("");
-  };
-
-  const handleAccountNumberChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setAccountNumber(e.target.value.replace(/\D/g, ""));
-    setAccountName("");
-  };
+  if (showIframe) {
+    return (
+      <div className="bg-background text-on-surface min-h-screen pb-24">
+        <header className="fixed top-0 w-full max-w-md z-50 flex items-center justify-between px-margin-mobile h-16 bg-surface">
+          <button
+            className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-container/10 transition-colors active:scale-95 duration-200"
+            onClick={() => setShowIframe(false)}
+          >
+            <span className="material-symbols-outlined text-primary">
+              arrow_back
+            </span>
+          </button>
+          <h1
+            className="absolute inset-0 flex items-center justify-center font-headline-md text-headline-md pointer-events-none"
+            style={{ color: "#ff7a00" }}
+          >
+            Liên kết tài khoản
+          </h1>
+          <div className="w-10" />
+        </header>
+        <main className="mt-16 px-margin-mobile max-w-md mx-auto pt-6 space-y-4">
+          <BankHubIframe />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-background text-on-surface min-h-screen pb-24">
@@ -111,84 +69,70 @@ const BankAccountSettings: React.FC = () => {
               account_balance
             </span>
             <h2 className="font-headline-md text-on-surface text-lg">
-              Thông tin tài khoản
+              Tài khoản đã liên kết
             </h2>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-label-md font-label-md text-on-surface-variant">
-              Tên ngân hàng
-            </label>
-            <div className="relative">
-              <select
-                value={bankCode}
-                onChange={handleBankChange}
-                className="w-full h-14 px-4 rounded-2xl border-2 border-surface-container-high focus:border-primary focus:ring-0 text-body-md transition-all bg-transparent cursor-pointer"
-              >
-                <option value="">Chọn ngân hàng</option>
-                {BANKS.map((bank) => (
-                  <option key={bank.code} value={bank.code}>
-                    {bank.shortName}
-                  </option>
-                ))}
-              </select>
+          {loading ? (
+            <div className="text-center py-6 text-on-surface-variant">
+              Đang tải thông tin...
             </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-label-md font-label-md text-on-surface-variant">
-              Số tài khoản
-            </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              value={accountNumber}
-              onChange={handleAccountNumberChange}
-              placeholder=""
-              className="w-full h-14 px-4 rounded-2xl border-2 border-surface-container-high focus:border-primary focus:ring-0 text-body-md transition-all bg-transparent"
-            />
-          </div>
-
-          <button
-            onClick={handleVerify}
-            disabled={!bankCode || !accountNumber}
-            className="w-full h-14 rounded-full bg-primary-container text-on-primary font-bold shadow-md active:scale-95 transition-transform disabled:opacity-50"
-          >
-            Xác thực tài khoản
-          </button>
-
-          {accountName && (
-            <div className="space-y-1.5">
-              <label className="text-label-md font-label-md text-on-surface-variant">
-                Chủ tài khoản
-              </label>
-              <div className="w-full h-14 px-4 rounded-2xl border-2 border-primary bg-primary-container/10 flex items-center">
-                <span className="text-body-md font-medium text-on-surface">
-                  {accountName}
-                </span>
-              </div>
+          ) : bankAccounts.length > 0 ? (
+            <div className="space-y-4">
+              {bankAccounts.map((account, index) => (
+                <div
+                  key={index}
+                  className="p-4 rounded-xl bg-primary-container/10 border border-primary/20 space-y-3"
+                >
+                  <div className="flex justify-between">
+                    <span className="text-label-md text-on-surface-variant">
+                      Ngân hàng
+                    </span>
+                    <span className="text-body-md font-bold text-on-surface">
+                      {account.bankName}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-label-md text-on-surface-variant">
+                      Số tài khoản
+                    </span>
+                    <span className="text-body-md font-bold text-on-surface">
+                      {account.accountNumber}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-label-md text-on-surface-variant">
+                      Chủ tài khoản
+                    </span>
+                    <span className="text-body-md font-bold text-on-surface">
+                      {account.accountName}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-on-surface-variant space-y-2">
+              <span className="material-symbols-outlined text-outline text-[48px]">
+                no_accounts
+              </span>
+              <p className="text-body-md">
+                Chưa liên kết tài khoản ngân hàng nào.
+              </p>
+              <p className="text-label-sm">
+                Hãy liên kết tài khoản qua BankHub để nhận thanh toán tự động.
+              </p>
             </div>
           )}
         </div>
 
-        {message && (
-          <p
-            className={
-              message.type === "error"
-                ? "text-error font-body-sm"
-                : "text-primary font-body-sm"
-            }
-          >
-            {message.text}
-          </p>
-        )}
-
         <button
-          onClick={handleSave}
-          disabled={!accountName}
-          className="w-full h-14 rounded-full bg-primary-container text-on-primary font-bold shadow-md active:scale-95 transition-transform disabled:opacity-50"
+          onClick={() => setShowIframe(true)}
+          className="w-full h-14 rounded-full bg-primary text-on-primary font-bold shadow-md active:scale-95 transition-transform"
         >
-          Lưu thông tin
+          {bankAccounts.length > 0
+            ? "Thay đổi liên kết tài khoản"
+            : "Liên kết tài khoản ngân hàng"}
         </button>
       </main>
     </div>

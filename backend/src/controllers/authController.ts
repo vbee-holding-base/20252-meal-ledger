@@ -9,7 +9,9 @@ import {
   findOrCreateOwner,
   getMyInfo,
   regenerateAccessToken,
+  updateOwnerXid,
 } from "../services/authService";
+import { createCompanyOwner } from "../services/bankHubService";
 import { UnauthorisedError } from "../config/errors";
 
 // GET /api/auth/google
@@ -34,9 +36,15 @@ export const googleCallback = async (
   try {
     const ticket = await getClientTicket(code);
     const owner = await findOrCreateOwner(ticket);
+    const ownerId = owner._id.toString();
+    const accessToken = generateAccessToken(ownerId);
+    const refreshToken = generateRefreshToken(ownerId);
 
-    const accessToken = generateAccessToken(owner._id.toString());
-    const refreshToken = generateRefreshToken(owner._id.toString());
+    if (!owner.xid) {
+      const createCompany = await createCompanyOwner(ownerId);
+      const xid = createCompany?.data?.xid;
+      if (xid) await updateOwnerXid(ownerId, xid);
+    }
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
@@ -54,6 +62,7 @@ export const googleCallback = async (
         email: owner.email,
         name: owner.fullName,
         avatar_url: owner.avatar,
+
         created_at: (owner as any).createdAt,
       }),
     });

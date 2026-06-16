@@ -1,4 +1,8 @@
-import express, { type Application } from "express";
+import express, {
+  type Application,
+  type Request,
+  type Response,
+} from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoute from "./routes/authRoute";
@@ -6,7 +10,7 @@ import participantRoute from "./routes/participantRoute";
 import restaurantRoute from "./routes/restaurantRoute";
 import mealParserRoute from "./routes/mealParserRoute";
 import debtRoute from "./routes/debtRoute";
-import bankAccountRoute from "./routes/bankAccountRoute";
+import bankHubRoute from "./routes/bankHubRoute";
 import errorHandler from "./middlewares/errorHandler";
 
 const app: Application = express();
@@ -26,8 +30,12 @@ app.use("/api/v1/participants", participantRoute);
 app.use("/api/v1/restaurants", restaurantRoute);
 app.use("/api/v1/meals", mealParserRoute);
 app.use("/api/v1/debts", debtRoute);
-app.use("/api/v1/bank-account", bankAccountRoute);
+app.use("/api/v1/bankhub", bankHubRoute);
 
 app.use(errorHandler);
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("API Running");
+});
 
 export default app;

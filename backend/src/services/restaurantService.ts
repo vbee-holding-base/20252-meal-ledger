@@ -12,11 +12,7 @@ interface RestaurantInput {
   address?: string;
 }
 
-import {
-  ValidationError,
-  NotFoundError,
-  DuplicateError,
-} from "../config/errors";
+import { ValidationError } from "../config/errors";
 const formatRestaurantInput = ({ name, address }: RestaurantInput) => {
   const formattedName = name?.trim();
   const formattedAddress = address?.trim() ?? "";

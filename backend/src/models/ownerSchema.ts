@@ -6,11 +6,13 @@ export interface IOwner {
   fullName: string;
   email: string;
   avatar: string;
-  bankAccount: {
+  isBankLinked: boolean;
+  xid: string;
+  bankAccounts?: Array<{
     bankName: string;
     accountNumber: string;
     accountName: string;
-  };
+  }>;
 }
 
 const ownerSchema = new mongoose.Schema<IOwner>(
@@ -19,10 +21,18 @@ const ownerSchema = new mongoose.Schema<IOwner>(
     fullName: { type: String, default: "" },
     email: { type: String, required: true, unique: true },
     avatar: { type: String, default: "" },
-    bankAccount: {
-      bankName: { type: String, required: false },
-      accountNumber: { type: String, required: false },
-      accountName: { type: String, required: false },
+    isBankLinked: { type: Boolean, required: false, default: false },
+    xid: { type: String, required: false },
+    bankAccounts: {
+      type: [
+        {
+          bankName: { type: String, required: false },
+          accountNumber: { type: String, required: false },
+          accountName: { type: String, required: false },
+        },
+      ],
+      required: false,
+      default: [],
     },
   },
   {
