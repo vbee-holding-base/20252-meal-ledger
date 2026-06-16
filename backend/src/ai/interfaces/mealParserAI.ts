@@ -1,8 +1,5 @@
-import {
-    ParseMealTextInput,
-    ParsedMealRaw,
-} from "../types/mealParserTypes";
+import { ParseMealTextInput, ParsedMealRaw } from "./mealParserTypes";
 
-export interface mealParserAI{
-    parseMealText(input: ParseMealTextInput): Promise<ParsedMealRaw>;
+export interface mealParserAI {
+  parseMealText(input: ParseMealTextInput): Promise<ParsedMealRaw>;
 }
