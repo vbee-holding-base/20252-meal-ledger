@@ -64,11 +64,13 @@ const LoginSearchBar: React.FC<LoginSearchBarProps> = ({ onItemSelect }) => {
         person_search
       </span>
       {isSearching && (
-        <div className="mt-1 text-sm text-gray-500">Đang tìm kiếm...</div>
+        <div className="mt-1 text-sm text-on-surface-variant">
+          Đang tìm kiếm...
+        </div>
       )}
-      {error && <div className="mt-1 text-sm text-red-500">{error}</div>}
+      {error && <div className="mt-1 text-sm text-error">{error}</div>}
       {results.length > 0 && (
-        <ul className="absolute left-0 right-0 z-10 mt-1 max-h-48 overflow-y-auto bg-white border border-gray-200 rounded-md shadow-lg">
+        <ul className="absolute left-0 right-0 z-10 mt-1 max-h-48 overflow-y-auto bg-surface-container-low border border-outline-variant/30 rounded-md shadow-lg">
           {results.map((item) => (
             <li
               key={item._id}
@@ -77,11 +79,11 @@ const LoginSearchBar: React.FC<LoginSearchBarProps> = ({ onItemSelect }) => {
                 setResults([]);
                 if (onItemSelect) onItemSelect(item);
               }}
-              className="px-4 py-2 cursor-pointer border-b border-gray-100 last:border-none hover:bg-gray-100 transition-colors"
+              className="px-4 py-2 cursor-pointer border-b border-outline-variant/20 last:border-none hover:bg-surface-container transition-colors"
             >
               <div className="flex justify-between items-center">
                 <span className="font-medium">{item.name}</span>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-on-surface-variant">
                   {item.totalDebt.toLocaleString("vi-VN")} đ
                 </span>
               </div>

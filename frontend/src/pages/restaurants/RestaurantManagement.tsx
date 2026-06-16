@@ -106,7 +106,7 @@ const RestaurantManagement: React.FC = () => {
       <TopAppBar title="Quán ăn" />
 
       <main className="pt-20 pb-base px-margin-mobile max-w-md mx-auto">
-        <section className="sticky bg-surface z-40 pt-1 pb-2 top-12">
+        <section className="sticky bg-surface z-40 pb-2 top-12">
           <SearchBar
             value={search}
             onChange={setSearch}
@@ -114,7 +114,7 @@ const RestaurantManagement: React.FC = () => {
           />
         </section>
 
-        <section className="pb-4">
+        <section className="pb-4 pt-2">
           <div className="flex gap-2 items-start">
             <div className="flex-1 space-y-2">
               <input

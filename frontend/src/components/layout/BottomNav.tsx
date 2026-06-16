@@ -9,12 +9,7 @@ const navItems = [
   { path: "/more", icon: "more_horiz", label: "Khác" },
 ];
 
-const HIDDEN_PATHS = [
-  "/login",
-  "/auth/callback",
-  "/add-meal",
-  "/add-meal-detail",
-];
+const HIDDEN_PATHS = ["/login", "/auth/callback"];
 
 const BottomNav: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +18,7 @@ const BottomNav: React.FC = () => {
   if (HIDDEN_PATHS.includes(location.pathname)) return null;
 
   return (
-    <div className="fixed bottom-0 w-full max-w-md z-50 bg-surface-container-lowest border-t border-outline-variant/20 pb-safe pb-2 pt-2 px-4 shadow-[0_-4px_20px_rgba(153,71,0,0.05)] rounded-t-3xl">
+    <div className="fixed bottom-0 w-full max-w-md z-50 bg-surface-container-lowest border-t border-outline-variant/20 pb-safe pb-2 pt-2 px-4">
       <div className="flex justify-around items-center max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;

@@ -95,22 +95,7 @@ const DebtDetailsPage: React.FC = () => {
     <div className="bg-background text-on-background min-h-screen flex flex-col pb-20">
       <TopAppBar title="Chi tiết nợ" />
 
-      <header className="fixed top-0 w-full max-w-md z-50 flex items-center justify-between px-margin-mobile h-16 bg-surface">
-        <button
-          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-container/10 transition-colors active:scale-95 duration-200"
-          onClick={() => navigate("/debts")}
-        >
-          <span className="material-symbols-outlined text-primary">
-            arrow_back
-          </span>
-        </button>
-        <h1 className="text-headline-md font-bold tracking-tight text-center text-primary whitespace-nowrap">
-          Chi tiết công nợ
-        </h1>
-        <div className="w-10"></div>
-      </header>
-
-      <main className="flex-1 mt-16 mb-6 px-margin-mobile max-w-md mx-auto w-full">
+      <main className="flex-1 pt-16 mb-6 px-margin-mobile max-w-md mx-auto w-full">
         <section className="py-md animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="bg-surface-container-lowest p-md rounded-[24px] shadow-[0_4px_20px_rgba(153,71,0,0.1)] flex flex-col items-center relative overflow-hidden pt-lg">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary-container/10 rounded-full blur-3xl"></div>
@@ -133,7 +118,7 @@ const DebtDetailsPage: React.FC = () => {
               <button
                 className={`mt-md rounded-full py-3 px-8 font-bold transition-all duration-200 active:scale-95 flex items-center gap-2 shadow-lg shadow-primary/20 ${
                   totalAmount > 0
-                    ? "bg-primary text-on-primary hover:bg-on-primary-fixed-variant"
+                    ? "bg-primary text-on-primary hover:bg-primary-fixed-dim"
                     : "bg-surface-container text-tertiary cursor-not-allowed"
                 }`}
                 disabled={totalAmount <= 0}

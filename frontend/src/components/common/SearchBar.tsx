@@ -13,11 +13,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   return (
     <div className="relative">
-      <span className="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-on-surface-variant right-4">
+      <span className="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-on-surface-variant left-4">
         search
       </span>
       <input
-        className="w-full h-12 pr-12 pl-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
+        className="w-full h-12 pl-12 pr-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
         placeholder={placeholder}
         type="text"
         value={value}
