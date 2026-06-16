@@ -15,7 +15,7 @@ const Home: React.FC = () => {
         <div className="space-y-4">
           {/* Card 1: Add Meal */}
           <button
-            className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant/30 squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
+            className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
             onClick={() => navigate("/add-meal")}
           >
             <div className="w-14 h-14 bg-primary-container/10 rounded-full flex items-center justify-center group-hover:bg-primary-container transition-colors duration-300">
@@ -38,7 +38,7 @@ const Home: React.FC = () => {
 
           {/* Card 2: Participants */}
           <button
-            className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant/30 squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
+            className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
             onClick={() => navigate("/participants")}
           >
             <div className="w-14 h-14 bg-tertiary-fixed rounded-full flex items-center justify-center group-hover:bg-tertiary transition-colors duration-300">
@@ -61,7 +61,7 @@ const Home: React.FC = () => {
 
           {/* Card 3: Restaurants */}
           <button
-            className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant/30 squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
+            className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
             onClick={() => navigate("/restaurants")}
           >
             <div className="w-14 h-14 bg-secondary-fixed rounded-full flex items-center justify-center group-hover:bg-secondary-container transition-colors duration-300">
@@ -84,7 +84,7 @@ const Home: React.FC = () => {
 
           {/* Card 4: Debts */}
           <button
-            className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant/30 squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
+            className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
             onClick={() => navigate("/debts")}
           >
             <div className="w-14 h-14 bg-error-container rounded-full flex items-center justify-center group-hover:bg-error transition-colors duration-300">

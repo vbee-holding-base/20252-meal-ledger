@@ -18,7 +18,7 @@ const BottomNav: React.FC = () => {
   if (HIDDEN_PATHS.includes(location.pathname)) return null;
 
   return (
-    <div className="fixed bottom-0 w-full max-w-md z-50 bg-surface-container-lowest border-t border-outline-variant/20 pb-safe pb-2 pt-2 px-4">
+    <div className="fixed bottom-0 w-full max-w-md z-50 bg-surface-container-lowest border-t border-outline-variant pb-safe pb-2 pt-2 px-4">
       <div className="flex justify-around items-center max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;

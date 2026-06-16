@@ -124,23 +124,23 @@ const EditRestaurant: React.FC = () => {
         </div>
 
         {/* Form */}
-        <div className="bg-surface-container-lowest rounded-2xl p-md shadow-[0_4px_20px_rgba(153,71,0,0.08)] space-y-5">
+        <div className="bg-surface-container-lowest rounded-2xl p-md card-shadow space-y-5">
           <div className="space-y-1.5">
             <label className="text-label-md font-label-md text-on-surface-variant">
               Tên quán
             </label>
             <div
-              className={`flex items-center gap-3 border-2 ${
+              className={`flex items-center gap-3 border ${
                 errors.name
                   ? "border-error"
-                  : "border-surface-container-high focus-within:border-primary"
+                  : "border-outline-variant focus-within:border-primary"
               } rounded-2xl px-4 transition-all`}
             >
               <span className="material-symbols-outlined text-on-surface-variant/60">
                 storefront
               </span>
               <input
-                className="flex-1 h-14 border-none focus:ring-0 p-0 text-body-md bg-transparent"
+                className="flex-1 h-14 border-none focus:ring-0 p-0 text-body-md text-on-surface bg-transparent"
                 placeholder="Nhập tên quán..."
                 type="text"
                 value={name}
@@ -167,17 +167,17 @@ const EditRestaurant: React.FC = () => {
               Địa chỉ
             </label>
             <div
-              className={`flex items-start gap-3 border-2 ${
+              className={`flex items-start gap-3 border ${
                 errors.address
                   ? "border-error"
-                  : "border-surface-container-high focus-within:border-primary"
+                  : "border-outline-variant focus-within:border-primary"
               } rounded-2xl px-4 pt-3 pb-3 transition-all`}
             >
               <span className="material-symbols-outlined text-on-surface-variant/60 mt-0.5">
                 location_on
               </span>
               <textarea
-                className="flex-1 border-none focus:ring-0 p-0 text-body-md bg-transparent resize-none min-h-[60px]"
+                className="flex-1 border-none focus:ring-0 p-0 text-body-md text-on-surface bg-transparent resize-none min-h-[60px]"
                 placeholder="Nhập địa chỉ..."
                 value={address}
                 onChange={(e) => {
@@ -207,7 +207,7 @@ const EditRestaurant: React.FC = () => {
         )}
         <div className="flex gap-4 pt-2">
           <button
-            className="flex-1 h-14 rounded-full border-2 border-primary text-primary font-bold active:scale-95 transition-transform disabled:opacity-50"
+            className="flex-1 h-14 rounded-full border border-primary text-primary font-bold active:scale-95 transition-transform disabled:opacity-50"
             onClick={() => navigate("/restaurants")}
             disabled={isSaving}
           >

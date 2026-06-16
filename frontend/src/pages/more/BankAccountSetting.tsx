@@ -43,10 +43,7 @@ const BankAccountSettings: React.FC = () => {
               arrow_back
             </span>
           </button>
-          <h1
-            className="absolute inset-0 flex items-center justify-center font-headline-md text-headline-md pointer-events-none"
-            style={{ color: "#ff7a00" }}
-          >
+          <h1 className="absolute inset-0 flex items-center justify-center font-headline-md text-headline-md pointer-events-none text-primary-container">
             Liên kết tài khoản
           </h1>
           <div className="w-10" />
@@ -63,8 +60,8 @@ const BankAccountSettings: React.FC = () => {
       <TopAppBar title="Tài khoản ngân hàng" />
 
       <main className="mt-16 px-margin-mobile max-w-md mx-auto space-y-6 pt-6">
-        <div className="bg-surface-container-lowest rounded-2xl p-md shadow-[0_4px_20px_rgba(153,71,0,0.08)] space-y-5">
-          <div className="flex items-center gap-3 pb-2 border-b border-surface-container-high">
+        <div className="bg-surface-container-lowest rounded-2xl p-md card-shadow space-y-5">
+          <div className="flex items-center gap-3 pb-2 border-b border-outline-variant">
             <span className="material-symbols-outlined text-primary text-[24px]">
               account_balance
             </span>

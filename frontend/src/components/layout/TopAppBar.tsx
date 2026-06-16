@@ -10,7 +10,7 @@ const TopAppBar: React.FC<TopAppBarProps> = ({ title, showBack = true }) => {
   const navigate = useNavigate();
 
   return (
-    <header className="fixed top-0 w-full max-w-md z-50 flex items-center px-margin-mobile h-16 bg-surface border-b border-outline-variant/20">
+    <header className="fixed top-0 w-full max-w-md z-50 flex items-center px-margin-mobile h-16 bg-surface border-b border-outline-variant">
       <div className="w-10 flex items-center justify-center">
         {showBack && (
           <button
@@ -23,10 +23,7 @@ const TopAppBar: React.FC<TopAppBarProps> = ({ title, showBack = true }) => {
           </button>
         )}
       </div>
-      <h1
-        className="flex-1 text-center font-headline-md text-headline-md pointer-events-none"
-        style={{ color: "#ff7a00" }}
-      >
+      <h1 className="flex-1 text-center font-headline-md text-headline-md pointer-events-none text-primary-container">
         {title}
       </h1>
       <div className="w-10" />

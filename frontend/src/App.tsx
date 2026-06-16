@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import AuthCallback from "./pages/AuthCallback";
@@ -42,109 +43,111 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-100 flex justify-center">
-          <div className="w-full max-w-md bg-background min-h-screen relative shadow-2xl overflow-x-hidden">
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/auth/callback" element={<AuthCallback />} />
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Home />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/participants"
-                element={
-                  <ProtectedRoute>
-                    <ParticipantManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/participants/:id/edit"
-                element={
-                  <ProtectedRoute>
-                    <EditParticipant />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/restaurants"
-                element={
-                  <ProtectedRoute>
-                    <RestaurantManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/restaurants/:id/edit"
-                element={
-                  <ProtectedRoute>
-                    <EditRestaurant />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/add-meal"
-                element={
-                  <ProtectedRoute>
-                    <AddMeal />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/add-meal-detail"
-                element={
-                  <ProtectedRoute>
-                    <AddMealDetail />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/debts"
-                element={
-                  <ProtectedRoute>
-                    <DebtManagement />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/debts/:id" element={<DebtDetailsPage />} />
-              <Route
-                path="/more"
-                element={
-                  <ProtectedRoute>
-                    <More />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/more/bank-account"
-                element={
-                  <ProtectedRoute>
-                    <BankAccountSettings />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/more/general-settings"
-                element={
-                  <ProtectedRoute>
-                    <GeneralSettings />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-            <BottomNav />
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <div className="min-h-screen bg-background flex justify-center">
+            <div className="w-full max-w-md bg-background min-h-screen relative shadow-2xl overflow-x-hidden">
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Home />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/participants"
+                  element={
+                    <ProtectedRoute>
+                      <ParticipantManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/participants/:id/edit"
+                  element={
+                    <ProtectedRoute>
+                      <EditParticipant />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/restaurants"
+                  element={
+                    <ProtectedRoute>
+                      <RestaurantManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/restaurants/:id/edit"
+                  element={
+                    <ProtectedRoute>
+                      <EditRestaurant />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/add-meal"
+                  element={
+                    <ProtectedRoute>
+                      <AddMeal />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/add-meal-detail"
+                  element={
+                    <ProtectedRoute>
+                      <AddMealDetail />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/debts"
+                  element={
+                    <ProtectedRoute>
+                      <DebtManagement />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/debts/:id" element={<DebtDetailsPage />} />
+                <Route
+                  path="/more"
+                  element={
+                    <ProtectedRoute>
+                      <More />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/more/bank-account"
+                  element={
+                    <ProtectedRoute>
+                      <BankAccountSettings />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/more/general-settings"
+                  element={
+                    <ProtectedRoute>
+                      <GeneralSettings />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+              <BottomNav />
+            </div>
           </div>
-        </div>
-      </Router>
-    </AuthProvider>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

@@ -17,7 +17,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         search
       </span>
       <input
-        className="w-full h-12 pl-12 pr-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
+        className="w-full h-12 pl-12 pr-4 rounded-xl bg-surface-container-low text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
         placeholder={placeholder}
         type="text"
         value={value}
