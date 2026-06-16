@@ -39,15 +39,6 @@ const Login: React.FC = () => {
                   src={logo}
                 />
               </div>
-              {/* Decorative element */}
-              <div className="absolute -top-2 -right-2 bg-secondary-container p-2 rounded-full shadow-lg">
-                <span
-                  className="material-symbols-outlined text-on-secondary-container"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  restaurant
-                </span>
-              </div>
             </div>
             <h1 className="font-headline-xl text-headline-xl text-primary tracking-tight mb-2">
               LunchSplit

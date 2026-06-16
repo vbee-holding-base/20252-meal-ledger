@@ -122,7 +122,7 @@ const ParticipantManagement: React.FC = () => {
         <section className="px-margin-mobile pb-4 pt-2">
           <div className="flex gap-2 items-center">
             <input
-              className="flex-1 h-12 px-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
+              className="flex-1 h-12 px-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
               placeholder="Tên người dùng"
               type="text"
               value={newName}
@@ -156,7 +156,7 @@ const ParticipantManagement: React.FC = () => {
             {filtered.map((p) => (
               <div
                 key={p.id}
-                className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(153,71,0,0.06)] active:scale-[0.98] transition-all"
+                className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl border border-outline-variant card-shadow active:scale-[0.98] transition-all"
               >
                 <div className="flex items-center gap-4">
                   <div

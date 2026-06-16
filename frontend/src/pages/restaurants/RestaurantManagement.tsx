@@ -118,14 +118,14 @@ const RestaurantManagement: React.FC = () => {
           <div className="flex gap-2 items-start">
             <div className="flex-1 space-y-2">
               <input
-                className="w-full h-12 px-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
+                className="w-full h-12 px-4 rounded-xl bg-surface-container-low text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
                 placeholder="Tên quán"
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
               />
               <input
-                className="w-full h-12 px-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
+                className="w-full h-12 px-4 rounded-xl bg-surface-container-low text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
                 placeholder="Địa chỉ"
                 type="text"
                 value={newAddress}
@@ -159,7 +159,7 @@ const RestaurantManagement: React.FC = () => {
           {filtered.map((r) => (
             <article
               key={r.id}
-              className="bg-surface-container-lowest p-md rounded-xl card-shadow flex items-center gap-4 transition-all hover:scale-[1.01]"
+              className="border border-outline-variant bg-surface-container-lowest p-md rounded-xl card-shadow flex items-center gap-4 transition-all hover:scale-[1.01]"
             >
               <div
                 className={`w-14 h-14 ${r.bg} rounded-xl flex items-center justify-center ${r.text}`}

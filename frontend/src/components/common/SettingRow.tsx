@@ -56,7 +56,7 @@ const SettingRow: React.FC<SettingRowProps> = ({
 
   return (
     <button
-      className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant/30 squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
+      className="w-full text-left bg-surface-container-lowest p-md rounded-xl card-shadow border border-outline-variant squishy-active group transition-all duration-300 hover:border-primary-container flex items-center gap-4"
       onClick={handleClick}
     >
       <div

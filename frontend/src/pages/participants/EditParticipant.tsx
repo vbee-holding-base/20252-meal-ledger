@@ -115,17 +115,17 @@ const EditParticipant: React.FC = () => {
         </div>
 
         {/* Form */}
-        <div className="bg-surface-container-lowest rounded-2xl p-md shadow-[0_4px_20px_rgba(153,71,0,0.08)] space-y-5">
+        <div className="bg-surface-container-lowest rounded-2xl p-md card-shadow space-y-5">
           <div className="space-y-1.5">
             <label className="text-label-md font-label-md text-on-surface-variant">
               Tên hoặc biệt danh
             </label>
             <input
-              className={`w-full h-14 px-4 rounded-2xl border-2 ${
+              className={`w-full h-14 px-4 rounded-2xl border ${
                 error
                   ? "border-error"
-                  : "border-surface-container-high focus:border-primary"
-              } focus:ring-0 text-body-md transition-all bg-transparent`}
+                  : "border-outline-variant focus:border-primary"
+              } focus:ring-0 text-body-md text-on-surface transition-all bg-transparent`}
               placeholder="Nhập tên..."
               type="text"
               value={name}
@@ -146,7 +146,7 @@ const EditParticipant: React.FC = () => {
             <label className="text-label-md font-label-md text-on-surface-variant">
               Công nợ hiện tại
             </label>
-            <div className="w-full h-14 px-4 rounded-2xl border-2 border-surface-container-high bg-surface-container-low flex items-center">
+            <div className="w-full h-14 px-4 rounded-2xl border border-outline-variant bg-surface-container-low flex items-center">
               <span
                 className={`font-bold text-body-md ${
                   participant.debt > 0 ? "text-error" : "text-tertiary"
@@ -166,7 +166,7 @@ const EditParticipant: React.FC = () => {
         {/* Actions */}
         <div className="flex gap-4 pt-2">
           <button
-            className="flex-1 h-14 rounded-full border-2 border-primary text-primary font-bold active:scale-95 transition-transform"
+            className="flex-1 h-14 rounded-full border border-primary text-primary font-bold active:scale-95 transition-transform"
             onClick={() => navigate("/participants")}
           >
             Hủy
