@@ -1,56 +1,13 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import TopAppBar from "../components/layout/TopAppBar";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScroll = window.pageYOffset;
-      const header = document.querySelector("header");
-      if (header) {
-        if (currentScroll > 50) {
-          header.classList.add("shadow-md", "bg-white/90", "backdrop-blur-md");
-        } else {
-          header.classList.remove(
-            "shadow-md",
-            "bg-white/90",
-            "backdrop-blur-md",
-          );
-        }
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <div className="bg-surface text-on-surface min-h-screen pb-24 font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
-      {/* TopAppBar */}
-      <header className="fixed top-0 w-full max-w-md z-50 flex items-center justify-between px-margin-mobile h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant/20 transition-all duration-300">
-        <h1 className="font-headline-md text-headline-md text-primary font-bold tracking-tight">
-          LunchSplit
-        </h1>
-        <div className="flex gap-2">
-          <button
-            onClick={handleLogout}
-            className="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center hover:bg-error hover:text-on-error transition-colors duration-300"
-            title="Đăng xuất"
-          >
-            <span className="material-symbols-outlined text-[20px]">
-              logout
-            </span>
-          </button>
-        </div>
-      </header>
+      <TopAppBar title="Trang chủ" showBack={false} />
 
       {/* Main Content Canvas */}
       <main className="pt-20 px-margin-mobile min-h-screen space-y-6 max-w-md mx-auto">
