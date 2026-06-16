@@ -2,7 +2,7 @@ import { mealParserAI } from "../ai/interfaces/mealParserAI";
 import {
     ParseMealTextInput,
     ParsedMealRaw,
-} from "../ai/types/mealParserTypes";
+} from "../ai/interfaces/mealParserTypes";
 export class MealParserService {
   constructor(private readonly aiProvider: mealParserAI) {}
 

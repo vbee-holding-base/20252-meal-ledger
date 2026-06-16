@@ -7,7 +7,7 @@ import {
   ServerError,
   UnauthorisedError,
 } from "../config/errors";
-import { createMealParserProvider } from "../ai/factories/mealParserProviderFactory";
+import { createMealParserProvider } from "../ai/factories/aiProviderFactory";
 import { MealParserService } from "../services/aiMealParserService";
 
 export const parseMealText = async (req: AuthRequest, res: Response) => {
