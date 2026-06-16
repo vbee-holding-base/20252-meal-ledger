@@ -28,7 +28,7 @@ const ParticipantMealCard: React.FC<ParticipantMealCardProps> = ({
           <button
             type="button"
             onClick={onDelete}
-            className="text-[#ba1a1a] hover:bg-error-container/10 p-1.5 rounded-full transition-colors active:scale-95 duration-150"
+            className="text-error hover:bg-error-container/10 p-1.5 rounded-full transition-colors active:scale-95 duration-150"
           >
             <span className="material-symbols-outlined text-[22px]">
               delete
@@ -45,7 +45,7 @@ const ParticipantMealCard: React.FC<ParticipantMealCardProps> = ({
           type="text"
           value={dishName}
           onChange={(e) => onDishNameChange(e.target.value)}
-          className="w-full bg-surface-container-low border border-transparent focus:border-primary-container focus:ring-0 rounded-2xl h-14 px-4 text-body-md transition-all duration-200 outline-none"
+          className="w-full bg-surface-container-low border border-transparent focus:border-primary-container focus:ring-0 rounded-2xl h-14 px-4 text-body-md text-on-surface transition-all duration-200 outline-none"
           placeholder="Nhập tên món ăn..."
         />
       </div>
@@ -59,7 +59,7 @@ const ParticipantMealCard: React.FC<ParticipantMealCardProps> = ({
             type="text"
             value={price}
             onChange={(e) => onPriceChange(e.target.value)}
-            className="w-full bg-surface-container-low border border-transparent focus:border-primary-container focus:ring-0 rounded-2xl h-14 pl-4 pr-10 text-body-md transition-all duration-200 outline-none font-medium"
+            className="w-full bg-surface-container-low border border-transparent focus:border-primary-container focus:ring-0 rounded-2xl h-14 pl-4 pr-10 text-body-md text-on-surface transition-all duration-200 outline-none font-medium"
             placeholder="0"
           />
           <span className="absolute right-4 text-on-surface-variant/60 font-normal text-lg pointer-events-none">

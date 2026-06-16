@@ -2,6 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --surface: #f8f9ff;
+  --on-surface: #0b1c30;
+  --background: #f8f9ff;
+  --on-background: #0b1c30;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #eff4ff;
+  --surface-container: #e5eeff;
+  --surface-variant: #d3e4fe;
+  --on-surface-variant: #514439;
+  --primary: #994700;
+  --on-primary: #ffffff;
+  --primary-container: #ff7a00;
+  --primary-fixed: #ffdbc8;
+  --on-primary-fixed: #321200;
+  --primary-fixed-dim: #ffb68b;
+  --secondary: #785900;
+  --secondary-container: #fdc003;
+  --on-secondary-container: #6c5000;
+  --secondary-fixed: #ffdf9e;
+  --tertiary: #006399;
+  --tertiary-container: #00a8ff;
+  --tertiary-fixed: #cde5ff;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --outline: #8c7263;
+  --outline-variant: #e0c0af;
+}
+
+.dark {
+  --surface: #12121e;
+  --on-surface: #e0e4f0;
+  --background: #0e0e18;
+  --on-background: #e0e4f0;
+  --surface-container-lowest: #0a0a12;
+  --surface-container-low: #1a1a28;
+  --surface-container: #222236;
+  --surface-variant: #3a3a50;
+  --on-surface-variant: #c7c1b6;
+  --primary: #994700;
+  --on-primary: #ffffff;
+  --primary-container: #ff7a00;
+  --primary-fixed: #ffdbc8;
+  --on-primary-fixed: #321200;
+  --primary-fixed-dim: #ffb68b;
+  --secondary: #785900;
+  --secondary-container: #fdc003;
+  --on-secondary-container: #6c5000;
+  --secondary-fixed: #ffdf9e;
+  --tertiary: #006399;
+  --tertiary-container: #00a8ff;
+  --tertiary-fixed: #cde5ff;
+  --error: #ba1a1a;
+  --on-error: #ffffff;
+  --error-container: #ffdad6;
+  --outline: #8c7263;
+  --outline-variant: #555566;
+}
+
 @layer base {
   .material-symbols-outlined {
     font-variation-settings:
@@ -32,10 +92,10 @@
 
 @layer utilities {
   .login-card-shadow {
-    box-shadow: 0 4px 20px rgba(153, 71, 0, 0.1);
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--primary) 10%, transparent);
   }
   .card-shadow {
-    box-shadow: 0 4px 20px rgba(153, 71, 0, 0.06);
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--primary) 6%, transparent);
   }
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
@@ -48,7 +108,7 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
   .modal-overlay {
-    background: rgba(11, 28, 48, 0.4);
+    background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
   }
   .hide-scrollbar::-webkit-scrollbar {

@@ -98,7 +98,7 @@ const DebtManagement: React.FC = () => {
             {filtered.map((p) => (
               <div
                 key={p.id}
-                className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(153,71,0,0.06)] active:scale-[0.98] transition-all"
+                className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl card-shadow active:scale-[0.98] transition-all"
               >
                 <div className="flex items-center gap-4">
                   <div

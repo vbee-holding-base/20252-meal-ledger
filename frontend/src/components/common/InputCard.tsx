@@ -19,7 +19,7 @@ const InputCard: React.FC<SimpleInputCardProps> = ({
 
   return (
     <section
-      className={`bg-surface-container-lowest rounded-3xl p-md border border-outline-variant/30 transition-all duration-300 shadow-[0_4px_20px_rgba(153,71,0,0.05)] ${
+      className={`bg-surface-container-lowest rounded-3xl p-md border border-outline-variant transition-all duration-300 card-shadow ${
         isFocused ? "ring-2 ring-primary-container/20" : ""
       }`}
     >
@@ -31,7 +31,7 @@ const InputCard: React.FC<SimpleInputCardProps> = ({
 
       <div className="relative mb-md">
         <textarea
-          className="w-full bg-surface-container-low border-2 border-transparent focus:border-primary-container focus:ring-0 rounded-2xl p-md text-body-md transition-all duration-300 outline-none resize-none"
+          className="w-full bg-surface-container-low border-2 border-transparent focus:border-primary-container focus:ring-0 rounded-2xl p-md text-body-md text-on-surface transition-all duration-300 outline-none resize-none"
           placeholder={placeholder}
           rows={rows}
           value={value}

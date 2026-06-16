@@ -97,7 +97,7 @@ const DebtDetailsPage: React.FC = () => {
 
       <main className="flex-1 pt-16 mb-6 px-margin-mobile max-w-md mx-auto w-full">
         <section className="py-md animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="bg-surface-container-lowest p-md rounded-[24px] shadow-[0_4px_20px_rgba(153,71,0,0.1)] flex flex-col items-center relative overflow-hidden pt-lg">
+          <div className="bg-surface-container-lowest p-md rounded-[24px] login-card-shadow flex flex-col items-center relative overflow-hidden pt-lg">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary-container/10 rounded-full blur-3xl"></div>
 
             <h2 className="font-headline-md text-headline-md text-on-background mb-1">
@@ -146,14 +146,14 @@ const DebtDetailsPage: React.FC = () => {
 
         <div className="space-y-4 mb-xl">
           {history.length === 0 ? (
-            <div className="rounded-3xl border border-surface-container-high p-6 text-center text-on-surface-variant">
+            <div className="rounded-3xl border border-outline-variant p-6 text-center text-on-surface-variant">
               Chưa có lịch sử bữa ăn cho người tham gia này.
             </div>
           ) : (
             history.map((tx) => (
               <div
                 key={`${tx.restaurantName}-${tx.date}-${tx.amount}`}
-                className="bg-surface-container-lowest p-md rounded-xl shadow-[0_4px_20px_rgba(153,71,0,0.1)] flex items-center gap-4 group transition-all hover:translate-x-1"
+                className="bg-surface-container-lowest p-md rounded-xl login-card-shadow flex items-center gap-4 group transition-all hover:translate-x-1"
               >
                 <div className="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center text-primary flex-shrink-0">
                   <span className="material-symbols-outlined">restaurant</span>
