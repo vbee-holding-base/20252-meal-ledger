@@ -1,4 +1,8 @@
-import { createBankHubLink, getSystemToken } from "../services/sepayService";
+import {
+  createBankHubLink,
+  getSystemToken,
+  getSepayBaseUrl,
+} from "../services/sepayService";
 import { findOwnerById, getOwnerNameById } from "../repo/authRepo";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import {
@@ -32,12 +36,22 @@ export const generateBankConnectLink = async (
   return createBankHubLink(owner.xid, purpose, redirectUri);
 };
 
-export const updateBankAccount = async (ownerId: string) => {
+export const generateBankUnconnectLink = async (
+  ownerId: string,
+  purpose: string,
+  redirectUri: string | null,
+  bankAccountXid: string,
+): Promise<any> => {
+  const owner = await findOwnerById(ownerId);
+  return createBankHubLink(owner.xid, purpose, redirectUri, bankAccountXid);
+};
+
+export const getBankAccountList = async (ownerId: string) => {
   const systemToken = await getSystemToken();
   const ownerXid = await getOwnerXid(ownerId);
   try {
     const response = await axios.get(
-      `${process.env.SEPAY_URL_SANDBOX}/v1/bank-account?limit=10&page=1&company_xid=${ownerXid}`,
+      `${getSepayBaseUrl()}/v1/bank-account?limit=10&page=1&company_xid=${ownerXid}`,
       {
         headers: {
           Authorization: `Bearer ${systemToken}`,
@@ -47,20 +61,21 @@ export const updateBankAccount = async (ownerId: string) => {
     );
     if (response.status === 200) {
       const accounts = response.data?.data;
-      if (!Array.isArray(accounts) || accounts.length === 0) {
-        throw new ExternalError("No bank account found for this owner");
+      if (!Array.isArray(accounts)) {
+        throw new ExternalError("Invalid response format from SePay");
       }
+
+      if (accounts.length === 0) {
+        return [];
+      }
+
       const bankAccounts = accounts.map((account: any) => ({
+        xid: account.xid ?? "",
         bankName: account.brand_name ?? "",
         accountNumber: account.account_number ?? "",
         accountName: account.account_holder_name ?? "",
       }));
 
-      if (bankAccounts.length === 0) {
-        throw new ExternalError("No bank account found for this owner");
-      }
-
-      await setAllOwnerBankAccount(ownerId, bankAccounts);
       return bankAccounts;
     }
 
@@ -79,6 +94,12 @@ export const updateBankAccount = async (ownerId: string) => {
   }
 };
 
+export const updateBankAccount = async (ownerId: string) => {
+  const bankAccounts = await getBankAccountList(ownerId);
+  await setAllOwnerBankAccount(ownerId, bankAccounts);
+  return bankAccounts;
+};
+
 export const createCompanyOwner = async (
   ownerId: string,
   status: string = "Active",
@@ -90,7 +111,7 @@ export const createCompanyOwner = async (
   };
   try {
     const response = await axios.post(
-      `${process.env.SEPAY_URL_SANDBOX}/v1/company/create`,
+      `${getSepayBaseUrl()}/v1/company/create`,
       payload,
       {
         headers: {

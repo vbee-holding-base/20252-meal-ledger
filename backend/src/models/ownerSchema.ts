@@ -9,6 +9,7 @@ export interface IOwner {
   isBankLinked: boolean;
   xid: string;
   bankAccounts?: Array<{
+    xid: string;
     bankName: string;
     accountNumber: string;
     accountName: string;
@@ -26,6 +27,7 @@ const ownerSchema = new mongoose.Schema<IOwner>(
     bankAccounts: {
       type: [
         {
+          xid: { type: String, required: false },
           bankName: { type: String, required: false },
           accountNumber: { type: String, required: false },
           accountName: { type: String, required: false },

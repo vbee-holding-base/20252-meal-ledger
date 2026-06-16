@@ -4,6 +4,7 @@ import axiosClient from "../../api/axiosClient";
 import BankHubIframe from "../../components/common/BankHubIframe";
 
 interface BankAccountInfo {
+  xid?: string;
   bankName: string;
   accountNumber: string;
   accountName: string;
@@ -13,6 +14,10 @@ const BankAccountSettings: React.FC = () => {
   const [bankAccounts, setBankAccounts] = useState<BankAccountInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showIframe, setShowIframe] = useState(false);
+  const [iframePurpose, setIframePurpose] = useState<
+    "LINK_BANK_ACCOUNT" | "UNLINK_BANK_ACCOUNT"
+  >("LINK_BANK_ACCOUNT");
+  const [selectedXid, setSelectedXid] = useState<string>("");
 
   useEffect(() => {
     loadBankAccount();
@@ -21,6 +26,11 @@ const BankAccountSettings: React.FC = () => {
   const loadBankAccount = async () => {
     try {
       setLoading(true);
+      try {
+        await axiosClient.post("/bankhub/bank-account");
+      } catch (err) {
+        console.error("Failed to sync bank accounts", err);
+      }
       const res = await axiosClient.get("/bankhub/bank-account");
       const data = res.data as BankAccountInfo[];
       setBankAccounts(Array.isArray(data) ? data : []);
@@ -49,7 +59,15 @@ const BankAccountSettings: React.FC = () => {
           <div className="w-10" />
         </header>
         <main className="mt-16 px-margin-mobile max-w-md mx-auto pt-6 space-y-4">
-          <BankHubIframe />
+          <BankHubIframe
+            purpose={iframePurpose}
+            bankAccountXid={selectedXid}
+            onSuccess={() => {
+              setShowIframe(false);
+              loadBankAccount();
+            }}
+            onClose={() => setShowIframe(false)}
+          />
         </main>
       </div>
     );
@@ -123,14 +141,31 @@ const BankAccountSettings: React.FC = () => {
           )}
         </div>
 
-        <button
-          onClick={() => setShowIframe(true)}
-          className="w-full h-14 rounded-full bg-primary text-on-primary font-bold shadow-md active:scale-95 transition-transform"
-        >
-          {bankAccounts.length > 0
-            ? "Thay đổi liên kết tài khoản"
-            : "Liên kết tài khoản ngân hàng"}
-        </button>
+        {bankAccounts.length > 0 ? (
+          <button
+            onClick={() => {
+              setIframePurpose("UNLINK_BANK_ACCOUNT");
+              setSelectedXid(bankAccounts[0]?.xid || "");
+              setShowIframe(true);
+            }}
+            className="w-full h-14 rounded-full bg-error text-white font-bold shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[20px]"></span>
+            Hủy liên kết tài khoản
+          </button>
+        ) : (
+          <button
+            onClick={() => {
+              setIframePurpose("LINK_BANK_ACCOUNT");
+              setSelectedXid("");
+              setShowIframe(true);
+            }}
+            className="w-full h-14 rounded-full bg-primary text-on-primary font-bold shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[20px]"></span>
+            Liên kết tài khoản ngân hàng
+          </button>
+        )}
       </main>
     </div>
   );

@@ -11,6 +11,7 @@ interface LinkTokenPayload {
   company_xid: string;
   purpose: string;
   completion_redirect_uri?: string;
+  bank_account_xid?: string;
 }
 interface SePayTokenResponse {
   access_token: string;
@@ -20,6 +21,16 @@ interface SePayTokenResponse {
 
 const TOKEN_KEY: string = "sepay_system_token";
 const TOKEN_TTL: number = 59900;
+
+export const getSepayBaseUrl = (): string => {
+  const clientID = process.env.SEPAY_CLIENT_ID || "";
+  if (clientID.startsWith("BH-SB-") || process.env.NODE_ENV !== "production") {
+    return (
+      process.env.SEPAY_URL_SANDBOX || "https://bankhub-api-sandbox.sepay.vn"
+    );
+  }
+  return process.env.SEPAY_URL_PRODUCTION || "https://bankhub-api.sepay.vn";
+};
 
 export const getSystemToken = async (): Promise<string> => {
   try {
@@ -45,7 +56,7 @@ export const getSystemToken = async (): Promise<string> => {
     ).toString("base64");
 
     const response: AxiosResponse<SePayTokenResponse> = await axios.post(
-      `${process.env.SEPAY_URL_SANDBOX}/v1/token`,
+      `${getSepayBaseUrl()}/v1/token`,
       {},
       {
         headers: {
@@ -81,6 +92,7 @@ export const createBankHubLink = async (
   companyXid: string,
   purpose: string = "LINK_BANK_ACCOUNT",
   redirectUri: string | null = null,
+  bankAccountXid: string | null = null,
 ): Promise<any> => {
   const systemToken = await getSystemToken();
 
@@ -93,9 +105,13 @@ export const createBankHubLink = async (
     payload.completion_redirect_uri = redirectUri;
   }
 
+  if (bankAccountXid) {
+    payload.bank_account_xid = bankAccountXid;
+  }
+
   try {
     const response = await axios.post(
-      `${process.env.SEPAY_URL_SANDBOX}/v1/link-token/create`,
+      `${getSepayBaseUrl()}/v1/link-token/create`,
       payload,
       {
         headers: {
@@ -117,7 +133,9 @@ export const createBankHubLink = async (
     if (axiosError.response) {
       const status = axiosError.response.status;
       if (status === 400) {
-        throw new ValidationError("Validation Error");
+        const errorData = JSON.stringify(axiosError.response?.data);
+        console.error("SePay 400 Error Data:", errorData);
+        throw new ValidationError(`Validation Error: ${errorData}`);
       }
       if (status === 401) {
         throw new UnauthorisedError("Unauthorized");
