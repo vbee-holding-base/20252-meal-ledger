@@ -4,7 +4,7 @@ import MoreCard from "../../components/common/MoreCard";
 
 const More: React.FC = () => (
   <div className="bg-background text-on-surface min-h-screen pb-24">
-    <TopAppBar title="Khác" showBack={false} />
+    <TopAppBar title="Khác" showBack={true} />
     <main className="flex-1 mt-16 px-margin-mobile pt-4 space-y-4 max-w-md mx-auto w-full">
       <MoreCard
         item={{

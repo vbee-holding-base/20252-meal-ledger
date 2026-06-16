@@ -16,8 +16,10 @@ const AddMeal: React.FC = () => {
 
   return (
     <div className="bg-background min-h-screen flex justify-center">
-      <div className="w-full max-w-md bg-background px-4 pb-28 relative">
-        <TopAppBar title="Thêm bữa ăn" />
+      <div className="w-full max-w-md bg-background px-4 pb-24 relative">
+        <div className="flex justify-center">
+          <TopAppBar title="Thêm bữa ăn" />
+        </div>
 
         <div className="pt-20">
           <InputCard

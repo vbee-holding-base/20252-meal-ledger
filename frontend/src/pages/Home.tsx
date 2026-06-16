@@ -35,7 +35,7 @@ const Home: React.FC = () => {
   return (
     <div className="bg-surface text-on-surface min-h-screen pb-24 font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
       {/* TopAppBar */}
-      <header className="fixed top-0 w-full max-w-md z-50 flex items-center justify-between px-margin-mobile h-16 bg-surface/80 backdrop-blur-md transition-all duration-300">
+      <header className="fixed top-0 w-full max-w-md z-50 flex items-center justify-between px-margin-mobile h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant/20 transition-all duration-300">
         <h1 className="font-headline-md text-headline-md text-primary font-bold tracking-tight">
           LunchSplit
         </h1>
@@ -148,55 +148,6 @@ const Home: React.FC = () => {
             </span>
           </button>
         </div>
-
-        {/* Recent Activity Mini Section */}
-        <section className="mt-8">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="font-headline-md text-[18px] text-on-background">
-              Hoạt động gần đây
-            </h4>
-            <button className="text-primary font-label-md hover:underline">
-              Xem tất cả
-            </button>
-          </div>
-          <div className="bg-surface-container-low rounded-xl p-sm space-y-3">
-            <div className="flex items-center justify-between p-base bg-surface-container-lowest rounded-lg border border-outline-variant/20">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-primary-container">
-                  lunch_dining
-                </span>
-                <div>
-                  <p className="font-label-md text-on-surface">
-                    Cơm Tấm Kim Huy
-                  </p>
-                  <p className="text-[10px] text-on-surface-variant">
-                    Thứ Ba, 21/05
-                  </p>
-                </div>
-              </div>
-              <p className="font-headline-md text-[14px] text-primary">
-                120.000đ
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between p-base bg-surface-container-lowest rounded-lg border border-outline-variant/20">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-tertiary">
-                  payments
-                </span>
-                <div>
-                  <p className="font-label-md text-on-surface">Phở Sinh Tử</p>
-                  <p className="text-[10px] text-on-surface-variant">
-                    Thứ Ba, 21/05
-                  </p>
-                </div>
-              </div>
-              <p className="font-headline-md text-[14px] text-tertiary">
-                250.000đ
-              </p>
-            </div>
-          </div>
-        </section>
       </main>
     </div>
   );

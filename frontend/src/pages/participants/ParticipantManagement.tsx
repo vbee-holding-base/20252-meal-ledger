@@ -9,7 +9,6 @@ import axiosClient from "../../api/axiosClient";
 const ParticipantManagement: React.FC = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Participant | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -106,7 +105,7 @@ const ParticipantManagement: React.FC = () => {
       <TopAppBar title="Người tham gia" />
 
       <main className="flex-1 mt-16 pb-32">
-        <section className="px-margin-mobile sticky bg-surface z-40 pt-1 pb-2 top-12">
+        <section className="px-margin-mobile sticky bg-surface z-40 pt-4 pb-2 top-12">
           <SearchBar
             value={search}
             onChange={setSearch}
@@ -120,7 +119,7 @@ const ParticipantManagement: React.FC = () => {
           </div>
         )}
 
-        <section className="px-margin-mobile pb-4">
+        <section className="px-margin-mobile pb-4 pt-2">
           <div className="flex gap-2 items-center">
             <input
               className="flex-1 h-12 px-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
@@ -166,7 +165,7 @@ const ParticipantManagement: React.FC = () => {
                     {p.initial ?? p.name.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-body-md text-body-md font-bold text-on-surface">
+                    <p className="font-body-md text-body-md text-on-surface">
                       {p.name}
                     </p>
                     {p.debt && p.debt > 0 ? (
@@ -199,49 +198,6 @@ const ParticipantManagement: React.FC = () => {
           </div>
         </section>
       </main>
-
-      {/* Add Modal */}
-      <div
-        className={`${isAddModalOpen ? "flex" : "hidden"} fixed inset-0 z-[60] items-end`}
-      >
-        <div
-          className="modal-overlay absolute inset-0"
-          onClick={() => setIsAddModalOpen(false)}
-        />
-        <div className="bg-surface-container-lowest w-full rounded-t-[32px] p-xl relative shadow-2xl animate-slide-up">
-          <div className="w-12 h-1.5 bg-outline-variant rounded-full mx-auto mb-8" />
-          <h3 className="font-headline-md text-headline-md text-on-surface mb-6">
-            Thêm người tham gia
-          </h3>
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-label-md font-label-md text-on-surface-variant">
-                Tên hoặc Biệt danh
-              </label>
-              <input
-                className="w-full h-14 px-4 rounded-2xl border-2 border-surface-container-high focus:border-primary focus:ring-0 text-body-md transition-all"
-                placeholder="Nhập tên..."
-                type="text"
-              />
-            </div>
-            <div className="flex gap-4">
-              <button
-                className="flex-1 h-14 rounded-full border-2 border-primary text-primary font-bold active:scale-95 transition-transform"
-                onClick={() => setIsAddModalOpen(false)}
-              >
-                Hủy
-              </button>
-              <button
-                className="flex-1 h-14 rounded-full bg-primary-container text-on-primary font-bold shadow-md active:scale-95 transition-transform"
-                onClick={() => setIsAddModalOpen(false)}
-              >
-                Lưu
-              </button>
-            </div>
-          </div>
-          <div className="safe-area-bottom h-8" />
-        </div>
-      </div>
 
       <ConfirmDeleteModal
         isOpen={!!deleteTarget}
