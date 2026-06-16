@@ -2,7 +2,7 @@ import { mealParserAI } from "../interfaces/mealParserAI";
 import {
   ParseMealTextInput,
   ParsedMealRaw,
-} from "../types/mealParserTypes";
+} from "../interfaces/mealParserTypes";
 import { buildPrompt } from "../prompts/mealPromptBuilder";
 import { rawMealParseSchema } from "../schemas/mealParserSchema";
 
