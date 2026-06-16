@@ -28,7 +28,10 @@ export const setAllOwnerBankAccount = async (
 ) => {
   const owner = await Owner.findByIdAndUpdate(
     ownerId,
-    { bankAccounts },
+    {
+      bankAccounts,
+      isBankLinked: bankAccounts.length > 0,
+    },
     { returnDocument: "after" },
   );
   if (!owner) throw new NotFoundError("owner not found");

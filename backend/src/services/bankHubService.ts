@@ -69,14 +69,26 @@ export const getBankAccountList = async (ownerId: string) => {
         return [];
       }
 
-      const bankAccounts = accounts.map((account: any) => ({
-        xid: account.xid ?? "",
-        bankName: account.brand_name ?? "",
-        accountNumber: account.account_number ?? "",
-        accountName: account.account_holder_name ?? "",
-      }));
+      const bankAccounts = accounts
+        .filter((account: any) => {
+          const isConnected =
+            account.bank_api_connected == 1 ||
+            account.bank_api_connected === "1" ||
+            account.bank_api_connected === true;
+          const isActive =
+            account.active == 1 ||
+            account.active === "1" ||
+            account.active === true;
+          return isConnected && isActive;
+        })
+        .map((account: any) => ({
+          xid: account.xid ?? "",
+          bankName: account.brand_name ?? "",
+          accountNumber: account.account_number ?? "",
+          accountName: account.account_holder_name ?? "",
+        }));
 
-      return bankAccounts;
+      return bankAccounts.slice(0, 1);
     }
 
     throw new ExternalError(
