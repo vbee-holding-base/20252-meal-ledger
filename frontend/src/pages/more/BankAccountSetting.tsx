@@ -47,7 +47,10 @@ const BankAccountSettings: React.FC = () => {
         <header className="fixed top-0 w-full max-w-md z-50 flex items-center justify-between px-margin-mobile h-16 bg-surface">
           <button
             className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary-container/10 transition-colors active:scale-95 duration-200"
-            onClick={() => setShowIframe(false)}
+            onClick={() => {
+              setShowIframe(false);
+              loadBankAccount();
+            }}
           >
             <span className="material-symbols-outlined text-primary">
               arrow_back
@@ -66,7 +69,10 @@ const BankAccountSettings: React.FC = () => {
               setShowIframe(false);
               loadBankAccount();
             }}
-            onClose={() => setShowIframe(false)}
+            onClose={() => {
+              setShowIframe(false);
+              loadBankAccount();
+            }}
           />
         </main>
       </div>

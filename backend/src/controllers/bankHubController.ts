@@ -29,6 +29,17 @@ export const generateLink = async (req: AuthRequest, res: Response) => {
     throw new ValidationError("Purpose is required");
   }
 
+  const owner = await findOwnerById(ownerId);
+  if (
+    purpose === "LINK_BANK_ACCOUNT" &&
+    owner.bankAccounts &&
+    owner.bankAccounts.length > 0
+  ) {
+    throw new ValidationError(
+      "Your account is already linked to a bank. You can only link up to 1 account.",
+    );
+  }
+
   if (purpose === "UNLINK_BANK_ACCOUNT" && !bankAccountXid) {
     throw new ValidationError("BankAccountXid is required");
   }
