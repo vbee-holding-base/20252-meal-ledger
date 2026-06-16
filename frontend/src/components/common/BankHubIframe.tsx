@@ -2,7 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import axiosClient from "../../api/axiosClient";
 import { AxiosError } from "axios";
 
-function BankHubIframe() {
+interface BankHubIframeProps {
+  purpose?: "LINK_BANK_ACCOUNT" | "UNLINK_BANK_ACCOUNT";
+  bankAccountXid?: string;
+  onSuccess?: () => void;
+  onClose?: () => void;
+}
+
+function BankHubIframe({
+  purpose = "LINK_BANK_ACCOUNT",
+  bankAccountXid,
+  onSuccess,
+  onClose,
+}: BankHubIframeProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [hostedLinkUrl, setHostedLinkUrl] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
@@ -11,7 +23,10 @@ function BankHubIframe() {
   useEffect(() => {
     async function fetchLinkUrl() {
       try {
-        const response = await axiosClient.post("/bankhub/generate-link");
+        const response = await axiosClient.post("/bankhub/generate-link", {
+          purpose,
+          bankAccountXid,
+        });
         const data = response.data;
         setHostedLinkUrl(data.hosted_link_url);
       } catch (err) {
@@ -29,23 +44,29 @@ function BankHubIframe() {
     fetchLinkUrl();
 
     const handleMessage = (event: MessageEvent) => {
-      if (event.origin !== "https://bankhub.sepay.vn") return;
+      const isSepayOrigin =
+        event.origin === "https://bankhub.sepay.vn" ||
+        event.origin === "https://bankhub-sandbox.sepay.vn";
+      if (!isSepayOrigin) return;
 
       const { event: eventType, metadata } = event.data;
 
       switch (eventType) {
         case "FINISHED_BANK_ACCOUNT_LINK":
           console.log("Tài khoản đã được liên kết:", metadata);
-          window.location.href = "/more/bank-account";
+          if (onSuccess) onSuccess();
+          else window.location.href = "/more/bank-account";
           break;
 
         case "FINISHED_BANK_ACCOUNT_UNLINK":
           console.log("Tài khoản đã được hủy liên kết");
-          window.location.href = "/more/bank-account";
+          if (onSuccess) onSuccess();
+          else window.location.href = "/more/bank-account";
           break;
 
         case "BANKHUB_CLOSE_LINK":
           console.log("Người dùng đóng flow liên kết");
+          if (onClose) onClose();
           break;
 
         case "BANKHUB_TOKEN_EXPIRED":
@@ -58,7 +79,7 @@ function BankHubIframe() {
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [purpose, bankAccountXid, onSuccess, onClose]);
 
   if (loading) return <div>Đang tải...</div>;
   if (error) return <div>Lỗi: {error}</div>;

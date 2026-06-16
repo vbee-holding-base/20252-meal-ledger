@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth";
 import {
   generateBankConnectLink,
+  generateBankUnconnectLink,
   updateBankAccount,
 } from "../services/bankHubService";
 import { ValidationError } from "../config/errors";
@@ -17,9 +18,19 @@ export const getBankAccount = async (req: AuthRequest, res: Response) => {
 
 export const generateLink = async (req: AuthRequest, res: Response) => {
   const ownerId = req.user?.id;
+  const purpose = req.body.purpose;
+  const bankAccountXid = req.body.bankAccountXid ?? "";
 
   if (!ownerId) {
     throw new ValidationError("OwnerID is required");
+  }
+
+  if (!purpose) {
+    throw new ValidationError("Purpose is required");
+  }
+
+  if (purpose === "UNLINK_BANK_ACCOUNT" && !bankAccountXid) {
+    throw new ValidationError("BankAccountXid is required");
   }
 
   const origin =
@@ -32,11 +43,19 @@ export const generateLink = async (req: AuthRequest, res: Response) => {
 
   const redirectUri = isLocal ? null : `${origin}/more/bank-account`;
 
-  const result = await generateBankConnectLink(
-    ownerId,
-    "LINK_BANK_ACCOUNT",
-    redirectUri,
-  );
+  let result: any;
+  if (purpose === "LINK_BANK_ACCOUNT") {
+    result = await generateBankConnectLink(ownerId, purpose, redirectUri);
+  } else if (purpose === "UNLINK_BANK_ACCOUNT") {
+    result = await generateBankUnconnectLink(
+      ownerId,
+      purpose,
+      redirectUri,
+      bankAccountXid,
+    );
+  } else {
+    throw new ValidationError("Invalid purpose");
+  }
 
   res.status(200).json({
     hosted_link_url: result.hosted_link_url,
