@@ -74,7 +74,7 @@ const SettingRow: React.FC<SettingRowProps> = ({
         </h3>
       </div>
       {type === "button" ? (
-        <span className="text-sm font-medium text-on-surface-variant shrink-0 bg-outline-variant/20 px-4 py-1.5 rounded-full">
+        <span className="text-sm font-medium text-on-surface-variant shrink-0 bg-outline-variant/20 px-4 py-1.5 rounded-full border border-outline-variant">
           {buttonLabel}
         </span>
       ) : (
