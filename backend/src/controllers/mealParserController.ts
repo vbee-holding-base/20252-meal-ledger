@@ -9,7 +9,7 @@ import {
 } from "../config/errors";
 import { createMealParserProvider } from "../ai/factories/aiProviderFactory";
 import { MealParserService } from "../services/aiMealParserService";
-
+import { finalValidatedResult } from "../validators/mealParserValidator";
 export const parseMealText = async (req: AuthRequest, res: Response) => {
   if (!req.user?.id) {
     throw new UnauthorisedError("Not authorized");
@@ -50,8 +50,14 @@ export const parseMealText = async (req: AuthRequest, res: Response) => {
       restaurants: restaurantContext,
     });
 
+    const validated = finalValidatedResult({
+      parsed,
+      participants: participantContext,
+      restaurants: restaurantContext,
+    });
+
     res.status(200).json({
-      data: parsed,
+      data: validated,
       context: {
         participants: participantContext,
         restaurants: restaurantContext,
