@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import TopAppBar from "../../components/layout/TopAppBar";
 import axiosClient from "../../api/axiosClient";
 import type { Restaurant } from "../../types";
 
 const EditRestaurant: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -48,7 +50,7 @@ const EditRestaurant: React.FC = () => {
         }
       } catch (err) {
         console.error(err);
-        setError("Không tải được thông tin quán ăn.");
+        setError(t("editRestaurant.fetchError"));
       } finally {
         setIsLoading(false);
       }
@@ -59,8 +61,8 @@ const EditRestaurant: React.FC = () => {
 
   const validate = () => {
     const next: typeof errors = {};
-    if (!name.trim()) next.name = "Tên quán không được để trống";
-    if (!address.trim()) next.address = "Địa chỉ không được để trống";
+    if (!name.trim()) next.name = t("editRestaurant.nameRequired");
+    if (!address.trim()) next.address = t("editRestaurant.addressRequired");
     setErrors(next);
     return Object.keys(next).length === 0;
   };
@@ -80,7 +82,7 @@ const EditRestaurant: React.FC = () => {
       navigate(-1);
     } catch (err) {
       console.error(err);
-      setError("Không thể cập nhật quán ăn. Vui lòng thử lại.");
+      setError(t("editRestaurant.updateError"));
     } finally {
       setIsSaving(false);
     }
@@ -89,7 +91,9 @@ const EditRestaurant: React.FC = () => {
   if (isLoading) {
     return (
       <div className="bg-background min-h-screen flex items-center justify-center">
-        <p className="text-on-surface-variant font-body-md">Đang tải...</p>
+        <p className="text-on-surface-variant font-body-md">
+          {t("editRestaurant.loading")}
+        </p>
       </div>
     );
   }
@@ -98,7 +102,7 @@ const EditRestaurant: React.FC = () => {
     return (
       <div className="bg-background min-h-screen flex items-center justify-center">
         <p className="text-on-surface-variant font-body-md">
-          {error || "Không tìm thấy quán ăn."}
+          {error || t("editRestaurant.notFound")}
         </p>
       </div>
     );
@@ -106,7 +110,7 @@ const EditRestaurant: React.FC = () => {
 
   return (
     <div className="bg-background text-on-surface min-h-screen pb-24">
-      <TopAppBar title="Chỉnh sửa quán ăn" />
+      <TopAppBar title={t("editRestaurant.title")} />
 
       <main className="mt-16 px-margin-mobile max-w-md mx-auto space-y-6 pt-6">
         {/* Icon preview */}
@@ -127,7 +131,7 @@ const EditRestaurant: React.FC = () => {
         <div className="bg-surface-container-lowest rounded-2xl p-md card-shadow space-y-5">
           <div className="space-y-1.5">
             <label className="text-label-md font-label-md text-on-surface-variant">
-              Tên quán
+              {t("editRestaurant.nameLabel")}
             </label>
             <div
               className={`flex items-center gap-3 border ${
@@ -141,7 +145,7 @@ const EditRestaurant: React.FC = () => {
               </span>
               <input
                 className="flex-1 h-14 border-none focus:ring-0 p-0 text-body-md text-on-surface bg-transparent"
-                placeholder="Nhập tên quán..."
+                placeholder={t("editRestaurant.namePlaceholder")}
                 type="text"
                 value={name}
                 onChange={(e) => {
@@ -164,7 +168,7 @@ const EditRestaurant: React.FC = () => {
 
           <div className="space-y-1.5">
             <label className="text-label-md font-label-md text-on-surface-variant">
-              Địa chỉ
+              {t("editRestaurant.addressLabel")}
             </label>
             <div
               className={`flex items-start gap-3 border ${
@@ -178,7 +182,7 @@ const EditRestaurant: React.FC = () => {
               </span>
               <textarea
                 className="flex-1 border-none focus:ring-0 p-0 text-body-md text-on-surface bg-transparent resize-none min-h-[60px]"
-                placeholder="Nhập địa chỉ..."
+                placeholder={t("editRestaurant.addressPlaceholder")}
                 value={address}
                 onChange={(e) => {
                   setAddress(e.target.value);
@@ -211,14 +215,14 @@ const EditRestaurant: React.FC = () => {
             onClick={() => navigate("/restaurants")}
             disabled={isSaving}
           >
-            Hủy
+            {t("editRestaurant.cancel")}
           </button>
           <button
             className="flex-1 h-14 rounded-full bg-primary-container text-on-primary font-bold shadow-md active:scale-95 transition-transform disabled:opacity-50"
             onClick={handleSave}
             disabled={isSaving}
           >
-            {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
+            {isSaving ? t("editRestaurant.saving") : t("editRestaurant.save")}
           </button>
         </div>
       </main>

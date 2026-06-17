@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { axiosPublic } from "../../api/axiosClient";
 
 export interface LoginSearchResult {
@@ -15,6 +16,7 @@ export interface LoginSearchBarProps {
 }
 
 const LoginSearchBar: React.FC<LoginSearchBarProps> = ({ onItemSelect }) => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<LoginSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -39,7 +41,7 @@ const LoginSearchBar: React.FC<LoginSearchBarProps> = ({ onItemSelect }) => {
         setResults(response.data.data);
       } catch (err) {
         console.log(err);
-        setError("Không thể lấy dữ liệu, Vui lòng thử lại.");
+        setError(t("loginSearchBar.fetchError"));
         setResults([]);
       } finally {
         setIsSearching(false);
@@ -50,12 +52,12 @@ const LoginSearchBar: React.FC<LoginSearchBarProps> = ({ onItemSelect }) => {
   return (
     <div className="relative group">
       <label className="absolute -top-2.5 left-4 px-base bg-surface-container-lowest text-label-sm text-primary font-semibold transition-all group-focus-within:text-primary-container">
-        Tên của bạn
+        {t("loginSearchBar.nameLabel")}
       </label>
       <input
         id="name-search-input"
         className="w-full h-14 bg-transparent border-2 border-outline-variant rounded-xl px-md font-body-md text-on-surface placeholder:text-outline/50 focus:border-primary-container focus:ring-0 transition-all outline-none"
-        placeholder="VD: Nguyễn Văn A"
+        placeholder={t("loginSearchBar.placeholder")}
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
@@ -65,7 +67,7 @@ const LoginSearchBar: React.FC<LoginSearchBarProps> = ({ onItemSelect }) => {
       </span>
       {isSearching && (
         <div className="mt-1 text-sm text-on-surface-variant">
-          Đang tìm kiếm...
+          {t("loginSearchBar.searching")}
         </div>
       )}
       {error && <div className="mt-1 text-sm text-error">{error}</div>}

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface SimpleInputCardProps {
   value: string;
@@ -11,10 +12,12 @@ interface SimpleInputCardProps {
 const InputCard: React.FC<SimpleInputCardProps> = ({
   value,
   onChange,
-  title = "Nhập thông tin",
+  title,
   placeholder = "",
   rows = 6,
 }) => {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t("inputCard.title");
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
   return (
@@ -23,9 +26,9 @@ const InputCard: React.FC<SimpleInputCardProps> = ({
         isFocused ? "ring-2 ring-primary-container/20" : ""
       }`}
     >
-      {title && (
+      {resolvedTitle && (
         <h2 className="text-headline-md text-on-surface mb-base font-medium">
-          {title}
+          {resolvedTitle}
         </h2>
       )}
 

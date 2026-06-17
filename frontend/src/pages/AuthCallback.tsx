@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 
 const AuthCallback = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const handledRef = useRef(false);
-  const [message, setMessage] = useState("Đang hoàn tất đăng nhập...");
+  const [message, setMessage] = useState(t("authCallback.completing"));
 
   const { login } = useAuth();
 
@@ -24,7 +26,7 @@ const AuthCallback = () => {
     const error = params.get("error");
 
     if (error || !token) {
-      setMessage("Đăng nhập Google thất bại. Vui lòng thử lại.");
+      setMessage(t("authCallback.failed"));
       return;
     }
 

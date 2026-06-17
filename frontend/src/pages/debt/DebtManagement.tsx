@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import TopAppBar from "../../components/layout/TopAppBar";
 import SearchBar from "../../components/common/SearchBar";
 import { useState, useEffect } from "react";
@@ -7,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import axiosClient from "../../api/axiosClient";
 
 const DebtManagement: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +44,7 @@ const DebtManagement: React.FC = () => {
       setParticipants(mappedParticipants);
     } catch (err) {
       console.error(err);
-      setError("Không tải được danh sách nợ.");
+      setError(t("debtManagement.fetchError"));
     } finally {
       setIsLoading(false);
     }
@@ -58,20 +60,22 @@ const DebtManagement: React.FC = () => {
 
   return (
     <div className="bg-background text-on-surface min-h-screen pb-24">
-      <TopAppBar title="Quản lý nợ" />
+      <TopAppBar title={t("debtManagement.title")} />
 
       <main className="flex-1 mt-16 pb-32">
         <section className="px-margin-mobile sticky bg-surface z-40 pt-1 pb-2 top-12">
           <SearchBar
             value={search}
             onChange={setSearch}
-            placeholder="Tìm kiếm nợ theo tên người tham gia"
+            placeholder={t("debtManagement.searchPlaceholder")}
           />
         </section>
 
         {isLoading && (
           <div className="px-margin-mobile py-3">
-            <p className="text-on-surface-variant text-center">Đang tải...</p>
+            <p className="text-on-surface-variant text-center">
+              {t("debtManagement.loading")}
+            </p>
           </div>
         )}
 
@@ -84,10 +88,10 @@ const DebtManagement: React.FC = () => {
         <section className="px-margin-mobile flex flex-col gap-3">
           <div className="flex items-center justify-between py-2">
             <h2 className="text-label-md font-label-md text-on-surface-variant">
-              Tất cả nợ ({filtered.length})
+              {t("debtManagement.allDebts", { count: filtered.length })}
             </h2>
             <button className="text-primary font-label-sm text-label-sm flex items-center gap-1">
-              Sắp xếp
+              {t("debtManagement.sort")}
               <span className="material-symbols-outlined text-base leading-none ml-1">
                 unfold_more
               </span>

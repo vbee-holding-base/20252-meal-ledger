@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import TopAppBar from "../../components/layout/TopAppBar";
 import SearchBar from "../../components/common/SearchBar";
 import ConfirmDeleteModal from "../../components/common/ConfirmDeleteModal";
@@ -7,6 +8,7 @@ import type { Restaurant } from "../../types";
 import axiosClient from "../../api/axiosClient";
 
 const RestaurantManagement: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -44,7 +46,7 @@ const RestaurantManagement: React.FC = () => {
       setRestaurants(mappedRestaurants);
     } catch (err) {
       console.error(err);
-      setError("Không tải được danh sách quán ăn.");
+      setError(t("restaurantManagement.fetchError"));
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +54,7 @@ const RestaurantManagement: React.FC = () => {
 
   const handleAddRestaurant = async () => {
     if (!newName.trim()) {
-      setError("Vui lòng nhập tên quán ăn.");
+      setError(t("restaurantManagement.nameRequired"));
       return;
     }
 
@@ -70,7 +72,7 @@ const RestaurantManagement: React.FC = () => {
       await fetchRestaurants();
     } catch (err) {
       console.error(err);
-      setError("Không thể thêm quán ăn. Vui lòng thử lại.");
+      setError(t("restaurantManagement.addError"));
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +89,7 @@ const RestaurantManagement: React.FC = () => {
       await fetchRestaurants();
     } catch (err) {
       console.error(err);
-      setError("Không thể xóa quán ăn. Vui lòng thử lại.");
+      setError(t("restaurantManagement.deleteError"));
     } finally {
       setIsLoading(false);
     }
@@ -103,14 +105,14 @@ const RestaurantManagement: React.FC = () => {
 
   return (
     <div className="bg-background text-on-background font-body-md min-h-screen">
-      <TopAppBar title="Quán ăn" />
+      <TopAppBar title={t("restaurantManagement.title")} />
 
       <main className="pt-20 pb-base px-margin-mobile max-w-md mx-auto">
         <section className="sticky bg-surface z-40 pb-2 top-12">
           <SearchBar
             value={search}
             onChange={setSearch}
-            placeholder="Tìm kiếm tên quán ăn..."
+            placeholder={t("restaurantManagement.searchPlaceholder")}
           />
         </section>
 
@@ -119,14 +121,14 @@ const RestaurantManagement: React.FC = () => {
             <div className="flex-1 space-y-2">
               <input
                 className="w-full h-12 px-4 rounded-xl bg-surface-container-low text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
-                placeholder="Tên quán"
+                placeholder={t("restaurantManagement.namePlaceholder")}
                 type="text"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
               />
               <input
                 className="w-full h-12 px-4 rounded-xl bg-surface-container-low text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
-                placeholder="Địa chỉ"
+                placeholder={t("restaurantManagement.addressPlaceholder")}
                 type="text"
                 value={newAddress}
                 onChange={(e) => setNewAddress(e.target.value)}
@@ -145,10 +147,12 @@ const RestaurantManagement: React.FC = () => {
 
         <section className="flex justify-between items-end mb-4">
           <h2 className="font-label-md text-label-md text-on-surface-variant">
-            Tất cả quán ăn ({filtered.length})
+            {t("restaurantManagement.allRestaurants", {
+              count: filtered.length,
+            })}
           </h2>
           <button className="text-primary font-label-sm text-label-sm flex items-center gap-1">
-            Sắp xếp
+            {t("restaurantManagement.sort")}
             <span className="material-symbols-outlined text-sm">
               unfold_more
             </span>
@@ -206,10 +210,10 @@ const RestaurantManagement: React.FC = () => {
               search_off
             </span>
             <p className="font-headline-md text-headline-md">
-              Không tìm thấy quán
+              {t("restaurantManagement.noResults")}
             </p>
             <p className="font-body-md text-body-md">
-              Hãy thử tìm với tên khác nhé!
+              {t("restaurantManagement.noResultsDesc")}
             </p>
           </div>
         )}

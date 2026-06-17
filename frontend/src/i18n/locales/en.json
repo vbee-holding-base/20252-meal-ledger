@@ -1,0 +1,186 @@
+{
+  "app": {
+    "loading": "Loading..."
+  },
+  "bottomNav": {
+    "home": "Home",
+    "addMeal": "Add Meal",
+    "members": "Members",
+    "restaurants": "Restaurants",
+    "more": "More"
+  },
+  "home": {
+    "title": "Home",
+    "addMeal": "Add Meal",
+    "addMealDesc": "Start splitting today's lunch bill",
+    "manageParticipants": "Manage Participants",
+    "manageParticipantsDesc": "View and edit your friends list",
+    "manageRestaurants": "Manage Restaurants",
+    "manageRestaurantsDesc": "Save your favorite restaurants",
+    "manageDebts": "Manage Debts",
+    "manageDebtsDesc": "Track and manage outstanding debts"
+  },
+  "addMeal": {
+    "title": "Add Meal",
+    "placeholder": "Example:\nMinh had bun cha 45k\nKhanh had nem chua 10k\nVinh had pho bo 35k",
+    "analyze": "Analyze"
+  },
+  "addMealDetail": {
+    "title": "Meal Details",
+    "addMember": "Add Member",
+    "save": "Save Information",
+    "memberName": "Member {{n}}"
+  },
+  "login": {
+    "subtitle": "Easily manage lunch money and debts",
+    "ownerLabel": "Group Owner",
+    "googleLogin": "Sign in with Google",
+    "memberLabel": "Member",
+    "footer": "© 2026 LunchSplit Team"
+  },
+  "authCallback": {
+    "completing": "Completing sign in...",
+    "failed": "Google sign in failed. Please try again."
+  },
+  "more": {
+    "title": "More",
+    "bankAccount": "Bank Account",
+    "bankAccountDesc": "Manage your bank account information",
+    "generalSettings": "General Settings",
+    "generalSettingsDesc": "Currency, language, notifications",
+    "help": "Help",
+    "helpDesc": "User guide and contact"
+  },
+  "generalSettings": {
+    "title": "General Settings",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "language": "Language",
+    "logout": "Log Out",
+    "languagePickerTitle": "Choose Language",
+    "close": "Close"
+  },
+  "bankAccount": {
+    "title": "Bank Account",
+    "iframeTitle": "Link Account",
+    "linkedAccounts": "Linked Accounts",
+    "loading": "Loading information...",
+    "bankLabel": "Bank",
+    "accountNumberLabel": "Account Number",
+    "accountNameLabel": "Account Name",
+    "noAccounts": "No bank accounts linked.",
+    "noAccountsDesc": "Link your account via BankHub to receive automatic payments.",
+    "unlink": "Unlink Account",
+    "link": "Link Bank Account"
+  },
+  "participantManagement": {
+    "title": "Participants",
+    "searchPlaceholder": "Search participant name...",
+    "loading": "Loading...",
+    "namePlaceholder": "Participant name",
+    "allParticipants": "All participants ({{count}})",
+    "sort": "Sort",
+    "fetchError": "Failed to load participant list.",
+    "nameRequired": "Please enter a participant name.",
+    "addError": "Could not add participant. Please try again.",
+    "deleteError": "Could not delete participant. Please try again.",
+    "debtWarning": "This person still owes {{debt}}k. Deleting will lose this debt data."
+  },
+  "editParticipant": {
+    "title": "Edit Member",
+    "loading": "Loading...",
+    "notFound": "Member not found.",
+    "fetchError": "Could not load member information.",
+    "nameLabel": "Name or Nickname",
+    "namePlaceholder": "Enter name...",
+    "emptyNameError": "Name cannot be empty",
+    "updateError": "Could not update member. Please try again.",
+    "debtLabel": "Current Debt",
+    "noDebt": "No debt",
+    "debtAutoCalc": "Debt is calculated automatically from meals.",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "saving": "Saving..."
+  },
+  "restaurantManagement": {
+    "title": "Restaurants",
+    "searchPlaceholder": "Search restaurant name...",
+    "namePlaceholder": "Restaurant name",
+    "addressPlaceholder": "Address",
+    "allRestaurants": "All restaurants ({{count}})",
+    "sort": "Sort",
+    "noResults": "No restaurants found",
+    "noResultsDesc": "Try searching with a different name!",
+    "fetchError": "Failed to load restaurant list.",
+    "nameRequired": "Please enter a restaurant name.",
+    "addError": "Could not add restaurant. Please try again.",
+    "deleteError": "Could not delete restaurant. Please try again."
+  },
+  "editRestaurant": {
+    "title": "Edit Restaurant",
+    "loading": "Loading...",
+    "notFound": "Restaurant not found.",
+    "fetchError": "Could not load restaurant information.",
+    "nameLabel": "Restaurant Name",
+    "namePlaceholder": "Enter restaurant name...",
+    "nameRequired": "Restaurant name cannot be empty",
+    "addressLabel": "Address",
+    "addressPlaceholder": "Enter address...",
+    "addressRequired": "Address cannot be empty",
+    "updateError": "Could not update restaurant. Please try again.",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "saving": "Saving..."
+  },
+  "debtManagement": {
+    "title": "Debt Management",
+    "searchPlaceholder": "Search debt by participant name",
+    "loading": "Loading...",
+    "allDebts": "All debts ({{count}})",
+    "sort": "Sort",
+    "fetchError": "Failed to load debt list."
+  },
+  "debtDetails": {
+    "title": "Debt Details",
+    "loading": "Loading...",
+    "notFound": "Debt information not found.",
+    "fetchError": "Could not load debt information. Please try again later.",
+    "invalidId": "Invalid ID.",
+    "unknownStatus": "Unknown status",
+    "payNow": "Pay Now",
+    "noDebt": "No debt",
+    "historyTitle": "Meal History",
+    "mealCount": "{{count}} meals",
+    "noHistory": "No meal history for this participant.",
+    "back": "Go Back"
+  },
+  "confirmDeleteModal": {
+    "title": "Are you sure you want to delete?",
+    "message": "Remove <strong>{{name}}</strong> from the group.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
+  },
+  "inputCard": {
+    "title": "Enter information"
+  },
+  "participantMealCard": {
+    "dishLabel": "Dish Name",
+    "dishPlaceholder": "Enter dish name...",
+    "priceLabel": "Price (VND)",
+    "pricePlaceholder": "0",
+    "currency": "đ"
+  },
+  "searchBar": {
+    "placeholder": "Search..."
+  },
+  "loginSearchBar": {
+    "nameLabel": "Your name",
+    "placeholder": "E.g.: Nguyen Van A",
+    "searching": "Searching...",
+    "fetchError": "Could not fetch data. Please try again."
+  },
+  "language": {
+    "vi": "Tiếng Việt",
+    "en": "English"
+  }
+}

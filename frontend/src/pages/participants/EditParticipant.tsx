@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import TopAppBar from "../../components/layout/TopAppBar";
 import axiosClient from "../../api/axiosClient";
 import type { Participant } from "../../types";
 
 const EditParticipant: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -35,7 +37,7 @@ const EditParticipant: React.FC = () => {
       const found = participantsData.find((item) => item._id === id);
 
       if (!found) {
-        setError("Không tìm thấy thành viên.");
+        setError(t("editParticipant.notFound"));
         setParticipant(null);
         return;
       }
@@ -53,7 +55,7 @@ const EditParticipant: React.FC = () => {
       setName(mapped.name);
     } catch (err) {
       console.error(err);
-      setError("Không tải được thông tin thành viên.");
+      setError(t("editParticipant.fetchError"));
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +67,7 @@ const EditParticipant: React.FC = () => {
 
   const handleSave = async () => {
     if (!name.trim() || !id) {
-      setError("Tên không được để trống");
+      setError(t("editParticipant.emptyNameError"));
       return;
     }
 
@@ -76,7 +78,7 @@ const EditParticipant: React.FC = () => {
       navigate(-1);
     } catch (err) {
       console.error(err);
-      setError("Không thể cập nhật thành viên. Vui lòng thử lại.");
+      setError(t("editParticipant.updateError"));
     } finally {
       setIsSaving(false);
     }
@@ -85,7 +87,9 @@ const EditParticipant: React.FC = () => {
   if (isLoading) {
     return (
       <div className="bg-background min-h-screen flex items-center justify-center">
-        <p className="text-on-surface-variant font-body-md">Đang tải...</p>
+        <p className="text-on-surface-variant font-body-md">
+          {t("editParticipant.loading")}
+        </p>
       </div>
     );
   }
@@ -94,7 +98,7 @@ const EditParticipant: React.FC = () => {
     return (
       <div className="bg-background min-h-screen flex items-center justify-center">
         <p className="text-on-surface-variant font-body-md">
-          {error || "Không tìm thấy thành viên."}
+          {error || t("editParticipant.notFound")}
         </p>
       </div>
     );
@@ -102,7 +106,7 @@ const EditParticipant: React.FC = () => {
 
   return (
     <div className="bg-background text-on-surface min-h-screen pb-24">
-      <TopAppBar title="Chỉnh sửa thành viên" />
+      <TopAppBar title={t("editParticipant.title")} />
 
       <main className="mt-16 px-margin-mobile max-w-md mx-auto space-y-6 pt-6">
         {/* Avatar preview */}
@@ -118,7 +122,7 @@ const EditParticipant: React.FC = () => {
         <div className="bg-surface-container-lowest rounded-2xl p-md card-shadow space-y-5">
           <div className="space-y-1.5">
             <label className="text-label-md font-label-md text-on-surface-variant">
-              Tên hoặc biệt danh
+              {t("editParticipant.nameLabel")}
             </label>
             <input
               className={`w-full h-14 px-4 rounded-2xl border ${
@@ -126,7 +130,7 @@ const EditParticipant: React.FC = () => {
                   ? "border-error"
                   : "border-outline-variant focus:border-primary"
               } focus:ring-0 text-body-md text-on-surface transition-all bg-transparent`}
-              placeholder="Nhập tên..."
+              placeholder={t("editParticipant.namePlaceholder")}
               type="text"
               value={name}
               onChange={(e) => {
@@ -144,7 +148,7 @@ const EditParticipant: React.FC = () => {
           {/* Debt info (read-only) */}
           <div className="space-y-1.5">
             <label className="text-label-md font-label-md text-on-surface-variant">
-              Công nợ hiện tại
+              {t("editParticipant.debtLabel")}
             </label>
             <div className="w-full h-14 px-4 rounded-2xl border border-outline-variant bg-surface-container-low flex items-center">
               <span
@@ -154,11 +158,11 @@ const EditParticipant: React.FC = () => {
               >
                 {participant.debt > 0
                   ? `${participant.debt.toLocaleString("vi-VN")}đ`
-                  : "Không có nợ"}
+                  : t("editParticipant.noDebt")}
               </span>
             </div>
             <p className="text-label-sm text-on-surface-variant pl-1">
-              Công nợ được tính tự động từ các bữa ăn.
+              {t("editParticipant.debtAutoCalc")}
             </p>
           </div>
         </div>
@@ -169,14 +173,14 @@ const EditParticipant: React.FC = () => {
             className="flex-1 h-14 rounded-full border border-primary text-primary font-bold active:scale-95 transition-transform"
             onClick={() => navigate("/participants")}
           >
-            Hủy
+            {t("editParticipant.cancel")}
           </button>
           <button
             className="flex-1 h-14 rounded-full bg-primary-container text-on-primary font-bold shadow-md active:scale-95 transition-transform disabled:opacity-50"
             onClick={handleSave}
             disabled={isSaving}
           >
-            {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
+            {isSaving ? t("editParticipant.saving") : t("editParticipant.save")}
           </button>
         </div>
       </main>

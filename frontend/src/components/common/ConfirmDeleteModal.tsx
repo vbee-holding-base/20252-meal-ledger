@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmDeleteModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
   name,
   warningMessage,
 }) => {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   return (
@@ -28,11 +30,14 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
             </span>
           </div>
           <h3 className="font-headline-md text-headline-md text-on-surface">
-            Bạn có chắc muốn xóa?
+            {t("confirmDeleteModal.title")}
           </h3>
-          <p className="text-body-md text-on-surface-variant">
-            Xóa <strong>{name}</strong> khỏi nhóm.
-          </p>
+          <p
+            className="text-body-md text-on-surface-variant"
+            dangerouslySetInnerHTML={{
+              __html: t("confirmDeleteModal.message", { name }),
+            }}
+          />
           {warningMessage && (
             <div className="flex items-start gap-3 p-3 bg-error-container/30 rounded-xl text-error text-left w-full">
               <span className="material-symbols-outlined text-sm">info</span>
@@ -44,13 +49,13 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({
               className="w-full h-12 rounded-full bg-error text-on-error font-bold active:scale-95 transition-transform"
               onClick={onConfirm}
             >
-              Xóa
+              {t("confirmDeleteModal.confirm")}
             </button>
             <button
               className="w-full h-12 rounded-full text-on-surface-variant font-bold active:scale-95 transition-transform"
               onClick={onClose}
             >
-              Hủy
+              {t("confirmDeleteModal.cancel")}
             </button>
           </div>
         </div>

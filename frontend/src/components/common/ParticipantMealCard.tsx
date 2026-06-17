@@ -1,12 +1,13 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface ParticipantMealCardProps {
   participantName: string;
   dishName: string;
   price: string | number;
-  onDishNameChange: (_value: string) => void; // Hàm xử lý khi gõ tên món
-  onPriceChange: (_value: string) => void; // Hàm xử lý khi gõ giá tiền
-  onDelete?: () => void; // Hàm xử lý khi bấm nút xóa (Thùng rác)
+  onDishNameChange: (_value: string) => void;
+  onPriceChange: (_value: string) => void;
+  onDelete?: () => void;
 }
 
 const ParticipantMealCard: React.FC<ParticipantMealCardProps> = ({
@@ -17,6 +18,7 @@ const ParticipantMealCard: React.FC<ParticipantMealCardProps> = ({
   onPriceChange,
   onDelete,
 }) => {
+  const { t } = useTranslation();
   return (
     <section className="bg-surface-container-lowest rounded-3xl p-5 border border-outline-variant/30 w-full max-w-md flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -39,20 +41,20 @@ const ParticipantMealCard: React.FC<ParticipantMealCardProps> = ({
 
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-medium text-on-surface-variant/80 pl-1">
-          Tên món ăn
+          {t("participantMealCard.dishLabel")}
         </label>
         <input
           type="text"
           value={dishName}
           onChange={(e) => onDishNameChange(e.target.value)}
           className="w-full bg-surface-container-low border border-transparent focus:border-primary-container focus:ring-0 rounded-2xl h-14 px-4 text-body-md text-on-surface transition-all duration-200 outline-none"
-          placeholder="Nhập tên món ăn..."
+          placeholder={t("participantMealCard.dishPlaceholder")}
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-medium text-on-surface-variant/80 pl-1">
-          Giá tiền (VND)
+          {t("participantMealCard.priceLabel")}
         </label>
         <div className="relative flex items-center">
           <input
@@ -60,10 +62,10 @@ const ParticipantMealCard: React.FC<ParticipantMealCardProps> = ({
             value={price}
             onChange={(e) => onPriceChange(e.target.value)}
             className="w-full bg-surface-container-low border border-transparent focus:border-primary-container focus:ring-0 rounded-2xl h-14 pl-4 pr-10 text-body-md text-on-surface transition-all duration-200 outline-none font-medium"
-            placeholder="0"
+            placeholder={t("participantMealCard.pricePlaceholder")}
           />
           <span className="absolute right-4 text-on-surface-variant/60 font-normal text-lg pointer-events-none">
-            đ
+            {t("participantMealCard.currency")}
           </span>
         </div>
       </div>

@@ -1,0 +1,186 @@
+{
+  "app": {
+    "loading": "Đang tải..."
+  },
+  "bottomNav": {
+    "home": "Trang chủ",
+    "addMeal": "Thêm bữa ăn",
+    "members": "Thành viên",
+    "restaurants": "Quán ăn",
+    "more": "Khác"
+  },
+  "home": {
+    "title": "Trang chủ",
+    "addMeal": "Thêm bữa ăn",
+    "addMealDesc": "Bắt đầu chia hóa đơn bữa trưa nay",
+    "manageParticipants": "Quản lý người tham gia",
+    "manageParticipantsDesc": "Xem và chỉnh sửa danh sách bạn bè",
+    "manageRestaurants": "Quản lý quán ăn",
+    "manageRestaurantsDesc": "Lưu lại những quán ngon đã ghé",
+    "manageDebts": "Quản lý nợ",
+    "manageDebtsDesc": "Theo dõi và quản lý các khoản nợ"
+  },
+  "addMeal": {
+    "title": "Thêm bữa ăn",
+    "placeholder": "Ví dụ:\nMinh ăn bún chả 45k\nKhánh ăn nem chua 10k\nVĩnh ăn phở bò 35k",
+    "analyze": "Phân tích"
+  },
+  "addMealDetail": {
+    "title": "Chi tiết bữa ăn",
+    "addMember": "Thêm thành viên",
+    "save": "Lưu thông tin",
+    "memberName": "Thành viên {{n}}"
+  },
+  "login": {
+    "subtitle": "Quản lý tiền ăn trưa và công nợ dễ dàng",
+    "ownerLabel": "Chủ nhóm",
+    "googleLogin": "Đăng nhập với Google",
+    "memberLabel": "Thành viên",
+    "footer": "© 2026 LunchSplit Team"
+  },
+  "authCallback": {
+    "completing": "Đang hoàn tất đăng nhập...",
+    "failed": "Đăng nhập Google thất bại. Vui lòng thử lại."
+  },
+  "more": {
+    "title": "Khác",
+    "bankAccount": "Tài khoản ngân hàng",
+    "bankAccountDesc": "Quản lý thông tin tài khoản ngân hàng",
+    "generalSettings": "Cài đặt chung",
+    "generalSettingsDesc": "Đơn vị tiền tệ, ngôn ngữ, thông báo",
+    "help": "Trợ giúp",
+    "helpDesc": "Hướng dẫn sử dụng và liên hệ"
+  },
+  "generalSettings": {
+    "title": "Cài đặt chung",
+    "darkMode": "Giao diện tối",
+    "lightMode": "Giao diện sáng",
+    "language": "Ngôn ngữ",
+    "logout": "Đăng xuất",
+    "languagePickerTitle": "Chọn ngôn ngữ",
+    "close": "Đóng"
+  },
+  "bankAccount": {
+    "title": "Tài khoản ngân hàng",
+    "iframeTitle": "Liên kết tài khoản",
+    "linkedAccounts": "Tài khoản đã liên kết",
+    "loading": "Đang tải thông tin...",
+    "bankLabel": "Ngân hàng",
+    "accountNumberLabel": "Số tài khoản",
+    "accountNameLabel": "Chủ tài khoản",
+    "noAccounts": "Chưa liên kết tài khoản ngân hàng nào.",
+    "noAccountsDesc": "Hãy liên kết tài khoản qua BankHub để nhận thanh toán tự động.",
+    "unlink": "Hủy liên kết tài khoản",
+    "link": "Liên kết tài khoản ngân hàng"
+  },
+  "participantManagement": {
+    "title": "Người tham gia",
+    "searchPlaceholder": "Tìm kiếm tên người tham gia...",
+    "loading": "Đang tải...",
+    "namePlaceholder": "Tên người dùng",
+    "allParticipants": "Tất cả người tham gia ({{count}})",
+    "sort": "Sắp xếp",
+    "fetchError": "Không tải được danh sách người tham gia.",
+    "nameRequired": "Vui lòng nhập tên người tham gia.",
+    "addError": "Không thể thêm người tham gia. Vui lòng thử lại.",
+    "deleteError": "Không thể xóa người tham gia. Vui lòng thử lại.",
+    "debtWarning": "Người này vẫn còn nợ {{debt}}k. Xóa sẽ làm mất dữ liệu khoản nợ này."
+  },
+  "editParticipant": {
+    "title": "Chỉnh sửa thành viên",
+    "loading": "Đang tải...",
+    "notFound": "Không tìm thấy thành viên.",
+    "fetchError": "Không tải được thông tin thành viên.",
+    "nameLabel": "Tên hoặc biệt danh",
+    "namePlaceholder": "Nhập tên...",
+    "emptyNameError": "Tên không được để trống",
+    "updateError": "Không thể cập nhật thành viên. Vui lòng thử lại.",
+    "debtLabel": "Công nợ hiện tại",
+    "noDebt": "Không có nợ",
+    "debtAutoCalc": "Công nợ được tính tự động từ các bữa ăn.",
+    "cancel": "Hủy",
+    "save": "Lưu thay đổi",
+    "saving": "Đang lưu..."
+  },
+  "restaurantManagement": {
+    "title": "Quán ăn",
+    "searchPlaceholder": "Tìm kiếm tên quán ăn...",
+    "namePlaceholder": "Tên quán",
+    "addressPlaceholder": "Địa chỉ",
+    "allRestaurants": "Tất cả quán ăn ({{count}})",
+    "sort": "Sắp xếp",
+    "noResults": "Không tìm thấy quán",
+    "noResultsDesc": "Hãy thử tìm với tên khác nhé!",
+    "fetchError": "Không tải được danh sách quán ăn.",
+    "nameRequired": "Vui lòng nhập tên quán ăn.",
+    "addError": "Không thể thêm quán ăn. Vui lòng thử lại.",
+    "deleteError": "Không thể xóa quán ăn. Vui lòng thử lại."
+  },
+  "editRestaurant": {
+    "title": "Chỉnh sửa quán ăn",
+    "loading": "Đang tải...",
+    "notFound": "Không tìm thấy quán ăn.",
+    "fetchError": "Không tải được thông tin quán ăn.",
+    "nameLabel": "Tên quán",
+    "namePlaceholder": "Nhập tên quán...",
+    "nameRequired": "Tên quán không được để trống",
+    "addressLabel": "Địa chỉ",
+    "addressPlaceholder": "Nhập địa chỉ...",
+    "addressRequired": "Địa chỉ không được để trống",
+    "updateError": "Không thể cập nhật quán ăn. Vui lòng thử lại.",
+    "cancel": "Hủy",
+    "save": "Lưu thay đổi",
+    "saving": "Đang lưu..."
+  },
+  "debtManagement": {
+    "title": "Quản lý nợ",
+    "searchPlaceholder": "Tìm kiếm nợ theo tên người tham gia",
+    "loading": "Đang tải...",
+    "allDebts": "Tất cả nợ ({{count}})",
+    "sort": "Sắp xếp",
+    "fetchError": "Không tải được danh sách nợ."
+  },
+  "debtDetails": {
+    "title": "Chi tiết nợ",
+    "loading": "Đang tải...",
+    "notFound": "Không tìm thấy thông tin nợ.",
+    "fetchError": "Không tải được thông tin nợ. Vui lòng thử lại sau.",
+    "invalidId": "ID không hợp lệ.",
+    "unknownStatus": "Trạng thái không xác định",
+    "payNow": "Tất toán ngay",
+    "noDebt": "Không có nợ",
+    "historyTitle": "Lịch sử ăn uống",
+    "mealCount": "{{count}} bữa ăn",
+    "noHistory": "Chưa có lịch sử bữa ăn cho người tham gia này.",
+    "back": "Quay lại"
+  },
+  "confirmDeleteModal": {
+    "title": "Bạn có chắc muốn xóa?",
+    "message": "Xóa <strong>{{name}}</strong> khỏi nhóm.",
+    "confirm": "Xóa",
+    "cancel": "Hủy"
+  },
+  "inputCard": {
+    "title": "Nhập thông tin"
+  },
+  "participantMealCard": {
+    "dishLabel": "Tên món ăn",
+    "dishPlaceholder": "Nhập tên món ăn...",
+    "priceLabel": "Giá tiền (VND)",
+    "pricePlaceholder": "0",
+    "currency": "đ"
+  },
+  "searchBar": {
+    "placeholder": "Tìm kiếm..."
+  },
+  "loginSearchBar": {
+    "nameLabel": "Tên của bạn",
+    "placeholder": "VD: Nguyễn Văn A",
+    "searching": "Đang tìm kiếm...",
+    "fetchError": "Không thể lấy dữ liệu, Vui lòng thử lại."
+  },
+  "language": {
+    "vi": "Tiếng Việt",
+    "en": "English"
+  }
+}

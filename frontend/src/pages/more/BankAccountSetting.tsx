@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import TopAppBar from "../../components/layout/TopAppBar";
 import axiosClient from "../../api/axiosClient";
 import BankHubIframe from "../../components/common/BankHubIframe";
@@ -11,6 +12,7 @@ interface BankAccountInfo {
 }
 
 const BankAccountSettings: React.FC = () => {
+  const { t } = useTranslation();
   const [bankAccounts, setBankAccounts] = useState<BankAccountInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [showIframe, setShowIframe] = useState(false);
@@ -57,7 +59,7 @@ const BankAccountSettings: React.FC = () => {
             </span>
           </button>
           <h1 className="absolute inset-0 flex items-center justify-center font-headline-md text-headline-md pointer-events-none text-primary-container">
-            Liên kết tài khoản
+            {t("bankAccount.iframeTitle")}
           </h1>
           <div className="w-10" />
         </header>
@@ -81,7 +83,7 @@ const BankAccountSettings: React.FC = () => {
 
   return (
     <div className="bg-background text-on-surface min-h-screen pb-24">
-      <TopAppBar title="Tài khoản ngân hàng" />
+      <TopAppBar title={t("bankAccount.title")} />
 
       <main className="mt-16 px-margin-mobile max-w-md mx-auto space-y-6 pt-6">
         <div className="bg-surface-container-lowest rounded-2xl p-md card-shadow space-y-5">
@@ -90,13 +92,13 @@ const BankAccountSettings: React.FC = () => {
               account_balance
             </span>
             <h2 className="font-headline-md text-on-surface text-lg">
-              Tài khoản đã liên kết
+              {t("bankAccount.linkedAccounts")}
             </h2>
           </div>
 
           {loading ? (
             <div className="text-center py-6 text-on-surface-variant">
-              Đang tải thông tin...
+              {t("bankAccount.loading")}
             </div>
           ) : bankAccounts.length > 0 ? (
             <div className="space-y-4">
@@ -107,7 +109,7 @@ const BankAccountSettings: React.FC = () => {
                 >
                   <div className="flex justify-between">
                     <span className="text-label-md text-on-surface-variant">
-                      Ngân hàng
+                      {t("bankAccount.bankLabel")}
                     </span>
                     <span className="text-body-md font-bold text-on-surface">
                       {account.bankName}
@@ -115,7 +117,7 @@ const BankAccountSettings: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-label-md text-on-surface-variant">
-                      Số tài khoản
+                      {t("bankAccount.accountNumberLabel")}
                     </span>
                     <span className="text-body-md font-bold text-on-surface">
                       {account.accountNumber}
@@ -123,7 +125,7 @@ const BankAccountSettings: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-label-md text-on-surface-variant">
-                      Chủ tài khoản
+                      {t("bankAccount.accountNameLabel")}
                     </span>
                     <span className="text-body-md font-bold text-on-surface">
                       {account.accountName}
@@ -137,12 +139,8 @@ const BankAccountSettings: React.FC = () => {
               <span className="material-symbols-outlined text-outline text-[48px]">
                 no_accounts
               </span>
-              <p className="text-body-md">
-                Chưa liên kết tài khoản ngân hàng nào.
-              </p>
-              <p className="text-label-sm">
-                Hãy liên kết tài khoản qua BankHub để nhận thanh toán tự động.
-              </p>
+              <p className="text-body-md">{t("bankAccount.noAccounts")}</p>
+              <p className="text-label-sm">{t("bankAccount.noAccountsDesc")}</p>
             </div>
           )}
         </div>
@@ -157,7 +155,7 @@ const BankAccountSettings: React.FC = () => {
             className="w-full h-14 rounded-full bg-error text-white font-bold shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-[20px]"></span>
-            Hủy liên kết tài khoản
+            {t("bankAccount.unlink")}
           </button>
         ) : (
           <button
@@ -169,7 +167,7 @@ const BankAccountSettings: React.FC = () => {
             className="w-full h-14 rounded-full bg-primary text-on-primary font-bold shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined text-[20px]"></span>
-            Liên kết tài khoản ngân hàng
+            {t("bankAccount.link")}
           </button>
         )}
       </main>

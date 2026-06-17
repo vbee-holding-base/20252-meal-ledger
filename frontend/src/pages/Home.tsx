@@ -1,13 +1,15 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import TopAppBar from "../components/layout/TopAppBar";
 
 const Home: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
     <div className="bg-surface text-on-surface min-h-screen pb-24 font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
-      <TopAppBar title="Trang chủ" showBack={false} />
+      <TopAppBar title={t("home.title")} showBack={false} />
 
       {/* Main Content Canvas */}
       <main className="pt-20 px-margin-mobile min-h-screen space-y-6 max-w-md mx-auto">
@@ -25,10 +27,10 @@ const Home: React.FC = () => {
             </div>
             <div className="flex-1">
               <h3 className="font-headline-md text-on-surface text-[20px]">
-                Thêm bữa ăn
+                {t("home.addMeal")}
               </h3>
               <p className="text-on-surface-variant font-label-sm">
-                Bắt đầu chia hóa đơn bữa trưa nay
+                {t("home.addMealDesc")}
               </p>
             </div>
             <span className="material-symbols-outlined text-outline">
@@ -48,10 +50,10 @@ const Home: React.FC = () => {
             </div>
             <div className="flex-1">
               <h3 className="font-headline-md text-on-surface text-[20px]">
-                Quản lý người tham gia
+                {t("home.manageParticipants")}
               </h3>
               <p className="text-on-surface-variant font-label-sm">
-                Xem và chỉnh sửa danh sách bạn bè
+                {t("home.manageParticipantsDesc")}
               </p>
             </div>
             <span className="material-symbols-outlined text-outline">
@@ -71,10 +73,10 @@ const Home: React.FC = () => {
             </div>
             <div className="flex-1">
               <h3 className="font-headline-md text-on-surface text-[20px]">
-                Quản lý quán ăn
+                {t("home.manageRestaurants")}
               </h3>
               <p className="text-on-surface-variant font-label-sm">
-                Lưu lại những quán ngon đã ghé
+                {t("home.manageRestaurantsDesc")}
               </p>
             </div>
             <span className="material-symbols-outlined text-outline">
@@ -94,10 +96,10 @@ const Home: React.FC = () => {
             </div>
             <div className="flex-1">
               <h3 className="font-headline-md text-on-surface text-[20px]">
-                Quản lý nợ
+                {t("home.manageDebts")}
               </h3>
               <p className="text-on-surface-variant font-label-sm">
-                Theo dõi và quản lý các khoản nợ
+                {t("home.manageDebtsDesc")}
               </p>
             </div>
             <span className="material-symbols-outlined text-outline">

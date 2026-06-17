@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import TopAppBar from "../components/layout/TopAppBar";
 import SubmitButton from "../components/common/SubmitButton";
 import ParticipantMealCard from "../components/common/ParticipantMealCard";
@@ -12,6 +13,7 @@ interface Participant {
 }
 
 const AddMealDetail: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [participants, setParticipants] = useState<Participant[]>([
     { id: 1, name: "Minh", dish: "Bún chả", price: "45000" },
@@ -25,7 +27,7 @@ const AddMealDetail: React.FC = () => {
       ...participants,
       {
         id: newId,
-        name: `Thành viên ${participants.length + 1}`,
+        name: t("addMealDetail.memberName", { n: participants.length + 1 }),
         dish: "",
         price: "",
       },
@@ -60,7 +62,7 @@ const AddMealDetail: React.FC = () => {
     <div className="bg-background min-h-screen flex justify-center">
       <div className="w-full max-w-md bg-background px-4 pb-24 relative flex flex-col">
         <div className="flex justify-center">
-          <TopAppBar title="Chi tiết bữa ăn" />
+          <TopAppBar title={t("addMealDetail.title")} />
         </div>
 
         <main className="flex-1 pt-20 pb-4 overflow-y-auto space-y-4">
@@ -82,11 +84,11 @@ const AddMealDetail: React.FC = () => {
             className="w-full h-14 border-2 border-dashed border-outline/40 hover:border-primary/60 hover:bg-primary/5 rounded-3xl text-on-surface-variant font-semibold text-base transition-all duration-200 active:scale-[0.99] flex items-center justify-center gap-2"
           >
             <span className="material-symbols-outlined">add</span>
-            Thêm thành viên
+            {t("addMealDetail.addMember")}
           </button>
         </main>
 
-        <SubmitButton title="Lưu thông tin" onClick={handleSubmit} />
+        <SubmitButton title={t("addMealDetail.save")} onClick={handleSubmit} />
       </div>
     </div>
   );

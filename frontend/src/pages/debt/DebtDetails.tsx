@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import TopAppBar from "../../components/layout/TopAppBar";
 import axiosClient, { axiosPublic } from "../../api/axiosClient";
 import { useAuth } from "../../context/AuthContext";
@@ -20,6 +21,7 @@ type DebtDetailApiResponse = {
 };
 
 const DebtDetailsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -31,7 +33,7 @@ const DebtDetailsPage: React.FC = () => {
 
   const fetchDebtDetails = async () => {
     if (!id) {
-      setError("ID không hợp lệ.");
+      setError(t("debtDetails.invalidId"));
       return;
     }
 
@@ -47,7 +49,7 @@ const DebtDetailsPage: React.FC = () => {
     } catch (err) {
       console.error(err);
       setDebtDetails(null);
-      setError("Không tải được thông tin nợ. Vui lòng thử lại sau.");
+      setError(t("debtDetails.fetchError"));
     } finally {
       setIsLoading(false);
     }
@@ -64,9 +66,11 @@ const DebtDetailsPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="bg-background min-h-screen">
-        <TopAppBar title="Chi tiết nợ" />
+        <TopAppBar title={t("debtDetails.title")} />
         <main className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-margin-mobile">
-          <p className="text-on-surface-variant font-body-md">Đang tải...</p>
+          <p className="text-on-surface-variant font-body-md">
+            {t("debtDetails.loading")}
+          </p>
         </main>
       </div>
     );
@@ -75,16 +79,16 @@ const DebtDetailsPage: React.FC = () => {
   if (error || !participant) {
     return (
       <div className="bg-background min-h-screen">
-        <TopAppBar title="Chi tiết nợ" />
+        <TopAppBar title={t("debtDetails.title")} />
         <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-margin-mobile text-center gap-4">
           <p className="text-on-surface-variant font-body-md">
-            {error || "Không tìm thấy thông tin nợ."}
+            {error || t("debtDetails.notFound")}
           </p>
           <button
             className="h-12 px-6 rounded-full bg-primary-container text-on-primary font-bold hover:bg-primary transition-colors"
             onClick={() => navigate("/debts")}
           >
-            Quay lại
+            {t("debtDetails.back")}
           </button>
         </main>
       </div>
@@ -93,7 +97,7 @@ const DebtDetailsPage: React.FC = () => {
 
   return (
     <div className="bg-background text-on-background min-h-screen flex flex-col pb-20">
-      <TopAppBar title="Chi tiết nợ" />
+      <TopAppBar title={t("debtDetails.title")} />
 
       <main className="flex-1 pt-16 mb-6 px-margin-mobile max-w-md mx-auto w-full">
         <section className="py-md animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -108,7 +112,7 @@ const DebtDetailsPage: React.FC = () => {
                 <span className="material-symbols-outlined text-base">
                   account_balance_wallet
                 </span>
-                {participant.status || "Trạng thái không xác định"}
+                {participant.status || t("debtDetails.unknownStatus")}
               </span>
             </div>
             <div className="flex flex-col items-center">
@@ -129,7 +133,9 @@ const DebtDetailsPage: React.FC = () => {
                 >
                   payments
                 </span>
-                {totalAmount > 0 ? "Tất toán ngay" : "Không có nợ"}
+                {totalAmount > 0
+                  ? t("debtDetails.payNow")
+                  : t("debtDetails.noDebt")}
               </button>
             </div>
           </div>
@@ -137,17 +143,17 @@ const DebtDetailsPage: React.FC = () => {
 
         <div className="flex justify-between items-center mb-sm">
           <h3 className="font-headline-md text-headline-md text-on-background">
-            Lịch sử ăn uống
+            {t("debtDetails.historyTitle")}
           </h3>
           <span className="font-label-md text-label-md text-primary bg-primary-fixed px-3 py-1 rounded-full">
-            {history.length} bữa ăn
+            {t("debtDetails.mealCount", { count: history.length })}
           </span>
         </div>
 
         <div className="space-y-4 mb-xl">
           {history.length === 0 ? (
             <div className="rounded-3xl border border-outline-variant p-6 text-center text-on-surface-variant">
-              Chưa có lịch sử bữa ăn cho người tham gia này.
+              {t("debtDetails.noHistory")}
             </div>
           ) : (
             history.map((tx) => (
