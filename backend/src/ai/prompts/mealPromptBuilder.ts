@@ -1,6 +1,4 @@
-import {
-    ParseMealTextInput,
-} from "../interfaces/mealParserTypes";
+import { ParseMealTextInput } from "../interfaces/mealParserTypes";
 export const buildPrompt = ({
   text,
   now,
