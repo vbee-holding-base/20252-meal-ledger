@@ -42,7 +42,7 @@ export class GeminiMealParserProvider implements mealParserAI {
             responseSchema: rawMealParseSchema,
           },
         }),
-      }
+      },
     );
 
     if (!response.ok) {
