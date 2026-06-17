@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import LoginSearchBar, {
   LoginSearchResult,
@@ -11,6 +12,7 @@ const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3001/api/v1";
 
 const Login: React.FC = () => {
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -44,7 +46,7 @@ const Login: React.FC = () => {
               LunchSplit
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant px-md">
-              Quản lý tiền ăn trưa và công nợ dễ dàng
+              {t("login.subtitle")}
             </p>
           </header>
 
@@ -53,7 +55,7 @@ const Login: React.FC = () => {
             {/* Owner Login (Google) */}
             <div className="relative pt-4 pb-2 mb-4">
               <label className="absolute -top-3 left-4 px-base bg-surface-container-lowest text-label-sm text-primary font-bold uppercase tracking-wider">
-                Chủ nhóm
+                {t("login.ownerLabel")}
               </label>
               <div className="border-2 border-outline-variant/30 rounded-xl p-md">
                 <a
@@ -78,7 +80,7 @@ const Login: React.FC = () => {
                       fill="#EA4335"
                     ></path>
                   </svg>
-                  <span>Đăng nhập với Google</span>
+                  <span>{t("login.googleLogin")}</span>
                 </a>
               </div>
             </div>
@@ -86,7 +88,7 @@ const Login: React.FC = () => {
             {/* Participant Search Section */}
             <div className="relative pt-4">
               <label className="absolute -top-3 left-4 px-base bg-surface-container-lowest text-label-sm text-primary font-bold uppercase tracking-wider">
-                Thành viên
+                {t("login.memberLabel")}
               </label>
               <div className="border-2 border-outline-variant/30 rounded-xl p-md">
                 <LoginSearchBar onItemSelect={handleParticipantSelect} />
@@ -97,7 +99,7 @@ const Login: React.FC = () => {
           {/* Visual Decoration / Footer */}
           <footer className="mt-xl text-center">
             <p className="font-label-sm text-label-sm text-outline">
-              © 2026 LunchSplit Team
+              {t("login.footer")}
             </p>
           </footer>
         </div>

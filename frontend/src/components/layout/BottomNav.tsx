@@ -1,21 +1,31 @@
 import React from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, matchPath } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
-const navItems = [
-  { path: "/", icon: "home", label: "Trang chủ" },
-  { path: "/add-meal", icon: "add", label: "Thêm bữa ăn" },
-  { path: "/participants", icon: "groups", label: "Thành viên" },
-  { path: "/restaurants", icon: "restaurant", label: "Quán ăn" },
-  { path: "/more", icon: "more_horiz", label: "Khác" },
-];
+const useNavItems = () => {
+  const { t } = useTranslation();
+  return [
+    { path: "/", icon: "home", label: t("bottomNav.home") },
+    { path: "/add-meal", icon: "add", label: t("bottomNav.addMeal") },
+    { path: "/participants", icon: "groups", label: t("bottomNav.members") },
+    {
+      path: "/restaurants",
+      icon: "restaurant",
+      label: t("bottomNav.restaurants"),
+    },
+    { path: "/more", icon: "more_horiz", label: t("bottomNav.more") },
+  ];
+};
 
-const HIDDEN_PATHS = ["/login", "/auth/callback"];
+const HIDDEN_PATHS = ["/login", "/auth/callback", "/debts/:id"];
 
 const BottomNav: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const navItems = useNavItems();
 
-  if (HIDDEN_PATHS.includes(location.pathname)) return null;
+  if (HIDDEN_PATHS.some((path) => matchPath(path, location.pathname)))
+    return null;
 
   return (
     <div className="fixed bottom-0 w-full max-w-md z-50 bg-surface-container-lowest border-t border-outline-variant pb-safe pb-2 pt-2 px-4">

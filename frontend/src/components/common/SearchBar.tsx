@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface SearchBarProps {
   value: string;
@@ -9,8 +10,10 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChange,
-  placeholder = "Tìm kiếm...",
+  placeholder,
 }) => {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t("searchBar.placeholder");
   return (
     <div className="relative">
       <span className="material-symbols-outlined absolute top-1/2 -translate-y-1/2 text-on-surface-variant left-4">
@@ -18,7 +21,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       </span>
       <input
         className="w-full h-12 pl-12 pr-4 rounded-xl bg-surface-container-low text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}

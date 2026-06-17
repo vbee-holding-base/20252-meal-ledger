@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import TopAppBar from "../../components/layout/TopAppBar";
 import SearchBar from "../../components/common/SearchBar";
 import ConfirmDeleteModal from "../../components/common/ConfirmDeleteModal";
@@ -7,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import axiosClient from "../../api/axiosClient";
 
 const ParticipantManagement: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<Participant | null>(null);
@@ -49,7 +51,7 @@ const ParticipantManagement: React.FC = () => {
       setParticipants(mappedParticipants);
     } catch (err) {
       console.error(err);
-      setError("Không tải được danh sách người tham gia.");
+      setError(t("participantManagement.fetchError"));
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +63,7 @@ const ParticipantManagement: React.FC = () => {
 
   const handleAdd = async () => {
     if (!newName.trim()) {
-      setError("Vui lòng nhập tên người tham gia.");
+      setError(t("participantManagement.nameRequired"));
       return;
     }
 
@@ -73,7 +75,7 @@ const ParticipantManagement: React.FC = () => {
       await fetchParticipants();
     } catch (err) {
       console.error(err);
-      setError("Không thể thêm người tham gia. Vui lòng thử lại.");
+      setError(t("participantManagement.addError"));
     } finally {
       setIsAdding(false);
     }
@@ -90,7 +92,7 @@ const ParticipantManagement: React.FC = () => {
       await fetchParticipants();
     } catch (err) {
       console.error(err);
-      setError("Không thể xóa người tham gia. Vui lòng thử lại.");
+      setError(t("participantManagement.deleteError"));
     } finally {
       setIsLoading(false);
     }
@@ -102,28 +104,30 @@ const ParticipantManagement: React.FC = () => {
 
   return (
     <div className="bg-background text-on-surface min-h-screen pb-24">
-      <TopAppBar title="Người tham gia" />
+      <TopAppBar title={t("participantManagement.title")} />
 
       <main className="flex-1 mt-16 pb-32">
         <section className="px-margin-mobile sticky bg-surface z-40 pt-4 pb-2 top-12">
           <SearchBar
             value={search}
             onChange={setSearch}
-            placeholder="Tìm kiếm tên người tham gia..."
+            placeholder={t("participantManagement.searchPlaceholder")}
           />
         </section>
 
         {isLoading && (
           <div className="px-margin-mobile py-3">
-            <p className="text-on-surface-variant text-center">Đang tải...</p>
+            <p className="text-on-surface-variant text-center">
+              {t("participantManagement.loading")}
+            </p>
           </div>
         )}
 
         <section className="px-margin-mobile pb-4 pt-2">
           <div className="flex gap-2 items-center">
             <input
-              className="flex-1 h-12 px-4 rounded-xl border-none bg-surface-container-low text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
-              placeholder="Tên người dùng"
+              className="flex-1 h-12 px-4 rounded-xl bg-surface-container-low text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary transition-all placeholder:text-outline"
+              placeholder={t("participantManagement.namePlaceholder")}
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
@@ -142,10 +146,12 @@ const ParticipantManagement: React.FC = () => {
         <section className="px-margin-mobile flex flex-col gap-3">
           <div className="flex items-center justify-between py-2">
             <h2 className="text-label-md font-label-md text-on-surface-variant">
-              Tất cả người tham gia ({filtered.length})
+              {t("participantManagement.allParticipants", {
+                count: filtered.length,
+              })}
             </h2>
             <button className="text-primary font-label-sm text-label-sm flex items-center gap-1">
-              Sắp xếp
+              {t("participantManagement.sort")}
               <span className="material-symbols-outlined text-base leading-none ml-1">
                 unfold_more
               </span>
@@ -206,7 +212,9 @@ const ParticipantManagement: React.FC = () => {
         name={deleteTarget?.name ?? ""}
         warningMessage={
           deleteTarget && deleteTarget.debt > 0
-            ? `Người này vẫn còn nợ ${deleteTarget.debt / 1000}k. Xóa sẽ làm mất dữ liệu khoản nợ này.`
+            ? t("participantManagement.debtWarning", {
+                debt: deleteTarget.debt / 1000,
+              })
             : undefined
         }
       />
