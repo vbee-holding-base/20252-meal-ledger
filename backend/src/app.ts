@@ -12,6 +12,7 @@ import mealParserRoute from "./routes/mealParserRoute";
 import debtRoute from "./routes/debtRoute";
 import bankHubRoute from "./routes/bankHubRoute";
 import errorHandler from "./middlewares/errorHandler";
+import notFoundHandler from "./middlewares/notFoundHandler";
 
 const app: Application = express();
 const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:5173";
@@ -32,6 +33,7 @@ app.use("/api/v1/meals", mealParserRoute);
 app.use("/api/v1/debts", debtRoute);
 app.use("/api/v1/bankhub", bankHubRoute);
 
+app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.get("/", (req: Request, res: Response) => {
