@@ -23,13 +23,26 @@
   "addMeal": {
     "title": "Thêm bữa ăn",
     "placeholder": "Ví dụ:\nMinh ăn bún chả 45k\nKhánh ăn nem chua 10k\nVĩnh ăn phở bò 35k",
-    "analyze": "Phân tích"
+    "analyze": "Phân tích",
+    "analyzing": "Đang phân tích...",
+    "error": "Phân tích thất bại"
   },
   "addMealDetail": {
     "title": "Chi tiết bữa ăn",
     "addMember": "Thêm thành viên",
     "save": "Lưu thông tin",
-    "memberName": "Thành viên {{n}}"
+    "saving": "Đang lưu...",
+    "saveError": "Lưu thất bại",
+    "memberName": "Thành viên {{n}}",
+    "restaurantName": "Tên quán",
+    "date": "Ngày",
+    "totalAmount": "Tổng tiền",
+    "quickCreate": "Tạo nhanh",
+    "noData": "Không có dữ liệu bữa ăn",
+    "allSet": "Tất cả đã tạo xong, có thể lưu!",
+    "quickCreateHint": "Vui lòng tạo nhanh các thành viên trước khi lưu",
+    "quickCreateError": "Không thể tạo. Tên có thể đã tồn tại.",
+    "totalMismatch": "Tổng tiền nhập ({{entered}}đ) không khớp với tổng các thành viên ({{computed}}đ)"
   },
   "login": {
     "subtitle": "Quản lý tiền ăn trưa và công nợ dễ dàng",
@@ -164,9 +177,8 @@
     "title": "Nhập thông tin"
   },
   "participantMealCard": {
-    "dishLabel": "Tên món ăn",
-    "dishPlaceholder": "Nhập tên món ăn...",
-    "priceLabel": "Giá tiền (VND)",
+    "nameLabel": "Tên thành viên",
+    "amountLabel": "Số tiền (VND)",
     "pricePlaceholder": "0",
     "currency": "đ"
   },

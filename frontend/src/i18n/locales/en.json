@@ -23,13 +23,26 @@
   "addMeal": {
     "title": "Add Meal",
     "placeholder": "Example:\nMinh had bun cha 45k\nKhanh had nem chua 10k\nVinh had pho bo 35k",
-    "analyze": "Analyze"
+    "analyze": "Analyze",
+    "analyzing": "Analyzing...",
+    "error": "Analysis failed"
   },
   "addMealDetail": {
     "title": "Meal Details",
     "addMember": "Add Member",
     "save": "Save Information",
-    "memberName": "Member {{n}}"
+    "saving": "Saving...",
+    "saveError": "Save failed",
+    "memberName": "Member {{n}}",
+    "restaurantName": "Restaurant",
+    "date": "Date",
+    "totalAmount": "Total",
+    "quickCreate": "Quick create",
+    "noData": "No meal data",
+    "allSet": "All set, ready to save!",
+    "quickCreateHint": "Please quick-create all members before saving",
+    "quickCreateError": "Could not create. Name may already exist.",
+    "totalMismatch": "Entered total ({{entered}}đ) does not match sum of members ({{computed}}đ)"
   },
   "login": {
     "subtitle": "Easily manage lunch money and debts",
@@ -164,9 +177,8 @@
     "title": "Enter information"
   },
   "participantMealCard": {
-    "dishLabel": "Dish Name",
-    "dishPlaceholder": "Enter dish name...",
-    "priceLabel": "Price (VND)",
+    "nameLabel": "Member name",
+    "amountLabel": "Amount (VND)",
     "pricePlaceholder": "0",
     "currency": "đ"
   },
