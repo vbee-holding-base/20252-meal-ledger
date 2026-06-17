@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { parseMealText } from "../controllers/mealParserController";
+import { saveMeal } from "../controllers/mealController";
 import { protect } from "../middlewares/auth";
 
 const router = Router();
 
-router.post("/parse", protect, parseMealText);
+router.post("/", protect, saveMeal);
 
 export default router;

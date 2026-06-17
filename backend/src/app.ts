@@ -9,6 +9,7 @@ import authRoute from "./routes/authRoute";
 import participantRoute from "./routes/participantRoute";
 import restaurantRoute from "./routes/restaurantRoute";
 import mealParserRoute from "./routes/mealParserRoute";
+import mealRoute from "./routes/mealRoute";
 import debtRoute from "./routes/debtRoute";
 import bankHubRoute from "./routes/bankHubRoute";
 import errorHandler from "./middlewares/errorHandler";
@@ -30,6 +31,7 @@ app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/participants", participantRoute);
 app.use("/api/v1/restaurants", restaurantRoute);
 app.use("/api/v1/meals", mealParserRoute);
+app.use("/api/v1/meals", mealRoute);
 app.use("/api/v1/debts", debtRoute);
 app.use("/api/v1/bankhub", bankHubRoute);
 
