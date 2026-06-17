@@ -5,6 +5,7 @@ import axiosClient, { axiosPublic } from "../../api/axiosClient";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import type { DebtDetails } from "../../types";
+import { formatDateTime } from "../../utils/format";
 
 type DebtDetailApiResponse = {
   participant: {
@@ -174,7 +175,7 @@ const DebtDetailsPage: React.FC = () => {
                         calendar_today
                       </span>
                       <p className="font-label-sm text-label-sm text-on-surface-variant">
-                        {tx.date}
+                        {formatDateTime(tx.date)}
                       </p>
                     </div>
                   </div>
