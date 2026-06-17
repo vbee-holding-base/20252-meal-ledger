@@ -11,7 +11,6 @@ export type MealParseIssueCode =
   | "EMPTY_ENTRIES"
   | "UNKNOWN_PARTICIPANT"
   | "UNKNOWN_RESTAURANT"
-  | "UNKNOWN_PAYER"
   | "MISSING_AMOUNT"
   | "INVALID_AMOUNT"
   | "TOTAL_MISMATCH"
@@ -21,8 +20,6 @@ export interface IndividualParseIssue {
   severity: MealParseIssueSeverity;
   code: MealParseIssueCode;
   message: string;
-  entryIndex?: number;
-  value?: unknown;
 }
 
 export interface ValidatedMealEntry {
@@ -37,12 +34,9 @@ export interface FinalValidatedMeal {
   restaurantName: string | null;
   restaurantId: string | null;
   date: string | null;
-  payerName: string | null;
-  payerId: string | null;
   totalAmount: number | null;
   entries: ValidatedMealEntry[];
   issues: IndividualParseIssue[];
-  isValid: boolean;
 }
 
 interface ValidateMealParseResultInput {
@@ -123,16 +117,6 @@ export const finalValidatedResult = ({
     });
   }
 
-  const payerId = findParticipantIdByName(parsed.payerName, participants);
-
-  if (parsed.payerName && !payerId) {
-    issues.push({
-      severity: "warning",
-      code: "UNKNOWN_PAYER",
-      message: `Payer "${parsed.payerName}" not found in your participant list.`,
-    });
-  }
-
   if (!isValidDate(parsed.date)) {
     issues.push({
       severity: "error",
@@ -149,7 +133,7 @@ export const finalValidatedResult = ({
     });
   }
 
-  const entries = parsed.entries.map((entry, i): ValidatedMealEntry => {
+  const entries = parsed.entries.map((entry): ValidatedMealEntry => {
     const entryIssues: IndividualParseIssue[] = [];
 
     const participantId = findParticipantIdByName(
@@ -162,8 +146,6 @@ export const finalValidatedResult = ({
         severity: "warning",
         code: "UNKNOWN_PARTICIPANT",
         message: `Participant "${entry.personName}" could not be found.`,
-        entryIndex: i,
-        value: entry.personName,
       });
     }
 
@@ -172,16 +154,12 @@ export const finalValidatedResult = ({
         severity: "error",
         code: "MISSING_AMOUNT",
         message: `Amount is missing for entry "${entry.personName}".`,
-        entryIndex: i,
-        value: entry.amount,
       });
     } else if (typeof entry.amount !== "number" || entry.amount <= 0) {
       entryIssues.push({
         severity: "error",
         code: "INVALID_AMOUNT",
         message: `Amount for entry "${entry.personName}" must be a positive number.`,
-        entryIndex: i,
-        value: entry.amount,
       });
     }
 
@@ -195,19 +173,13 @@ export const finalValidatedResult = ({
   });
 
   const entryIssues = entries.flatMap((entry) => entry.issues);
-  const allIssues = [...issues, ...entryIssues];
-
   const totalEntryAmount = sumEntryAmounts(parsed.entries);
 
   if (parsed.totalAmount !== null && totalEntryAmount !== parsed.totalAmount) {
-    allIssues.push({
+    issues.push({
       severity: "warning",
       code: "TOTAL_MISMATCH",
       message: `Total amount ${parsed.totalAmount} does not match sum of entry amounts ${totalEntryAmount}.`,
-      value: {
-        totalAmount: parsed.totalAmount,
-        totalEntryAmount,
-      },
     });
   }
 
@@ -215,11 +187,8 @@ export const finalValidatedResult = ({
     restaurantName: parsed.restaurantName,
     restaurantId,
     date: parsed.date,
-    payerName: parsed.payerName,
-    payerId,
     totalAmount: parsed.totalAmount,
     entries,
-    issues: allIssues,
-    isValid: !allIssues.some((issue) => issue.severity === "error"),
+    issues,
   };
 };

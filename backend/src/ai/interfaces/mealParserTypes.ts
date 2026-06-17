@@ -18,7 +18,6 @@ export interface ParsedMealRawEntry {
 export interface ParsedMealRaw {
   restaurantName: string | null;
   date: string | null;
-  payerName: string | null;
   totalAmount: number | null;
   entries: ParsedMealRawEntry[];
   notes: string[];

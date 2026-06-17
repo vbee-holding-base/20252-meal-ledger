@@ -9,10 +9,6 @@ export const rawMealParseSchema = {
       type: "string",
       nullable: true,
     },
-    payerName: {
-      type: "string",
-      nullable: true,
-    },
     totalAmount: {
       type: "number",
       nullable: true,
@@ -43,12 +39,5 @@ export const rawMealParseSchema = {
       },
     },
   },
-  required: [
-    "restaurantName",
-    "date",
-    "payerName",
-    "totalAmount",
-    "entries",
-    "notes",
-  ],
+  required: ["restaurantName", "date", "totalAmount", "entries", "notes"],
 };

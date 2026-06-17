@@ -18,7 +18,6 @@ Không giải thích ngoài JSON.
 Cần trích xuất:
 - restaurantName: tên quán nếu có, không có thì null.
 - date: ngày giờ bữa ăn nếu có. Nếu không có thời gian, dùng thời điểm hiện tại: ${now.toISOString()}.
-- payerName: người trả tiền nếu text có nói. Nếu không nói ai trả tiền thì null.
 - totalAmount: tổng tiền nếu có, không có thì null.
 - entries: danh sách người được nhắc tới cùng số tiền tương ứng.
 - notes: ghi chú parse nếu text mơ hồ.
