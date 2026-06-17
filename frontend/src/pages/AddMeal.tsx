@@ -4,16 +4,34 @@ import { useTranslation } from "react-i18next";
 import TopAppBar from "../components/layout/TopAppBar";
 import InputCard from "../components/common/InputCard";
 import SubmitButton from "../components/common/SubmitButton";
+import axiosClient from "../api/axiosClient";
 
 const AddMeal: React.FC = () => {
   const { t } = useTranslation();
   const [mealText, setMealText] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleAnalyzeSubmit = () => {
-    if (!mealText.trim()) return;
+  const handleAnalyzeSubmit = async () => {
+    if (!mealText.trim() || isLoading) return;
 
-    navigate("/add-meal-detail", { state: { rawText: mealText } });
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await axiosClient.post("/meals/parse", { text: mealText });
+      navigate("/add-meal-detail", {
+        state: {
+          parsedData: res.data.data,
+          context: res.data.context,
+        },
+      });
+    } catch {
+      setError(t("addMeal.error"));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -30,10 +48,15 @@ const AddMeal: React.FC = () => {
             placeholder={t("addMeal.placeholder")}
           />
         </div>
+
+        {error && (
+          <p className="text-error text-sm text-center mt-2">{error}</p>
+        )}
+
         <SubmitButton
-          title={t("addMeal.analyze")}
+          title={isLoading ? t("addMeal.analyzing") : t("addMeal.analyze")}
           onClick={handleAnalyzeSubmit}
-          disabled={!mealText.trim()}
+          disabled={!mealText.trim() || isLoading}
         />
       </div>
     </div>
