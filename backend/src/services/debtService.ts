@@ -9,7 +9,10 @@ export const getDetailDebt = async (participantId: string) => {
       const participantInfo = meal.participantsInfo.find(
         (p) => p.participantId.toString() === participantId.toString(),
       );
-      if (!participantInfo || participantInfo.status !== "unpaid") {
+      if (
+        !participantInfo ||
+        !["unpaid", "uncomplete"].includes(participantInfo.status)
+      ) {
         return null;
       }
       return {

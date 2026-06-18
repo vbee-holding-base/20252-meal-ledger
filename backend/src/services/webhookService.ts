@@ -6,7 +6,7 @@ import { findParticipantByIdAndOwner } from "../repo/participantRepo";
 import { findUnpaidMealsByParticipant } from "../repo/debtRepo";
 import { parsePaymentCode } from "../utils/paymentCode";
 import { findOwnerById } from "../repo/authRepo";
-import { ValidationError } from "../config/errors";
+import { ValidationError, NotFoundError } from "../config/errors";
 import mongoose from "mongoose";
 
 interface SePayWebhookPayload {
@@ -40,123 +40,148 @@ export const processSepayWebhook = async (payload: SePayWebhookPayload) => {
 
   console.log(`Processing transaction: ${transactionId}, amount: ${amount}`);
 
-  const existingTx = await findTransactionBySePayId(transactionId);
-  if (existingTx) {
-    console.log(`Transaction ${transactionId} has already been processed.`);
-    return {
-      success: true,
-      duplicate: true,
-      message: "Transaction already processed",
-    };
-  }
-
-  if (transferType !== "credit") {
-    console.log(
-      `Transaction ${transactionId} is not a credit transaction. Ignored.`,
-    );
-    return {
-      success: true,
-      ignored: true,
-      message: "Non-credit transaction ignored",
-    };
-  }
-
-  const ids = parsePaymentCode(content);
-  if (!ids) {
-    console.warn(
-      `Content "${content}" does not match payment code pattern. Ignored.`,
-    );
-    return {
-      success: false,
-      message: "Invalid payment code format in content",
-    };
-  }
-
-  const { ownerId, participantId } = ids;
-
+  const session = await mongoose.startSession();
   try {
-    const owner = await findOwnerById(ownerId);
-    if (!owner) {
-      throw new ValidationError("Owner not found from decoded payment code");
-    }
+    let result: any = null;
 
-    const participant = await findParticipantByIdAndOwner(
-      ownerId,
-      participantId,
-    );
-    if (!participant) {
-      throw new ValidationError(
-        "Participant not found from decoded payment code",
+    await session.withTransaction(async () => {
+      const existingTx = await findTransactionBySePayId(transactionId, session);
+      if (existingTx) {
+        console.log(`Transaction ${transactionId} has already been processed.`);
+        result = {
+          success: true,
+          duplicate: true,
+          message: "Transaction already processed",
+        };
+        return;
+      }
+
+      if (transferType !== "credit") {
+        console.log(
+          `Transaction ${transactionId} is not a credit transaction. Ignored.`,
+        );
+        result = {
+          success: true,
+          ignored: true,
+          message: "Non-credit transaction ignored",
+        };
+        return;
+      }
+
+      const ids = parsePaymentCode(content);
+      if (!ids) {
+        console.warn(
+          `Content "${content}" does not match payment code pattern. Ignored.`,
+        );
+        result = {
+          success: false,
+          isValidationError: true,
+          message: "Invalid payment code format in content",
+        };
+        return;
+      }
+
+      const { ownerId, participantId } = ids;
+
+      const owner = await findOwnerById(ownerId);
+      if (!owner) {
+        throw new ValidationError("Owner not found from decoded payment code");
+      }
+
+      const participant = await findParticipantByIdAndOwner(
+        ownerId,
+        participantId,
+        session,
       );
-    }
 
-    const unpaidMeals = await findUnpaidMealsByParticipant(participantId);
-    let remainingPayment = amount;
-
-    for (const meal of unpaidMeals) {
-      if (remainingPayment <= 0) break;
-
-      const pInfo = meal.participantsInfo.find(
-        (p) => p.participantId.toString() === participantId,
+      const unpaidMeals = await findUnpaidMealsByParticipant(
+        participantId,
+        session,
       );
+      let remainingPayment = amount;
 
-      if (
-        pInfo &&
-        (pInfo.status === "unpaid" || pInfo.status === "uncomplete")
-      ) {
-        if (remainingPayment >= pInfo.amount) {
-          pInfo.status = "paid";
-          remainingPayment -= pInfo.amount;
-          await meal.save();
-          console.log(
-            `Marked meal ${meal._id} as paid for participant ${participant.name}`,
-          );
-        } else {
-          pInfo.status = "uncomplete";
-          pInfo.amount -= remainingPayment;
-          remainingPayment = 0;
-          await meal.save();
-          console.log(
-            `Marked meal ${meal._id} as uncomplete for participant ${participant.name}`,
-          );
+      for (const meal of unpaidMeals) {
+        if (remainingPayment <= 0) break;
+
+        const pInfo = meal.participantsInfo.find(
+          (p) => p.participantId.toString() === participantId,
+        );
+
+        if (
+          pInfo &&
+          (pInfo.status === "unpaid" || pInfo.status === "uncomplete")
+        ) {
+          if (remainingPayment >= pInfo.amount) {
+            pInfo.status = "paid";
+            remainingPayment -= pInfo.amount;
+            await meal.save({ session });
+            console.log(
+              `Marked meal ${meal._id} as paid for participant ${participant.name}`,
+            );
+          } else {
+            pInfo.status = "uncomplete";
+            pInfo.amount -= remainingPayment;
+            remainingPayment = 0;
+            await meal.save({ session });
+            console.log(
+              `Marked meal ${meal._id} as uncomplete for participant ${participant.name}`,
+            );
+          }
         }
       }
-    }
 
-    participant.totalDebt = Math.max(0, participant.totalDebt - amount);
-    await participant.save();
-    console.log(
-      `Decreased totalDebt for ${participant.name} to ${participant.totalDebt}`,
-    );
+      participant.totalDebt = Math.max(0, participant.totalDebt - amount);
+      await participant.save({ session });
+      console.log(
+        `Decreased totalDebt for ${participant.name} to ${participant.totalDebt}`,
+      );
 
-    const parsedDate = new Date(transactionDateStr.replace(" ", "T"));
+      const parsedDate = new Date(transactionDateStr.replace(" ", "T"));
 
-    const newTx = await createTransaction({
-      ownerId: new mongoose.Types.ObjectId(ownerId),
-      participantId: new mongoose.Types.ObjectId(participantId),
-      amount,
-      transferDescription: content,
-      status: "completed",
-      date: isNaN(parsedDate.getTime()) ? new Date() : parsedDate,
-      transactionId,
-      referenceCode,
-      gateway,
-      accountNumber,
-      bankAccountXid,
-      transferType,
-      content,
-      accumulated,
+      const newTx = await createTransaction(
+        {
+          ownerId: new mongoose.Types.ObjectId(ownerId),
+          participantId: new mongoose.Types.ObjectId(participantId),
+          amount,
+          transferDescription: content,
+          status: "completed",
+          date: isNaN(parsedDate.getTime()) ? new Date() : parsedDate,
+          transactionId,
+          referenceCode,
+          gateway,
+          accountNumber,
+          bankAccountXid,
+          transferType,
+          content,
+          accumulated,
+        },
+        session,
+      );
+
+      console.log(
+        `Successfully logged transaction ${newTx._id} for transaction ID: ${transactionId}`,
+      );
+      result = { success: true, transaction: newTx };
     });
 
-    console.log(
-      `Successfully logged transaction ${newTx._id} for transaction ID: ${transactionId}`,
-    );
-    return { success: true, transaction: newTx };
+    return result;
   } catch (error: any) {
+    if (error instanceof ValidationError || error instanceof NotFoundError) {
+      console.warn(
+        `Validation failed for transaction ${transactionId}: ${error.message}`,
+      );
+      return {
+        success: false,
+        isValidationError: true,
+        message: error.message,
+      };
+    }
     console.error(
-      `Error processing transaction ${transactionId}:`,
-      error.message,
+      `Unexpected error processing transaction ${transactionId}:`,
+      error,
     );
-    return { success: false, message: error.message };
+    throw error;
+  } finally {
+    session.endSession();
   }
 };

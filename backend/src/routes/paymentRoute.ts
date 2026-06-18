@@ -1,9 +1,13 @@
 import { Router } from "express";
 import { protect } from "../middlewares/auth";
-import { generateQrCodePayment } from "../controllers/paymentController";
+import {
+  getPaymentInfo,
+  checkPaymentStatus,
+} from "../controllers/paymentController";
 
 const router = Router();
 
-router.get("/qr/:orderId", protect, generateQrCodePayment);
+router.get("/:participantId", protect, getPaymentInfo);
+router.get("/:participantId/status", protect, checkPaymentStatus);
 
 export default router;

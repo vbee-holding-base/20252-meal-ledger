@@ -52,11 +52,12 @@ export const findParticipantById = async (participantId: string) => {
 export const findParticipantByIdAndOwner = async (
   ownerId: string,
   participantId: string,
+  session?: mongoose.ClientSession,
 ) => {
   const participant = await Participant.findOne({
     ownerId,
     _id: participantId,
-  });
+  }).session(session || null);
   if (!participant) {
     throw new NotFoundError("unexisting participant");
   }
