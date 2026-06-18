@@ -5,7 +5,7 @@ import axiosClient, { axiosPublic } from "../../api/axiosClient";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
 import type { DebtDetails } from "../../types";
-import { formatDateTime } from "../../utils/format";
+import MealHistory from "../../components/common/MealHistory";
 
 type DebtDetailApiResponse = {
   participant: {
@@ -18,6 +18,7 @@ type DebtDetailApiResponse = {
     restaurantName: string;
     date: string;
     amount: number;
+    status: string;
   }[];
 };
 
@@ -108,14 +109,7 @@ const DebtDetailsPage: React.FC = () => {
             <h2 className="font-headline-md text-headline-md text-on-background mb-1">
               {participant.name}
             </h2>
-            <div className="flex flex-wrap items-center justify-center gap-2 mb-md">
-              <span className="inline-flex items-center gap-2 rounded-full bg-surface-container px-3 py-1 text-label-sm text-on-surface-variant">
-                <span className="material-symbols-outlined text-base">
-                  account_balance_wallet
-                </span>
-                {participant.status || t("debtDetails.unknownStatus")}
-              </span>
-            </div>
+            <div className="flex flex-wrap items-center justify-center gap-2 mb-md"></div>
             <div className="flex flex-col items-center">
               <span className="text-[48px] font-extrabold text-primary leading-none tracking-tight">
                 {totalAmount.toLocaleString("vi-VN")}đ
@@ -156,42 +150,7 @@ const DebtDetailsPage: React.FC = () => {
           </span>
         </div>
 
-        <div className="space-y-4 mb-xl">
-          {history.length === 0 ? (
-            <div className="rounded-3xl border border-outline-variant p-6 text-center text-on-surface-variant">
-              {t("debtDetails.noHistory")}
-            </div>
-          ) : (
-            history.map((tx) => (
-              <div
-                key={`${tx.restaurantName}-${tx.date}-${tx.amount}`}
-                className="bg-surface-container-lowest p-md rounded-xl login-card-shadow flex items-center gap-4 group transition-all hover:translate-x-1"
-              >
-                <div className="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center text-primary flex-shrink-0">
-                  <span className="material-symbols-outlined">restaurant</span>
-                </div>
-                <div className="flex-1 flex justify-between items-center gap-2">
-                  <div className="flex flex-col">
-                    <h4 className="font-label-md text-label-md text-on-background">
-                      {tx.restaurantName}
-                    </h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="material-symbols-outlined text-[14px] text-on-surface-variant">
-                        calendar_today
-                      </span>
-                      <p className="font-label-sm text-label-sm text-on-surface-variant">
-                        {formatDateTime(tx.date)}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="font-label-md text-label-md text-primary text-right whitespace-nowrap">
-                    {tx.amount.toLocaleString("vi-VN")}đ
-                  </span>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+        <MealHistory history={history} />
       </main>
     </div>
   );

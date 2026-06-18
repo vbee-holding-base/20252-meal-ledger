@@ -16,3 +16,18 @@ export const findUnpaidMealsByParticipant = async (
     .sort({ date: 1 })
     .session(session || null);
 };
+
+export const findAllMealsByParticipant = async (
+  participantId: string,
+  session?: mongoose.ClientSession,
+) => {
+  return await Meal.find({
+    participantsInfo: {
+      $elemMatch: {
+        participantId: new mongoose.Types.ObjectId(participantId),
+      },
+    },
+  })
+    .sort({ date: -1 })
+    .session(session || null);
+};
