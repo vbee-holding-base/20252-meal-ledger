@@ -42,6 +42,7 @@
     "allSet": "All set, ready to save!",
     "quickCreateHint": "Please quick-create all members before saving",
     "quickCreateError": "Could not create. Name may already exist.",
+    "nameRequired": "Please enter a name",
     "totalMismatch": "Entered total ({{entered}}đ) does not match sum of members ({{computed}}đ)"
   },
   "login": {
@@ -180,7 +181,9 @@
     "nameLabel": "Member name",
     "amountLabel": "Amount (VND)",
     "pricePlaceholder": "0",
-    "currency": "đ"
+    "currency": "đ",
+    "delete": "Delete",
+    "quickCreate": "Quick create"
   },
   "searchBar": {
     "placeholder": "Search..."

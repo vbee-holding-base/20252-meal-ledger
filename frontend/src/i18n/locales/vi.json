@@ -37,11 +37,12 @@
     "restaurantName": "Tên quán",
     "date": "Ngày",
     "totalAmount": "Tổng tiền",
-    "quickCreate": "Tạo nhanh",
+    "quickCreate": "Thêm nhanh",
     "noData": "Không có dữ liệu bữa ăn",
     "allSet": "Tất cả đã tạo xong, có thể lưu!",
     "quickCreateHint": "Vui lòng tạo nhanh các thành viên trước khi lưu",
     "quickCreateError": "Không thể tạo. Tên có thể đã tồn tại.",
+    "nameRequired": "Vui lòng nhập tên",
     "totalMismatch": "Tổng tiền nhập ({{entered}}đ) không khớp với tổng các thành viên ({{computed}}đ)"
   },
   "login": {
@@ -180,7 +181,9 @@
     "nameLabel": "Tên thành viên",
     "amountLabel": "Số tiền (VND)",
     "pricePlaceholder": "0",
-    "currency": "đ"
+    "currency": "đ",
+    "delete": "Xoá",
+    "quickCreate": "Thêm nhanh"
   },
   "searchBar": {
     "placeholder": "Tìm kiếm..."

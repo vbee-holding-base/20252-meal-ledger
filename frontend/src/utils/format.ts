@@ -19,5 +19,5 @@ export function formatDate(dateStr: string): string {
 export function formatCurrency(raw: string): string {
   const num = Number(raw.replace(/[^0-9]/g, ""));
   if (isNaN(num) || num === 0) return raw;
-  return num.toLocaleString("vi-VN");
+  return num.toLocaleString("vi-VN") + "đ";
 }
