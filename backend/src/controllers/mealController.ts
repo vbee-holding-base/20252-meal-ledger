@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth";
 import { ValidationError, UnauthorisedError } from "../config/errors";
-import { createMeal } from "../repo/mealRepo";
+import { createMealWithDebt } from "../services/mealService";
 
 interface SaveMealParticipant {
   participant_id: string;
@@ -48,7 +48,7 @@ export const saveMeal = async (req: AuthRequest, res: Response) => {
     );
   }
 
-  const meal = await createMeal({
+  const meal = await createMealWithDebt({
     ownerId: req.user.id,
     restaurantId: restaurant_id,
     restaurantName: restaurant_name,

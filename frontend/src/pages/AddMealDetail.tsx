@@ -7,11 +7,22 @@ import SubmitButton from "../components/common/SubmitButton";
 import ParticipantMealCard from "../components/common/ParticipantMealCard";
 import axiosClient from "../api/axiosClient";
 
+interface EntryIssue {
+  severity: string;
+  code: string;
+  message: string;
+}
+
 interface EntryState {
   localId: number;
   personName: string;
   participantId: string | null;
   amount: string;
+}
+
+interface ContextItem {
+  id: string;
+  name: string;
 }
 
 interface LocationState {
@@ -24,7 +35,13 @@ interface LocationState {
       personName: string;
       participantId: string | null;
       amount: number | null;
+      issues?: EntryIssue[];
     }[];
+    issues?: EntryIssue[];
+  };
+  context?: {
+    participants: ContextItem[];
+    restaurants: ContextItem[];
   };
 }
 
@@ -32,7 +49,15 @@ const AddMealDetail: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const parsedData = (location.state as LocationState)?.parsedData;
+  const locationState = location.state as LocationState;
+  const parsedData = locationState?.parsedData;
+  const context = locationState?.context;
+  const participantList = context?.participants ?? [];
+  const restaurantList = context?.restaurants ?? [];
+
+  const participantMap = new Map<string, string>(
+    participantList.map((p) => [p.name.toLowerCase(), p.id]),
+  );
 
   const [restaurantName, setRestaurantName] = useState<string>(
     parsedData?.restaurantName ?? "",
@@ -101,9 +126,12 @@ const AddMealDetail: React.FC = () => {
 
   const handleNameChange = (localId: number, value: string) => {
     setEntries((prev) =>
-      prev.map((e) =>
-        e.localId === localId ? { ...e, personName: value } : e,
-      ),
+      prev.map((e) => {
+        if (e.localId !== localId) return e;
+        const matchedId =
+          participantMap.get(value.trim().toLowerCase()) ?? null;
+        return { ...e, personName: value, participantId: matchedId };
+      }),
     );
   };
 
@@ -117,47 +145,32 @@ const AddMealDetail: React.FC = () => {
     setEntries((prev) => prev.filter((e) => e.localId !== localId));
   };
 
-  const handleAddEntry = async () => {
-    const name = window.prompt(
-      t("addMealDetail.memberName", { n: entries.length + 1 }),
-    );
-    if (!name?.trim()) return;
-
-    try {
-      const res = await axiosClient.post("/participants", {
-        name: name.trim(),
-      });
-      const newParticipant = res.data;
-      setEntries((prev) => [
-        ...prev,
-        {
-          localId: Date.now(),
-          personName: newParticipant.name,
-          participantId: newParticipant.id ?? newParticipant._id,
-          amount: "",
-        },
-      ]);
-    } catch {
-      setEntries((prev) => [
-        ...prev,
-        {
-          localId: Date.now(),
-          personName: name.trim(),
-          participantId: null,
-          amount: "",
-        },
-      ]);
-    }
+  const handleAddEntry = () => {
+    setEntries((prev) => [
+      ...prev,
+      {
+        localId: Date.now(),
+        personName: "",
+        participantId: null,
+        amount: "",
+      },
+    ]);
   };
 
   const handleQuickCreateParticipant = async (localId: number) => {
+    const entry = entries.find((e) => e.localId === localId);
+    if (!entry) return;
+    if (entry.participantId != null) return;
+    if (!entry.personName.trim()) {
+      setCreateError(t("addMealDetail.nameRequired"));
+      return;
+    }
+
     setIsCreating((prev) => ({ ...prev, [localId]: true }));
     setCreateError(null);
     try {
-      const entry = entries.find((e) => e.localId === localId);
-      if (!entry) return;
       const res = await axiosClient.post("/participants", {
-        name: entry.personName,
+        name: entry.personName.trim(),
       });
       const newParticipant = res.data;
       setEntries((prev) =>
@@ -176,6 +189,8 @@ const AddMealDetail: React.FC = () => {
 
   const handleQuickCreateRestaurant = async () => {
     if (!restaurantName.trim()) return;
+    if (restaurantId != null) return;
+
     setCreateError(null);
     try {
       const res = await axiosClient.post("/restaurants", {
@@ -229,7 +244,14 @@ const AddMealDetail: React.FC = () => {
               <input
                 type="text"
                 value={restaurantName}
-                onChange={(e) => setRestaurantName(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setRestaurantName(val);
+                  const match = restaurantList.find(
+                    (r) => r.name.toLowerCase() === val.trim().toLowerCase(),
+                  );
+                  setRestaurantId(match?.id ?? null);
+                }}
                 className={`flex-1 bg-surface-container-low border focus:border-primary-container focus:ring-0 rounded-2xl h-14 px-4 text-body-md text-on-surface transition-all duration-200 outline-none ${
                   restaurantName.trim() === ""
                     ? "border-error"
@@ -237,17 +259,18 @@ const AddMealDetail: React.FC = () => {
                 }`}
                 placeholder={t("addMealDetail.restaurantName")}
               />
-              {restaurantId == null && restaurantName.trim() && (
-                <button
-                  type="button"
-                  onClick={handleQuickCreateRestaurant}
-                  className="shrink-0 text-primary hover:bg-primary-container/10 p-2 rounded-full transition-colors active:scale-95 duration-150"
-                >
-                  <span className="material-symbols-outlined text-[22px]">
-                    add
-                  </span>
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={handleQuickCreateRestaurant}
+                disabled={!restaurantName.trim() || restaurantId != null}
+                className={`shrink-0 px-4 py-2 rounded-xl border text-sm font-medium active:scale-95 transition-all ${
+                  restaurantName.trim() && restaurantId == null
+                    ? "border-primary text-primary hover:bg-primary/5 cursor-pointer"
+                    : "border-outline text-outline cursor-not-allowed"
+                }`}
+              >
+                {t("addMealDetail.quickCreate")}
+              </button>
             </div>
           </section>
 
@@ -280,16 +303,13 @@ const AddMealDetail: React.FC = () => {
                       e.target.select();
                     }}
                     onBlur={() => setTotalFocused(false)}
-                    className={`w-full bg-surface-container-low border focus:border-primary-container focus:ring-0 rounded-2xl h-14 pl-4 pr-7 text-body-md text-on-surface transition-all duration-200 outline-none font-medium ${
+                    className={`w-full bg-surface-container-low border focus:border-primary-container focus:ring-0 rounded-2xl h-14 pl-4 pr-4 text-body-md text-on-surface transition-all duration-200 outline-none font-medium ${
                       totalAmount.trim() === ""
                         ? "border-error"
                         : "border-outline-variant"
                     }`}
                     placeholder="0"
                   />
-                  <span className="absolute right-2 text-on-surface-variant/60 font-normal text-lg pointer-events-none">
-                    {t("participantMealCard.currency")}
-                  </span>
                 </div>
               </div>
             </div>
@@ -304,11 +324,7 @@ const AddMealDetail: React.FC = () => {
               onPriceChange={(value) => handlePriceChange(entry.localId, value)}
               onDelete={() => handleDeleteEntry(entry.localId)}
               isNewParticipant={entry.participantId == null}
-              onQuickCreate={
-                entry.participantId == null
-                  ? () => handleQuickCreateParticipant(entry.localId)
-                  : undefined
-              }
+              onQuickCreate={() => handleQuickCreateParticipant(entry.localId)}
               nameError={nameEmpty(entry.personName)}
               amountError={amountEmpty(entry.amount)}
               creating={isCreating[entry.localId]}
@@ -325,13 +341,13 @@ const AddMealDetail: React.FC = () => {
           </button>
 
           {entries.length > 0 && !allEntriesCreated && (
-            <p className="text-xs text-warning text-center">
+            <p className="text-error text-base text-center">
               {t("addMealDetail.quickCreateHint")}
             </p>
           )}
 
           {totalMismatch && (
-            <p className="text-xs text-warning text-center">
+            <p className="text-error text-base text-center">
               {t("addMealDetail.totalMismatch", {
                 computed: computedTotal.toLocaleString("vi-VN"),
                 entered: totalAmountNum.toLocaleString("vi-VN"),
@@ -340,12 +356,12 @@ const AddMealDetail: React.FC = () => {
           )}
 
           {createError && (
-            <p className="text-xs text-error text-center">{createError}</p>
+            <p className="text-error text-base text-center">{createError}</p>
           )}
         </main>
 
         {saveError && (
-          <p className="text-error text-sm text-center mb-2">{saveError}</p>
+          <p className="text-error text-base text-center mb-2">{saveError}</p>
         )}
 
         <SubmitButton
