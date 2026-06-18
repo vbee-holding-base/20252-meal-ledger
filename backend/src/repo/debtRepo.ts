@@ -6,7 +6,7 @@ export const findUnpaidMealsByParticipant = async (participantId: string) => {
     participantsInfo: {
       $elemMatch: {
         participantId: new mongoose.Types.ObjectId(participantId),
-        status: "unpaid",
+        status: { $in: ["unpaid", "uncomplete"] },
       },
     },
   });

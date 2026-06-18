@@ -4,7 +4,7 @@
     "outDir": "./dist",
     "module": "nodenext",
     "moduleResolution": "node16",
-    "target": "es2016",
+    "target": "es2022",
     "types": ["node"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
