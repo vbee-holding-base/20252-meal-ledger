@@ -13,6 +13,7 @@ import mealRoute from "./routes/mealRoute";
 import debtRoute from "./routes/debtRoute";
 import bankHubRoute from "./routes/bankHubRoute";
 import webhookRoute from "./routes/webhookRoute";
+import paymentRoute from "./routes/paymentRoute";
 import errorHandler from "./middlewares/errorHandler";
 import notFoundHandler from "./middlewares/notFoundHandler";
 
@@ -36,7 +37,7 @@ app.use("/api/v1/meals", mealRoute);
 app.use("/api/v1/debts", debtRoute);
 app.use("/api/v1/bankhub", bankHubRoute);
 app.use("/api/v1/webhook", webhookRoute);
-
+app.use("/api/v1/payment", paymentRoute);
 app.use(notFoundHandler);
 app.use(errorHandler);
 

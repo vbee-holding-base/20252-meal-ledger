@@ -4,7 +4,9 @@ export const encodeId = (id: string): string => {
   if (!id || !mongoose.Types.ObjectId.isValid(id)) {
     throw new Error("Invalid ObjectId format to encode");
   }
-  return BigInt("0x" + id).toString(36);
+  return BigInt("0x" + id)
+    .toString(36)
+    .padStart(19, "0");
 };
 
 const parseBase36 = (str: string): bigint => {
@@ -32,18 +34,20 @@ export const generatePaymentCode = (
   ownerId: string,
   participantId: string,
 ): string => {
-  return `ML_${encodeId(ownerId)}_${encodeId(participantId)}`;
+  const encodedOwnerId = encodeId(ownerId);
+  const encodedParticipantId = encodeId(participantId);
+  return `ML${encodedOwnerId}${encodedParticipantId}`;
 };
 
 export const parsePaymentCode = (
   content: string,
 ): { ownerId: string; participantId: string } | null => {
   if (!content) return null;
-  const match = content.match(/ML_([0-9a-z]+)_([0-9a-z]+)/i);
-  if (!match || !match[1] || !match[2]) return null;
+  const match = content.match(/ML([a-z0-9]{19})([a-z0-9]{19})/i);
+  if (!match) return null;
 
-  const ownerId = decodeId(match[1]);
-  const participantId = decodeId(match[2]);
+  const ownerId = decodeId(match[1] as string);
+  const participantId = decodeId(match[2] as string);
 
   if (!ownerId || !participantId) return null;
 

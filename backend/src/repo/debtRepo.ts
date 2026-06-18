@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
 import Meal from "../models/mealSchema";
 
-export const findUnpaidMealsByParticipant = async (participantId: string) => {
+export const findUnpaidMealsByParticipant = async (
+  participantId: string,
+  session?: mongoose.ClientSession,
+) => {
   return await Meal.find({
     participantsInfo: {
       $elemMatch: {
@@ -9,5 +12,7 @@ export const findUnpaidMealsByParticipant = async (participantId: string) => {
         status: { $in: ["unpaid", "uncomplete"] },
       },
     },
-  });
+  })
+    .sort({ date: 1 })
+    .session(session || null);
 };
