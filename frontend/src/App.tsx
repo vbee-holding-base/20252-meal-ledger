@@ -24,6 +24,7 @@ import DebtManagement from "./pages/debt/DebtManagement";
 import More from "./pages/more/More";
 import BankAccountSettings from "./pages/more/BankAccountSetting";
 import GeneralSettings from "./pages/more/GeneralSettings";
+import PaymentPage from "./pages/debt/Payment";
 //import HelpSupport from "./pages/more/HelpSupport";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -144,6 +145,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  <Route path="/payment/:id" element={<PaymentPage />} />
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
                 <BottomNav />

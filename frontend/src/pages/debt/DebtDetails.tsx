@@ -127,6 +127,11 @@ const DebtDetailsPage: React.FC = () => {
                     : "bg-surface-container text-tertiary cursor-not-allowed"
                 }`}
                 disabled={totalAmount <= 0}
+                onClick={() => {
+                  if (totalAmount > 0 && id) {
+                    navigate(`/payment/${id}`);
+                  }
+                }}
               >
                 <span
                   className="material-symbols-outlined text-sm"
