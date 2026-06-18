@@ -8,6 +8,14 @@ export interface ITransaction {
   transferDescription: string;
   status: string;
   date: Date;
+  transactionId?: string;
+  referenceCode?: string;
+  gateway?: string;
+  accountNumber?: string;
+  bankAccountXid?: string;
+  transferType?: string;
+  content?: string;
+  accumulated?: number;
 }
 
 const transactionSchema = new mongoose.Schema<ITransaction>(
@@ -22,6 +30,14 @@ const transactionSchema = new mongoose.Schema<ITransaction>(
     transferDescription: { type: String, required: true },
     status: { type: String, required: true },
     date: { type: Date, required: true },
+    transactionId: { type: String, unique: true, sparse: true, index: true },
+    referenceCode: { type: String },
+    gateway: { type: String },
+    accountNumber: { type: String },
+    bankAccountXid: { type: String },
+    transferType: { type: String },
+    content: { type: String },
+    accumulated: { type: Number },
   },
   {
     timestamps: true,
