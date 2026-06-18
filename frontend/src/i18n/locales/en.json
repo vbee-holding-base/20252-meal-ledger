@@ -165,8 +165,13 @@
     "noDebt": "No debt",
     "historyTitle": "Meal History",
     "mealCount": "{{count}} meals",
-    "noHistory": "No meal history for this participant.",
-    "back": "Go Back"
+    "noHistory": "There is no meal history.",
+    "back": "Go Back",
+    "unpaidTab": "Unpaid",
+    "paidTab": "Paid",
+    "statusUnpaid": "Unpaid",
+    "statusUncomplete": "Partially Paid",
+    "statusPaid": "Paid"
   },
   "confirmDeleteModal": {
     "title": "Are you sure you want to delete?",

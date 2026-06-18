@@ -11,7 +11,7 @@ dotenv.config({ path: path.join(__dirname, "../.env") });
 // =====================================================================
 const TRANSACTION_CONFIG = {
   // Thay thế bằng ID tài khoản ngân hàng liên kết trong Sandbox SePay của bạn (UUID)
-  bank_account_xid: "93a2cd84-e237-4a39-9503-dd1d51d18974",
+  bank_account_xid: "ba17e0cb-6b04-11f1-b21a-a6006ab65aca",
 
   // Loại giao dịch: "credit" (tiền vào) hoặc "debit" (tiền ra)
   transfer_type: "credit",

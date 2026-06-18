@@ -165,8 +165,13 @@
     "noDebt": "Không có nợ",
     "historyTitle": "Lịch sử ăn uống",
     "mealCount": "{{count}} bữa ăn",
-    "noHistory": "Chưa có lịch sử bữa ăn cho người tham gia này.",
-    "back": "Quay lại"
+    "noHistory": "Không có lịch sử bữa ăn nào.",
+    "back": "Quay lại",
+    "unpaidTab": "Chưa thanh toán",
+    "paidTab": "Đã thanh toán",
+    "statusUnpaid": "Chưa thanh toán",
+    "statusUncomplete": "Còn nợ một phần",
+    "statusPaid": "Đã thanh toán"
   },
   "confirmDeleteModal": {
     "title": "Bạn có chắc muốn xóa?",
