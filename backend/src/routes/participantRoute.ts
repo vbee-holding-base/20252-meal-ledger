@@ -6,7 +6,6 @@ import {
   updateParticipant,
 } from "../controllers/participantController";
 import { protect } from "../middlewares/auth";
-import { createRateLimiter } from "../middlewares/rateLimiter";
 
 const router = Router();
 
