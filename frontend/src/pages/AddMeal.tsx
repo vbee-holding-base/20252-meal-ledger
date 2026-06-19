@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import TopAppBar from "../components/layout/TopAppBar";
 import InputCard from "../components/common/InputCard";
 import SubmitButton from "../components/common/SubmitButton";
+import RateLimitModal from "../components/common/RateLimitModal";
 import axiosClient from "../api/axiosClient";
 
 const AddMeal: React.FC = () => {
@@ -12,6 +13,41 @@ const AddMeal: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const [isRateLimitModalOpen, setIsRateLimitModalOpen] = useState(false);
+  const [rateLimitData, setRateLimitData] = useState({
+    limit: 0 as number | string,
+    remaining: 0 as number | string,
+    retryAfter: 0,
+  });
+
+  React.useEffect(() => {
+    const handleRateLimit = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setRateLimitData(customEvent.detail);
+      setIsRateLimitModalOpen(true);
+    };
+
+    window.addEventListener("rateLimitExceeded", handleRateLimit);
+    return () =>
+      window.removeEventListener("rateLimitExceeded", handleRateLimit);
+  }, []);
+
+  React.useEffect(() => {
+    let timer: number;
+    if (rateLimitData.retryAfter > 0) {
+      timer = window.setInterval(() => {
+        setRateLimitData((prev) => {
+          if (prev.retryAfter <= 1) {
+            clearInterval(timer);
+            return { ...prev, retryAfter: 0 };
+          }
+          return { ...prev, retryAfter: prev.retryAfter - 1 };
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [rateLimitData.retryAfter]);
 
   const handleAnalyzeSubmit = async () => {
     if (!mealText.trim() || isLoading) return;
@@ -54,11 +90,27 @@ const AddMeal: React.FC = () => {
         )}
 
         <SubmitButton
-          title={isLoading ? t("addMeal.analyzing") : t("addMeal.analyze")}
+          title={
+            rateLimitData.retryAfter > 0
+              ? `${t("common.wait", "Wait")} ${rateLimitData.retryAfter}s`
+              : isLoading
+                ? t("addMeal.analyzing")
+                : t("addMeal.analyze")
+          }
           onClick={handleAnalyzeSubmit}
-          disabled={!mealText.trim() || isLoading}
+          disabled={
+            !mealText.trim() || isLoading || rateLimitData.retryAfter > 0
+          }
         />
       </div>
+
+      <RateLimitModal
+        isOpen={isRateLimitModalOpen}
+        onClose={() => setIsRateLimitModalOpen(false)}
+        limit={rateLimitData.limit}
+        remaining={rateLimitData.remaining}
+        retryAfter={rateLimitData.retryAfter}
+      />
     </div>
   );
 };

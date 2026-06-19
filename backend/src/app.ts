@@ -24,6 +24,11 @@ app.use(
   cors({
     origin: FRONTEND_URL,
     credentials: true,
+    exposedHeaders: [
+      "X-RateLimit-Limit",
+      "X-RateLimit-Remaining",
+      "Retry-After",
+    ],
   }),
 );
 app.use(express.json());
