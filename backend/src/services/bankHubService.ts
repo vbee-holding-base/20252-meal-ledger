@@ -27,6 +27,11 @@ interface ICreateCompanyResponse {
   };
 }
 
+interface IUpadateCompanyTransactionAmountBodyRequest {
+  company_id: string;
+  transaction_amount: string;
+}
+
 export const generateBankConnectLink = async (
   ownerId: string,
   purpose: string,
@@ -154,5 +159,49 @@ export const createCompanyOwner = async (
       }
     }
     throw new ExternalError(`Lỗi kết nối tới SePay: ${axiosError.message}`);
+  }
+};
+
+export const updateCompanyOwnerTransactionAmount = async (
+  ownerId: string,
+): Promise<ICreateCompanyResponse> => {
+  const systemToken = await getSystemToken();
+  const payload: IUpadateCompanyTransactionAmountBodyRequest = {
+    company_id: ownerId,
+    transaction_amount: "Unlimited",
+  };
+  try {
+    const response = await axios.post(
+      `${getSepayBaseUrl()}/v1/company/edit/${ownerId}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${systemToken}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (response.status === 200 || response.status === 201) {
+      return response.data;
+    }
+
+    throw new ExternalError(
+      `Failed to create company with status: ${response.status}`,
+    );
+  } catch (error: unknown) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response) {
+      const status = axiosError.response.status;
+      if (status === 400) {
+        throw new ValidationError("Validation Error");
+      }
+      if (status === 401) {
+        throw new UnauthorisedError("Unauthorized");
+      }
+      if (status === 404) {
+        throw new NotFoundError("Company Not Found");
+      }
+    }
+    throw new ExternalError(`Connection error to SePay: ${axiosError.message}`);
   }
 };

@@ -42,7 +42,7 @@ export const getSystemToken = async (): Promise<string> => {
       }
     } catch (redisError) {
       console.warn(
-        "[SePay Service] Lỗi đọc token từ Redis, sẽ gọi API trực tiếp:",
+        "[SePay Service] Error reading token from Redis, will call the API directly:",
         redisError,
       );
     }
@@ -74,17 +74,17 @@ export const getSystemToken = async (): Promise<string> => {
         });
       }
     } catch (redisError) {
-      console.warn("[SePay Service] Lỗi ghi token vào Redis:", redisError);
+      console.warn("[SePay Service] Error writing token to Redis:", redisError);
     }
 
     return newToken;
   } catch (error: unknown) {
     const axiosError = error as AxiosError;
     console.error(
-      "[SePay Service] Lỗi cấp System Token:",
+      "[SePay Service] System Token error:",
       axiosError.response?.data || axiosError.message,
     );
-    throw new Error("Không thể xác thực với hệ thống SePay");
+    throw new Error("Can't authenticate with the SePay system");
   }
 };
 
@@ -141,9 +141,9 @@ export const createBankHubLink = async (
         throw new UnauthorisedError("Unauthorized");
       }
       if (status === 404) {
-        throw new NotFoundError("Not found (Công ty không tồn tại)");
+        throw new NotFoundError("Not found company");
       }
     }
-    throw new ExternalError(`Lỗi kết nối tới SePay: ${axiosError.message}`);
+    throw new ExternalError(`Connection error to SePay: ${axiosError.message}`);
   }
 };

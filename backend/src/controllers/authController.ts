@@ -11,7 +11,10 @@ import {
   regenerateAccessToken,
   updateOwnerXid,
 } from "../services/authService";
-import { createCompanyOwner } from "../services/bankHubService";
+import {
+  createCompanyOwner,
+  updateCompanyOwnerTransactionAmount,
+} from "../services/bankHubService";
 import { UnauthorisedError } from "../config/errors";
 
 // GET /api/auth/google
@@ -43,7 +46,10 @@ export const googleCallback = async (
     if (!owner.xid) {
       const createCompany = await createCompanyOwner(ownerId);
       const xid = createCompany?.data?.xid;
-      if (xid) await updateOwnerXid(ownerId, xid);
+      if (xid) {
+        await updateOwnerXid(ownerId, xid);
+        await updateCompanyOwnerTransactionAmount(xid);
+      }
     }
 
     res.cookie("refreshToken", refreshToken, {
