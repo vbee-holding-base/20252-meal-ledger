@@ -12,12 +12,6 @@ import { createRateLimiter } from "../middlewares/rateLimiter";
 
 const router = Router();
 
-const memberSearchRateLimiter = createRateLimiter({
-  clientLimit: 3,
-  serverLimit: 30, // Higher server limit for public search
-  keyPrefix: "search_member",
-});
-
 const debtDetailRateLimiter = createRateLimiter({
   clientLimit: 5,
   serverLimit: 50,
@@ -25,7 +19,7 @@ const debtDetailRateLimiter = createRateLimiter({
 });
 
 router.get("/public/:id", debtDetailRateLimiter, getDetailDebtsPublic);
-router.get("/public", memberSearchRateLimiter, readParticipantsPublic);
+router.get("/public", readParticipantsPublic);
 router.get("/:id", protect, getDetailDebts);
 router.get("/", protect, readParticipants);
 
