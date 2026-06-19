@@ -26,12 +26,12 @@ jobs:
     - name: Build Backend
       working-directory: ./backend
       run: |
-        npm install
+        npm install --ignore-scripts
         npx webpack
 
     # Step build Frontend
     - name: Build Frontend
       working-directory: ./frontend
       run: |
-        npm install
+        npm install --ignore-scripts
         npx webpack
