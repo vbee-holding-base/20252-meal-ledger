@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      HUSKY: 0 
 
     strategy:
       matrix:
@@ -26,13 +28,13 @@ jobs:
     - name: Build Backend
       working-directory: ./backend
       run: |
-        npm install --ignore-scripts
-        npm run build
+        npm install
+        npm run build # (Hoặc npx webpack... tùy cấu hình của bạn)
 
     # Step build Frontend
     - name: Build Frontend
       working-directory: ./frontend
       run: |
         rm -f package-lock.json
-        HUSKY=0 npm install
+        npm install
         npm run build
