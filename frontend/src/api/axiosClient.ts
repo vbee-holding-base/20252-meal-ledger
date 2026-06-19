@@ -47,6 +47,21 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Handle 429 Too Many Requests
+    if (error.response?.status === 429) {
+      const limit = error.response.headers["x-ratelimit-limit"] || "Unknown";
+      const remaining = error.response.headers["x-ratelimit-remaining"] || "0";
+      const retryAfter = error.response.headers["retry-after"] || "60";
+
+      window.dispatchEvent(
+        new CustomEvent("rateLimitExceeded", {
+          detail: { limit, remaining, retryAfter: parseInt(retryAfter, 10) },
+        }),
+      );
+
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 

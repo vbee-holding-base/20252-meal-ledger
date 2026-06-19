@@ -8,11 +8,18 @@ import {
   readParticipantsPublic,
 } from "../controllers/participantController";
 import { protect } from "../middlewares/auth";
+import { createRateLimiter } from "../middlewares/rateLimiter";
 
 const router = Router();
 
+const memberSearchRateLimiter = createRateLimiter({
+  clientLimit: 3,
+  serverLimit: 30, // Higher server limit for public search
+  keyPrefix: "search_member",
+});
+
 router.get("/public/:id", getDetailDebtsPublic);
-router.get("/public", readParticipantsPublic);
+router.get("/public", memberSearchRateLimiter, readParticipantsPublic);
 router.get("/:id", protect, getDetailDebts);
 router.get("/", protect, readParticipants);
 
