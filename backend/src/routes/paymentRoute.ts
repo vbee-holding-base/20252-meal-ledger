@@ -7,7 +7,7 @@ import {
 
 const router = Router();
 
-router.get("/:participantId", protect, getPaymentInfo);
-router.get("/:participantId/status", protect, checkPaymentStatus);
+router.get("/:participantId", getPaymentInfo);
+router.get("/:participantId/status", checkPaymentStatus);
 
 export default router;
