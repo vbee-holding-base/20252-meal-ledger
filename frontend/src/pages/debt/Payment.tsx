@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TopAppBar from "../../components/layout/TopAppBar";
-import axiosClient from "../../api/axiosClient";
+import axiosPublic from "../../api/axiosClient";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import QRCode from "../../components/common/QRcode";
@@ -57,7 +57,7 @@ const PaymentPage: React.FC = () => {
       }
 
       try {
-        const resp = await axiosClient.get(`/payment/${participantId}`);
+        const resp = await axiosPublic.get(`/payment/${participantId}`);
         setPaymentInfo(resp.data as PaymentInfo);
       } catch (err: unknown) {
         let message = "Lỗi khi lấy thông tin thanh toán";
@@ -75,7 +75,6 @@ const PaymentPage: React.FC = () => {
     fetchPayment();
   }, [participantId]);
 
-  // Sử dụng cơ chế setTimeout đệ quy để tránh các yêu cầu mạng bị chồng chéo (overlapping)
   useEffect(() => {
     if (!participantId || loading || isPaid) return;
 
@@ -85,7 +84,7 @@ const PaymentPage: React.FC = () => {
     const checkStatus = async () => {
       try {
         setCheckingStatus(true);
-        const resp = await axiosClient.get(`/payment/${participantId}/status`);
+        const resp = await axiosPublic.get(`/payment/${participantId}/status`);
         const status = resp.data as PaymentStatus;
 
         if (active) {
@@ -93,8 +92,7 @@ const PaymentPage: React.FC = () => {
             setIsPaid(true);
             setTransactionDetails(status.transaction ?? null);
           } else {
-            // Chỉ lên lịch chạy lần tiếp theo nếu chưa thanh toán và component vẫn active
-            timerId = setTimeout(checkStatus, 3000);
+            timerId = setTimeout(checkStatus, 10000);
           }
         }
       } catch {

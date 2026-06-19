@@ -6,8 +6,16 @@ export const verifySepayWebhook = (
   res: Response,
   next: NextFunction,
 ) => {
+  console.log("[SePay Webhook] incoming request:", {
+    method: req.method,
+    url: req.originalUrl,
+    headers: req.headers,
+    body: req.body,
+  });
+
   const authHeader = req.headers.authorization;
   if (!authHeader) {
+    console.warn("[SePay Webhook] missing Authorization header");
     throw new UnauthorisedError("Missing Authorization header");
   }
 

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { processSepayWebhook } from "../services/webhookService";
 
 export const handleSepayWebhook = async (req: Request, res: Response) => {
+  console.log("[SePay Webhook] handling request body:", req.body);
   try {
     const result = await processSepayWebhook(req.body);
     if (result.success) {

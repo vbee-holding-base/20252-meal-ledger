@@ -2,27 +2,30 @@ const { createClient } = require("redis");
 const axios = require("axios");
 const dotenv = require("dotenv");
 const path = require("path");
+const readline = require("readline");
 
-// Tải cấu hình môi trường từ file .env của backend
+require("ts-node").register();
+const { generatePaymentCode } = require("../src/utils/paymentCode");
+
 dotenv.config({ path: path.join(__dirname, "../.env") });
 
-// =====================================================================
-// CẤU HÌNH THÔNG TIN GIAO DỊCH GIẢ LẬP BẰNG TAY (BẠN TỰ NHẬP Ở ĐÂY)
-// =====================================================================
 const TRANSACTION_CONFIG = {
-  // Thay thế bằng ID tài khoản ngân hàng liên kết trong Sandbox SePay của bạn (UUID)
   bank_account_xid: "ba17e0cb-6b04-11f1-b21a-a6006ab65aca",
 
-  // Loại giao dịch: "credit" (tiền vào) hoặc "debit" (tiền ra)
   transfer_type: "credit",
 
-  // Số tiền giao dịch (VND)
-  amount: 35000,
+  amount: 40000,
 
-  // Nội dung chuyển khoản (chứa mã thanh toán ML...)
   transaction_content: "ML36kb1iye7208lwrhup236nf0qebkjllgip8cre",
 };
-// =====================================================================
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+const askQuestion = (query) =>
+  new Promise((resolve) => rl.question(query, resolve));
 
 const REDIS_KEY = "sepay_system_token";
 
@@ -56,7 +59,6 @@ async function getAccessToken() {
     return accessToken;
   }
 
-  // Dự phòng: Nếu chưa có trong Redis, tự động gọi API cấp mới từ SePay bằng ID/Secret
   console.log(
     "Không tìm thấy token trong Redis. Đang gọi API SePay cấp mới...",
   );
@@ -86,6 +88,34 @@ async function simulateTransaction() {
     process.env.SEPAY_URL_SANDBOX || "https://bankhub-api-sandbox.sepay.vn";
 
   try {
+    console.log("\n=== GIẢ LẬP GIAO DỊCH SEPAY ===");
+    const ownerId = await askQuestion(
+      "Nhập ownerId (bỏ qua để dùng mặc định): ",
+    );
+    const participantId = await askQuestion(
+      "Nhập participantId (bỏ qua để dùng mặc định): ",
+    );
+
+    let transactionContent = TRANSACTION_CONFIG.transaction_content;
+    if (ownerId.trim() && participantId.trim()) {
+      try {
+        transactionContent = generatePaymentCode(
+          ownerId.trim(),
+          participantId.trim(),
+        );
+        console.log(`-> Đã tạo transaction_content: ${transactionContent}`);
+      } catch (err) {
+        console.error(`-> Lỗi khi tạo mã giao dịch: ${err.message}`);
+        console.log(
+          `-> Sử dụng transaction_content mặc định: ${transactionContent}`,
+        );
+      }
+    } else {
+      console.log(
+        `-> Sử dụng transaction_content mặc định: ${transactionContent}`,
+      );
+    }
+
     const token = await getAccessToken();
     console.log("\nĐang gửi yêu cầu giả lập giao dịch tới SePay Sandbox...");
 
@@ -95,7 +125,7 @@ async function simulateTransaction() {
         bank_account_xid: TRANSACTION_CONFIG.bank_account_xid,
         transfer_type: TRANSACTION_CONFIG.transfer_type,
         amount: TRANSACTION_CONFIG.amount,
-        transaction_content: TRANSACTION_CONFIG.transaction_content,
+        transaction_content: transactionContent,
       },
       {
         headers: {
@@ -112,6 +142,8 @@ async function simulateTransaction() {
       "\nLỗi khi giả lập giao dịch:",
       error.response?.data || error.message,
     );
+  } finally {
+    rl.close();
   }
 }
 
