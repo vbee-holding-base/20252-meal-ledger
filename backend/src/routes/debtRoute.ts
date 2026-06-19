@@ -18,7 +18,13 @@ const memberSearchRateLimiter = createRateLimiter({
   keyPrefix: "search_member",
 });
 
-router.get("/public/:id", getDetailDebtsPublic);
+const debtDetailRateLimiter = createRateLimiter({
+  clientLimit: 5,
+  serverLimit: 50,
+  keyPrefix: "debt_detail",
+});
+
+router.get("/public/:id", debtDetailRateLimiter, getDetailDebtsPublic);
 router.get("/public", memberSearchRateLimiter, readParticipantsPublic);
 router.get("/:id", protect, getDetailDebts);
 router.get("/", protect, readParticipants);
