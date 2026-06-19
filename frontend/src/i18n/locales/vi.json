@@ -98,7 +98,8 @@
     "nameRequired": "Vui lòng nhập tên người tham gia.",
     "addError": "Không thể thêm người tham gia. Vui lòng thử lại.",
     "deleteError": "Không thể xóa người tham gia. Vui lòng thử lại.",
-    "debtWarning": "Người này vẫn còn nợ {{debt}}k. Xóa sẽ làm mất dữ liệu khoản nợ này."
+    "debtWarning": "Người này vẫn còn nợ {{debt}}k. Xóa sẽ làm mất dữ liệu khoản nợ này.",
+    "rateLimitError": "Thao tác quá nhanh, thử lại sau {{retryAfter}}s."
   },
   "editParticipant": {
     "title": "Chỉnh sửa thành viên",
@@ -197,7 +198,8 @@
     "nameLabel": "Tên của bạn",
     "placeholder": "VD: Nguyễn Văn A",
     "searching": "Đang tìm kiếm...",
-    "fetchError": "Không thể lấy dữ liệu, Vui lòng thử lại."
+    "fetchError": "Không thể lấy dữ liệu, Vui lòng thử lại.",
+    "rateLimitError": "Thao tác quá nhanh, thử lại sau {{retryAfter}}s."
   },
   "language": {
     "vi": "Tiếng Việt",
