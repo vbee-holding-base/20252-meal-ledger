@@ -62,7 +62,7 @@ export const googleCallback = async (
     redirectToFrontend(res, {
       access_token: accessToken,
       token_type: "Bearer",
-      expires_in: "900",
+      expires_in: "900000",
       owner: JSON.stringify({
         id: owner._id.toString(),
         email: owner.email,
