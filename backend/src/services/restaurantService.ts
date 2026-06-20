@@ -1,8 +1,6 @@
 import {
   getRestaurantsByOwnerId,
-  findRestaurantByNameAndOwner,
   createRestaurant,
-  findOtherRestaurantByName,
   updateRestaurant,
   deleteRestaurant,
 } from "../repo/restaurantRepo";
@@ -18,7 +16,7 @@ const formatRestaurantInput = ({ name, address }: RestaurantInput) => {
   const formattedAddress = address?.trim() ?? "";
 
   if (!formattedName) {
-    throw new ValidationError("Tên quán không được để trống");
+    throw new ValidationError("restaurant name required");
   }
 
   return {

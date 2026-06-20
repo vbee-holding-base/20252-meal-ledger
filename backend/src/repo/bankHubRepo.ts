@@ -1,6 +1,6 @@
 import Owner from "../models/ownerSchema";
 import { NotFoundError } from "../config/errors";
-import { findOwnerById } from "../repo/authRepo";
+import { findOwnerById } from "./authRepo";
 
 export const setOwnerBankAccount = async (
   ownerId: string,
@@ -39,6 +39,6 @@ export const setAllOwnerBankAccount = async (
 
 export const getOwnerXid = async (ownerId: string) => {
   const owner = await findOwnerById(ownerId);
-  if (!owner) throw new NotFoundError("Owner not found");
+  if (!owner) throw new NotFoundError("owner not found");
   return owner.xid;
 };

@@ -19,7 +19,7 @@ export const createRestaurant = async (
 ) => {
   const existing = await Restaurant.findOne({ ownerId, name });
   if (existing) {
-    throw new DuplicateError("Quán ăn này đã có trong danh sách");
+    throw new DuplicateError("existing restaurant");
   }
   return await Restaurant.create({ ownerId, name, address });
 };
@@ -48,7 +48,7 @@ export const updateRestaurant = async (
       _id: { $ne: restaurantId },
     });
     if (existing) {
-      throw new DuplicateError("Quán ăn này đã có trong danh sách");
+      throw new DuplicateError("existing restaurant");
     }
   }
 
@@ -59,7 +59,7 @@ export const updateRestaurant = async (
   );
 
   if (!updated) {
-    throw new NotFoundError("Không tìm thấy quán ăn");
+    throw new NotFoundError("restaurant not found");
   }
   return updated;
 };
@@ -73,7 +73,7 @@ export const deleteRestaurant = async (
     ownerId,
   });
   if (!deleted) {
-    throw new NotFoundError("Không tìm thấy quán ăn");
+    throw new NotFoundError("restaurant not found");
   }
   return deleted;
 };
