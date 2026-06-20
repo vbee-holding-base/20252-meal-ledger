@@ -2,7 +2,7 @@ import {
   createBankHubLink,
   getSystemToken,
   getSepayBaseUrl,
-} from "../services/sepayService";
+} from "./sepayService";
 import { findOwnerById, getOwnerNameById } from "../repo/authRepo";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import {
@@ -107,7 +107,7 @@ export const getBankAccountList = async (ownerId: string) => {
         throw new UnauthorisedError("Unauthorized");
       }
     }
-    throw new ExternalError(`Lỗi kết nối tới SePay: ${axiosError.message}`);
+    throw new ExternalError(`SePay connection error: ${axiosError.message}`);
   }
 };
 
@@ -155,10 +155,10 @@ export const createCompanyOwner = async (
         throw new UnauthorisedError("Unauthorized");
       }
       if (status === 503) {
-        throw new NotFoundError("Service Unavailable (Sepay Database)");
+        throw new NotFoundError("Service Unavailable (SePay Database)");
       }
     }
-    throw new ExternalError(`Lỗi kết nối tới SePay: ${axiosError.message}`);
+    throw new ExternalError(`SePay connection error: ${axiosError.message}`);
   }
 };
 

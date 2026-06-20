@@ -62,6 +62,6 @@ export const deleteRestaurant = async (req: AuthRequest, res: Response) => {
   await deleteRestaurantForOwner(req.user.id, restaurantId);
 
   res.status(200).json({
-    message: "Thành công",
+    message: "success",
   });
 };

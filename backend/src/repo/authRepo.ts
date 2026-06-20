@@ -36,7 +36,7 @@ export const getOwnerNameById = async (id: string): Promise<string> => {
 
 export const setOwnerXid = async (id: string, xid: string): Promise<void> => {
   if (!mongoose.Types.ObjectId.isValid(id))
-    throw new ValidationError("OwnerId Unvalid");
+    throw new ValidationError("OwnerId invalid");
 
   const owner = await Owner.findByIdAndUpdate(
     id,
@@ -54,7 +54,7 @@ export const setBankAccount = async (
   accountName: string,
 ): Promise<void> => {
   if (!mongoose.Types.ObjectId.isValid(id))
-    throw new ValidationError("OwnerId Unvalid");
+    throw new ValidationError("OwnerId invalid");
 
   const owner = await Owner.findByIdAndUpdate(
     id,
