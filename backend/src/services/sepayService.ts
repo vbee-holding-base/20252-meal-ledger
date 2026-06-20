@@ -84,7 +84,7 @@ export const getSystemToken = async (): Promise<string> => {
       "[SePay Service] System Token error:",
       axiosError.response?.data || axiosError.message,
     );
-    throw new Error("Can't authenticate with the SePay system");
+    throw new ExternalError("Can't authenticate with the SePay system");
   }
 };
 

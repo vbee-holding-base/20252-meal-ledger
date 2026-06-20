@@ -5,6 +5,7 @@ import {
 } from "../interfaces/mealParserTypes";
 import { buildPrompt } from "../prompts/mealPromptBuilder";
 import { rawMealParseSchema } from "../schemas/mealParserSchema";
+import { ExternalError, ServerError } from "../../config/errors";
 
 const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta";
 
@@ -12,9 +13,7 @@ export class GeminiMealParserProvider implements mealParserAI {
   async parseMealText(input: ParseMealTextInput): Promise<ParsedMealRaw> {
     const apiKey = process.env.GEMINI_API_KEY;
 
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is not configured");
-    }
+    if (!apiKey) throw new ServerError("GEMINI_API_KEY is not configured");
 
     const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
 
@@ -47,20 +46,16 @@ export class GeminiMealParserProvider implements mealParserAI {
 
     if (!response.ok) {
       const errorBody = await response.text();
-      throw new Error(`Gemini request failed: ${response.status} ${errorBody}`);
+      throw new ExternalError(
+        `Gemini request failed: ${response.status} ${errorBody}`,
+      );
     }
 
     const data = await response.json();
     const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (typeof responseText !== "string" || responseText.trim() === "") {
-      throw new Error("Gemini response did not contain parseable text");
-    }
-
-    try {
-      return JSON.parse(responseText) as ParsedMealRaw;
-    } catch {
-      throw new Error("Gemini response was not valid JSON");
-    }
+    if (typeof responseText !== "string" || responseText.trim() === "")
+      throw new ExternalError("Gemini response did not contain parseable text");
+    return JSON.parse(responseText) as ParsedMealRaw;
   }
 }
