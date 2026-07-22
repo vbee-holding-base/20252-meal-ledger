@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { ServerError, UnauthorisedError } from "../config/errors";
+import { logger } from "../config/logger";
 
 export interface AuthRequest extends Request {
   user?: { id: string };
@@ -18,7 +19,7 @@ export const protect = (
   const token = authHeader.split(" ")[1];
   const secret = process.env.JWT_SECRET;
   if (!secret) {
-    console.error("JWT_SECRET is not defined in environment");
+    logger.error("JWT_SECRET is not defined in environment");
     return next(new ServerError("server configuration error"));
   }
 

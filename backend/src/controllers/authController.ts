@@ -16,6 +16,7 @@ import {
   updateCompanyOwnerTransactionAmount,
 } from "../services/bankHubService";
 import { UnauthorisedError } from "../config/errors";
+import { logger } from "../config/logger";
 
 // GET /api/auth/google
 
@@ -73,7 +74,7 @@ export const googleCallback = async (
       }),
     });
   } catch (error) {
-    console.error("Google Callback Error:", error);
+    logger.error(error, "Google Callback Error:");
     redirectToFrontend(res, { error: "Server error" });
   }
 };

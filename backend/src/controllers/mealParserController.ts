@@ -10,6 +10,7 @@ import {
 import { createMealParserProvider } from "../ai/factories/aiProviderFactory";
 import { MealParserService } from "../services/aiMealParserService";
 import { finalValidatedResult } from "../validators/mealParserValidator";
+import { logger } from "../config/logger";
 export const parseMealText = async (req: AuthRequest, res: Response) => {
   if (!req.user?.id) {
     throw new UnauthorisedError("Not authorized");
@@ -64,7 +65,7 @@ export const parseMealText = async (req: AuthRequest, res: Response) => {
       },
     });
   } catch (error) {
-    console.error("Error parsing meal text:", error);
+    logger.error(error, "Error parsing meal text:");
     throw new ServerError("Could not parse meal text.");
   }
 };
