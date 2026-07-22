@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UnauthorisedError } from "../config/errors";
+import { logger } from "../config/logger";
 
 export const verifySepayWebhook = (
   req: Request,
@@ -8,7 +9,7 @@ export const verifySepayWebhook = (
 ) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    console.warn("[SePay Webhook] missing Authorization header");
+    logger.warn("[SePay Webhook] missing Authorization header");
     throw new UnauthorisedError("Missing Authorization header");
   }
 
@@ -29,7 +30,7 @@ export const verifySepayWebhook = (
   const expectedApiKey = process.env.SEPAY_NOTIFY_API_KEY;
 
   if (!expectedApiKey) {
-    console.error(
+    logger.error(
       "SEPAY_NOTIFY_API_KEY is not defined in environment variables",
     );
     throw new UnauthorisedError("Server configuration error");

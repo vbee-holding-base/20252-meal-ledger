@@ -1,6 +1,7 @@
 import { Response, NextFunction } from "express";
 import { redisClient } from "../config/redis";
 import { AuthRequest } from "./auth";
+import { logger } from "../config/logger";
 
 export interface RateLimiterOptions {
   clientLimit: number;
@@ -95,7 +96,7 @@ export const createRateLimiter = (options: RateLimiterOptions) => {
 
       next();
     } catch (error) {
-      console.error("Rate limiter error", error);
+      logger.error(error, "Rate limiter error");
       next();
     }
   };

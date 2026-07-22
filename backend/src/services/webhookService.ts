@@ -8,6 +8,7 @@ import { parsePaymentCode } from "../utils/paymentCode";
 import { findOwnerById } from "../repo/authRepo";
 import { ValidationError, NotFoundError } from "../config/errors";
 import mongoose from "mongoose";
+import { logger } from "../config/logger";
 
 interface SePayWebhookPayload {
   gateway: string;
@@ -38,7 +39,7 @@ export const processSepayWebhook = async (payload: SePayWebhookPayload) => {
     accumulated,
   } = payload;
 
-  console.log(`Processing transaction: ${transactionId}, amount: ${amount}`);
+  logger.info(`Processing transaction: ${transactionId}, amount: ${amount}`);
 
   const session = await mongoose.startSession();
   try {
@@ -47,7 +48,7 @@ export const processSepayWebhook = async (payload: SePayWebhookPayload) => {
     await session.withTransaction(async () => {
       const existingTx = await findTransactionBySePayId(transactionId, session);
       if (existingTx) {
-        console.log(`Transaction ${transactionId} has already been processed.`);
+        logger.info(`Transaction ${transactionId} has already been processed.`);
         result = {
           success: true,
           duplicate: true,
@@ -57,7 +58,7 @@ export const processSepayWebhook = async (payload: SePayWebhookPayload) => {
       }
 
       if (transferType !== "credit") {
-        console.log(
+        logger.info(
           `Transaction ${transactionId} is not a credit transaction. Ignored.`,
         );
         result = {
@@ -70,7 +71,7 @@ export const processSepayWebhook = async (payload: SePayWebhookPayload) => {
 
       const ids = parsePaymentCode(content);
       if (!ids) {
-        console.warn(
+        logger.warn(
           `Content "${content}" does not match payment code pattern. Ignored.`,
         );
         result = {
@@ -115,7 +116,7 @@ export const processSepayWebhook = async (payload: SePayWebhookPayload) => {
             pInfo.status = "paid";
             remainingPayment -= pInfo.amount;
             await meal.save({ session });
-            console.log(
+            logger.info(
               `Marked meal ${meal._id} as paid for participant ${participant.name}`,
             );
           } else {
@@ -123,7 +124,7 @@ export const processSepayWebhook = async (payload: SePayWebhookPayload) => {
             pInfo.amount -= remainingPayment;
             remainingPayment = 0;
             await meal.save({ session });
-            console.log(
+            logger.info(
               `Marked meal ${meal._id} as uncomplete for participant ${participant.name}`,
             );
           }
@@ -132,7 +133,7 @@ export const processSepayWebhook = async (payload: SePayWebhookPayload) => {
 
       participant.totalDebt = Math.max(0, participant.totalDebt - amount);
       await participant.save({ session });
-      console.log(
+      logger.info(
         `Decreased totalDebt for ${participant.name} to ${participant.totalDebt}`,
       );
 
@@ -158,7 +159,7 @@ export const processSepayWebhook = async (payload: SePayWebhookPayload) => {
         session,
       );
 
-      console.log(
+      logger.info(
         `Successfully logged transaction ${newTx._id} for transaction ID: ${transactionId}`,
       );
       result = { success: true, transaction: newTx };
@@ -167,7 +168,7 @@ export const processSepayWebhook = async (payload: SePayWebhookPayload) => {
     return result;
   } catch (error: any) {
     if (error instanceof ValidationError || error instanceof NotFoundError) {
-      console.warn(
+      logger.warn(
         `Validation failed for transaction ${transactionId}: ${error.message}`,
       );
       return {
@@ -176,7 +177,7 @@ export const processSepayWebhook = async (payload: SePayWebhookPayload) => {
         message: error.message,
       };
     }
-    console.error(
+    logger.error(
       `Unexpected error processing transaction ${transactionId}:`,
       error,
     );

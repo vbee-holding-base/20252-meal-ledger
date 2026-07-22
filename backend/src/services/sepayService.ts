@@ -6,6 +6,7 @@ import {
   ValidationError,
   ExternalError,
 } from "../config/errors";
+import { logger } from "../config/logger";
 
 interface LinkTokenPayload {
   company_xid: string;
@@ -41,9 +42,9 @@ export const getSystemToken = async (): Promise<string> => {
         cachedToken = await redisClient.get(TOKEN_KEY);
       }
     } catch (redisError) {
-      console.warn(
+      logger.warn(
+        { redisError },
         "[SePay Service] Error reading token from Redis, will call the API directly:",
-        redisError,
       );
     }
 
@@ -74,15 +75,18 @@ export const getSystemToken = async (): Promise<string> => {
         });
       }
     } catch (redisError) {
-      console.warn("[SePay Service] Error writing token to Redis:", redisError);
+      logger.warn(
+        { redisError },
+        "[SePay Service] Error writing token to Redis:",
+      );
     }
 
     return newToken;
   } catch (error: unknown) {
     const axiosError = error as AxiosError;
-    console.error(
-      "[SePay Service] System Token error:",
-      axiosError.response?.data || axiosError.message,
+    logger.error(
+      { err: axiosError.response?.data || axiosError.message },
+      "[SePay Service] System Token error",
     );
     throw new ExternalError("Can't authenticate with the SePay system");
   }
@@ -134,7 +138,7 @@ export const createBankHubLink = async (
       const status = axiosError.response.status;
       if (status === 400) {
         const errorData = JSON.stringify(axiosError.response?.data);
-        console.error("SePay 400 Error Data:", errorData);
+        logger.error({ errorData }, "SePay 400 Error Data:");
         throw new ValidationError(`Validation Error: ${errorData}`);
       }
       if (status === 401) {

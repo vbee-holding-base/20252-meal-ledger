@@ -16,6 +16,7 @@ import webhookRoute from "./routes/webhookRoute";
 import paymentRoute from "./routes/paymentRoute";
 import errorHandler from "./middlewares/errorHandler";
 import notFoundHandler from "./middlewares/notFoundHandler";
+import requestLogger from "./middlewares/requestLogger";
 
 const app: Application = express();
 const FRONTEND_URL = process.env.FRONTEND_URL ?? "http://localhost:5173";
@@ -33,6 +34,7 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+app.use(requestLogger);
 
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/participants", participantRoute);

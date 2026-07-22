@@ -1,4 +1,5 @@
 import { createClient, RedisClientOptions } from "redis";
+import { logger } from "./logger";
 
 const redisUrl: string = process.env.REDIS_URL || "redis://localhost:6379";
 
@@ -18,11 +19,11 @@ if (isTLS) {
 const redisClient = createClient(clientOptions);
 
 redisClient.on("connect", () => {
-  console.log("Redis connected successfully");
+  logger.info("Redis connected successfully");
 });
 
 redisClient.on("error", (err: Error) => {
-  console.error("Redis connection error:", err);
+  //logger.error({ err }, "Redis connection error:");
 });
 
 const connectRedis = async (): Promise<void> => {
@@ -31,7 +32,7 @@ const connectRedis = async (): Promise<void> => {
       await redisClient.connect();
     }
   } catch (error) {
-    console.error("Failed to connect to Redis:", error);
+    //logger.error({ error }, "Failed to connect to Redis:");
   }
 };
 
@@ -41,7 +42,7 @@ const quitRedis = async (): Promise<void> => {
       await redisClient.quit();
     }
   } catch (error) {
-    console.error("Failed to close Redis connection:", error);
+    //logger.error({ error }, "Failed to close Redis connection:");
   }
 };
 
