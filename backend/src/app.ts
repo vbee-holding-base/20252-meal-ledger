@@ -36,6 +36,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(requestLogger);
 
+app.get("/", (_req: Request, res: Response) => {
+  res.send("API Running");
+});
+
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/participants", participantRoute);
 app.use("/api/v1/restaurants", restaurantRoute);
@@ -47,9 +51,5 @@ app.use("/api/v1/webhook", webhookRoute);
 app.use("/api/v1/payment", paymentRoute);
 app.use(notFoundHandler);
 app.use(errorHandler);
-
-app.get("/", (req: Request, res: Response) => {
-  res.send("API Running");
-});
 
 export default app;

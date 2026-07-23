@@ -7,11 +7,15 @@ const errorHandler = (
   res: Response,
   _next: NextFunction,
 ) => {
-  if (err instanceof ApiError)
-    return res.status(err.statusCode).json(err.toJSON());
+  const statusCode = err instanceof ApiError ? err.statusCode : 500;
+  const error =
+    err instanceof ApiError
+      ? err.toJSON()
+      : { errorCode: ErrorCode.SERVER_ERROR, message: err.message };
   return res
-    .status(500)
-    .json({ errorCode: ErrorCode.SERVER_ERROR, message: err.message });
+    .status(statusCode)
+    .json(error)
+    .on("finish", () => {});
 };
 
 export default errorHandler;
