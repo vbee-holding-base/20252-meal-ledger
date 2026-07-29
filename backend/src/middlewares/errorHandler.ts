@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import ApiError, { ErrorCode } from "../config/errors";
+import { logger } from "../config/logger";
 
 const errorHandler = (
   err: Error,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction,
 ) => {
@@ -15,7 +16,17 @@ const errorHandler = (
   return res
     .status(statusCode)
     .json(error)
-    .on("finish", () => {});
+    .on("finish", () =>
+      logger.error(
+        {
+          method: req.method,
+          url: req.originalUrl,
+          status: res.statusCode,
+          ip: req.ip,
+        },
+        "HTTP error",
+      ),
+    );
 };
 
 export default errorHandler;
