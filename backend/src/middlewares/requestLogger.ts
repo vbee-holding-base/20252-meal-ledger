@@ -15,17 +15,6 @@ const requestLogger = (req: Request, res: Response, next: NextFunction) => {
         },
         "HTTP req",
       );
-    else
-      logger.error(
-        {
-          method: req.method,
-          url: req.originalUrl,
-          status: res.statusCode,
-          durationMs: Date.now() - start,
-          ip: req.ip,
-        },
-        "HTTP error",
-      );
   });
   next();
 };
