@@ -18,10 +18,6 @@ export const parseMealText = async (req: AuthRequest, res: Response) => {
 
   const { text } = req.body;
 
-  if (!text || typeof text !== "string" || text.trim() === "") {
-    throw new ValidationError("Text is required.");
-  }
-
   const [participants, restaurants] = await Promise.all([
     getAllParticipantByOwnerId(req.user.id),
     getRestaurantsByOwnerId(req.user.id),
