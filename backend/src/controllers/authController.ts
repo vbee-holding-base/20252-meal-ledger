@@ -4,6 +4,7 @@ import {
   generateAuthorizeUrl,
   generateAccessToken,
   generateRefreshToken,
+  revokeRefreshToken,
   redirectToFrontend,
   getClientTicket,
   findOrCreateOwner,
@@ -42,7 +43,7 @@ export const googleCallback = async (
     const owner = await findOrCreateOwner(ticket);
     const ownerId = owner._id.toString();
     const accessToken = generateAccessToken(ownerId);
-    const refreshToken = generateRefreshToken(ownerId);
+    const refreshToken = await generateRefreshToken(ownerId);
 
     if (!owner.xid) {
       const createCompany = await createCompanyOwner(ownerId);
@@ -90,6 +91,10 @@ export const logout = async (
   req: AuthRequest,
   res: Response,
 ): Promise<void> => {
+  const token = req.cookies?.refreshToken;
+  const userId = req.user?.id;
+  await revokeRefreshToken(userId, token);
+
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: true,
