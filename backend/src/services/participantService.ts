@@ -7,7 +7,7 @@ import {
   deleteParticipant,
 } from "../repo/participantRepo";
 import { ValidationError } from "../config/errors";
-import { escapeRegex } from "../validators/participantValidator";
+import { escapeRegex } from "../validations/participantValidator";
 
 export const readParticipantsByOwner = async (ownerId: string) => {
   return await getAllParticipantByOwnerId(ownerId);

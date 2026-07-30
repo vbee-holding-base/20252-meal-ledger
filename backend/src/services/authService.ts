@@ -13,6 +13,7 @@ import {
   UnauthorisedError,
   ValidationError,
 } from "../config/errors";
+import { redisClient } from "../config/redis";
 
 let client: OAuth2Client;
 
@@ -55,13 +56,25 @@ export const generateAccessToken = (id: string) => {
   });
 };
 
-export const generateRefreshToken = (id: string) => {
+export const generateRefreshToken = async (id: string): Promise<string> => {
   if (!process.env.JWT_REFRESH_SECRET)
     throw new ServerError("JWT_REFRESH_SECRET is not defined in environment");
 
-  return jwt.sign({ id }, process.env.JWT_REFRESH_SECRET!, {
+  const refreshToken = jwt.sign({ id }, process.env.JWT_REFRESH_SECRET!, {
     expiresIn: "7d",
   });
+
+  try {
+    if (redisClient.isOpen) {
+      await redisClient.set(`refresh_token:${id}`, refreshToken, {
+        EX: 7 * 24 * 60 * 60,
+      });
+    }
+  } catch (error) {
+    console.error("Failed to store refresh token in Redis:", error);
+  }
+
+  return refreshToken;
 };
 
 export const redirectToFrontend = (
@@ -123,9 +136,45 @@ export const regenerateAccessToken = async (token: string) => {
       token,
       process.env.JWT_REFRESH_SECRET,
     )) as any;
+
+    if (redisClient.isOpen) {
+      const storedToken = await redisClient.get(`refresh_token:${decoded.id}`);
+      if (!storedToken || storedToken !== token) {
+        throw new UnauthorisedError("invalid refresh token");
+      }
+    }
+
     return await generateAccessToken(decoded.id);
   } catch (error) {
+    if (error instanceof UnauthorisedError || error instanceof ServerError) {
+      throw error;
+    }
     throw new UnauthorisedError("invalid refresh token");
+  }
+};
+
+export const revokeRefreshToken = async (
+  userId?: string,
+  token?: string,
+): Promise<void> => {
+  try {
+    let id = userId;
+    if (!id && token && process.env.JWT_REFRESH_SECRET) {
+      try {
+        const decoded = jwt.verify(
+          token,
+          process.env.JWT_REFRESH_SECRET,
+        ) as any;
+        id = decoded.id;
+      } catch {
+        // ignore invalid token error on decode
+      }
+    }
+    if (id && redisClient.isOpen) {
+      await redisClient.del(`refresh_token:${id}`);
+    }
+  } catch (error) {
+    console.error("Failed to revoke refresh token from Redis:", error);
   }
 };
 
