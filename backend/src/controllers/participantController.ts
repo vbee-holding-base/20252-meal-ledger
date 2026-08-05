@@ -3,7 +3,7 @@ import {
   getOwnerId,
   normaliseName,
   participantIdFromParams,
-} from "../validators/participantValidator";
+} from "../validations/participantValidator";
 import {
   createParticipantForOwner,
   deleteParticipantForOwner,

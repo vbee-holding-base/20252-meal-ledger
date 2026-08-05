@@ -6,93 +6,109 @@ import { logger } from "../config/logger";
 export interface RateLimiterOptions {
   clientLimit: number;
   serverLimit: number;
-  keyPrefix: string;
+  keyPrefix: string; // phân biệt endpoint
 }
+
+interface TokenBucketResult {
+  allowed: boolean;
+  remaining: number;
+  retryAfter: number;
+}
+
+const TOKEN_BUCKET_SCRIPT = `
+local key = KEYS[1]
+local capacity = tonumber(ARGV[1])
+local refillRate = tonumber(ARGV[2])
+local now = tonumber(ARGV[3])
+local ttl = tonumber(ARGV[4])
+
+local bucket = redis.call("HMGET", key, "tokens", "updatedAt")
+local tokens = tonumber(bucket[1])
+local updatedAt = tonumber(bucket[2])
+
+if tokens == nil then
+  tokens = capacity
+  updatedAt = now
+end
+
+local elapsed = math.max(0, now - updatedAt)
+local refill = elapsed * refillRate
+tokens = math.min(capacity, tokens + refill)
+
+local allowed = 0
+local retryAfter = 0
+
+if tokens >= 1 then
+  tokens = tokens - 1
+  allowed = 1
+else
+  retryAfter = math.ceil((1 - tokens) / refillRate)
+end
+
+redis.call("HSET", key, "tokens", tokens, "updatedAt", now)
+redis.call("EXPIRE", key, ttl)
+
+return { allowed, math.floor(tokens), retryAfter }
+`;
+
+const consumeToken = async (
+  key: string,
+  capacity: number,
+): Promise<TokenBucketResult> => {
+  const windowSeconds = 60; // used for setting how much tokens can be refilled per second
+  const refillRate = capacity / windowSeconds;
+  const now = Date.now() / 1000;
+  const ttl = windowSeconds * 2;
+
+  const result = (await redisClient.eval(TOKEN_BUCKET_SCRIPT, {
+    keys: [key],
+    arguments: [String(capacity), String(refillRate), String(now), String(ttl)],
+  })) as number[];
+
+  return {
+    allowed: result[0] === 1,
+    remaining: result[1] ?? 0,
+    retryAfter: Math.max(1, result[2] ?? 1),
+  };
+};
 
 export const createRateLimiter = (options: RateLimiterOptions) => {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      // Use user ID if authenticated, fallback to IP address for public endpoints
       const identifier = req.user?.id || req.ip || "unknown";
-      const now = Date.now();
-      const windowMs = 60 * 1000;
 
-      // 1. Server Rate Limit (Fixed Window)
-      const serverLimit = options.serverLimit;
-      const currentMinute = Math.floor(now / windowMs);
-      const serverKey = `rate_limit:server:${options.keyPrefix}:${currentMinute}`;
+      const serverKey = `rate_limit:server:${options.keyPrefix}`;
+      const serverBucket = await consumeToken(serverKey, options.serverLimit);
 
-      const serverMulti = redisClient.multi();
-      serverMulti.incr(serverKey);
-      serverMulti.expire(serverKey, 60);
-      const serverResult = await serverMulti.exec();
-
-      const serverRequestsCount = Number(serverResult[0]);
-
-      if (serverRequestsCount > serverLimit) {
-        const retryAfter = 60 - Math.floor((now % windowMs) / 1000);
-        res.setHeader("X-RateLimit-Limit", String(serverLimit));
+      if (!serverBucket.allowed) {
+        res.setHeader("X-RateLimit-Limit", String(options.serverLimit));
         res.setHeader("X-RateLimit-Remaining", "0");
-        res.setHeader("Retry-After", String(retryAfter));
+        res.setHeader("Retry-After", String(serverBucket.retryAfter));
 
         res.status(429).json({
           message: "Server rate limit exceeded. Please try again later.",
-          retryAfter,
+          retryAfter: serverBucket.retryAfter,
         });
         return;
       }
 
-      // 2. Client Rate Limit (Rolling Window)
-      if (identifier) {
-        const clientLimit = options.clientLimit;
-        const clientKey = `rate_limit:client:${options.keyPrefix}:${identifier}`;
-        const minTimestamp = now - windowMs;
+      const clientKey = `rate_limit:client:${options.keyPrefix}:${identifier}`;
+      const clientBucket = await consumeToken(clientKey, options.clientLimit);
 
-        const clientMulti = redisClient.multi();
-        clientMulti.zRemRangeByScore(clientKey, 0, minTimestamp);
-        // Pass array of objects for better compatibility
-        clientMulti.zAdd(clientKey, [
-          {
-            score: now,
-            value: `${now}-${Math.random()}`,
-          },
-        ]);
-        clientMulti.zCard(clientKey);
-        clientMulti.zRange(clientKey, 0, 0);
-        clientMulti.expire(clientKey, 60);
+      if (!clientBucket.allowed) {
+        res.setHeader("X-RateLimit-Limit", String(options.clientLimit));
+        res.setHeader("X-RateLimit-Remaining", "0");
+        res.setHeader("Retry-After", String(clientBucket.retryAfter));
 
-        const clientResult = await clientMulti.exec();
-        const clientRequestsCount = Number(clientResult[2]);
-        const oldestReqArray = clientResult[3] as unknown as string[];
-
-        const remaining = Math.max(0, clientLimit - clientRequestsCount);
-
-        if (clientRequestsCount > clientLimit) {
-          let retryAfter = 60;
-          if (oldestReqArray && oldestReqArray.length > 0) {
-            const firstReq = oldestReqArray[0];
-            if (firstReq) {
-              const oldestTime = parseFloat(firstReq.split("-")[0] || "0");
-              retryAfter = Math.ceil((oldestTime + windowMs - now) / 1000);
-            }
-          }
-
-          retryAfter = Math.max(1, retryAfter);
-
-          res.setHeader("X-RateLimit-Limit", String(clientLimit));
-          res.setHeader("X-RateLimit-Remaining", "0");
-          res.setHeader("Retry-After", String(retryAfter));
-
-          res.status(429).json({
-            message: "Client rate limit exceeded. Please wait.",
-            retryAfter,
-          });
-          return;
-        }
-
-        res.setHeader("X-RateLimit-Limit", String(clientLimit));
-        res.setHeader("X-RateLimit-Remaining", String(remaining));
+        res.status(429).json({
+          message: "Client rate limit exceeded. Please wait.",
+          retryAfter: clientBucket.retryAfter,
+        });
+        return;
       }
+
+      res.setHeader("X-RateLimit-Limit", String(options.clientLimit));
+      res.setHeader("X-RateLimit-Remaining", String(clientBucket.remaining));
 
       next();
     } catch (error) {
