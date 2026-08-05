@@ -9,7 +9,7 @@ import {
 } from "../config/errors";
 import { createMealParserProvider } from "../ai/factories/aiProviderFactory";
 import { MealParserService } from "../services/aiMealParserService";
-import { finalValidatedResult } from "../validators/mealParserValidator";
+import { finalValidatedResult } from "../validations/mealParserValidator";
 import { logger } from "../config/logger";
 export const parseMealText = async (req: AuthRequest, res: Response) => {
   if (!req.user?.id) {

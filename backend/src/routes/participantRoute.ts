@@ -12,25 +12,34 @@ import {
   deleteParticipantSchema,
   updateParticipantSchema,
 } from "../validators/participantSchema";
-
+import { createRateLimiter } from "../middlewares/rateLimiter";
 const router = Router();
+
+const participantRateLimiter = createRateLimiter({
+  clientLimit: 30,
+  serverLimit: 100,
+  keyPrefix: "participants",
+});
 
 router.get("/", protect, readParticipants);
 router.post(
   "/",
   protect,
+  participantRateLimiter,
   validateRequest(createParticipantSchema),
   createParticipant,
 );
 router.put(
   "/:participantId",
   protect,
+  participantRateLimiter,
   validateRequest(updateParticipantSchema),
   updateParticipant,
 );
 router.delete(
   "/:participantId",
   protect,
+  participantRateLimiter,
   validateRequest(deleteParticipantSchema),
   deleteParticipant,
 );

@@ -7,7 +7,7 @@ import { parseMealTextRequestSchema } from "../validators/parserSchema";
 const router = Router();
 
 const addMealRateLimiter = createRateLimiter({
-  clientLimit: 3,
+  clientLimit: 2,
   serverLimit: 5,
   keyPrefix: "add_meal",
 });
