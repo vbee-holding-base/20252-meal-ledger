@@ -5,7 +5,7 @@
     "module": "nodenext",
     "moduleResolution": "node16",
     "target": "es2022",
-    "types": ["node"],
+    "types": ["node", "vitest/globals"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
