@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "types": ["node"],
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "module": "ESNext",
+    "strict": true
+  },
+  "include": ["playwright.config.ts", "tests/e2e/**/*.ts"]
+}
